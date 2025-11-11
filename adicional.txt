@@ -1,0 +1,4 @@
+npm install express-async-handler para manejar mejor los errores en las peticiones en la bdd
+npm install express-validator para validar los datos de entrada (que la capacidad de un restaurante no sea un numero negativo por ejemplo)
+npm install multer para controlar la subida de imagenes
+Sharp (Recomendada): para el redimensionamiento
