@@ -2,4 +2,4 @@
 ./Back/.env
 ./Back/uploads
 ./Front/front/node_modules
-./Front/front/.env.local
+./Front/front/.env
