@@ -1,0 +1,8 @@
+#menu-toggle:not(:checked) {
+  width: 0 !important;
+  height: 0 !important;
+}
+#menu-toggle:checked {
+  width: 100vw !important;
+  height: 100vh !important;
+}

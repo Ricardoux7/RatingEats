@@ -1,2 +1,5 @@
 ./Back/node_modules
 ./Back/.env
+./Back/uploads
+./Front/front/node_modules
+./Front/front/.env.local

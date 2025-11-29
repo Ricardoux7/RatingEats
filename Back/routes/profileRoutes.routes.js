@@ -1,11 +1,13 @@
 import express from 'express';
 import { protect } from '../middlewares/authMiddleware.middlewares.js';
-const router = express.Router();
-router.get('/', protect, (req, res) => {
-    res.json({ 
-        msg: 'Acceso exitoso a la ruta privada',
-        user: req.user
-    });
-});
+import { getProfile, editProfile, addFavoriteRestaurants, removeFavoriteRestaurants, getFavoriteRestaurants, getReviews } from '../controllers/profileController.controllers.js';
 
-export default router;
+const ProfileRouter = express.Router();
+
+ProfileRouter.route('/').get(protect, getProfile).patch(protect, editProfile);
+ProfileRouter.route('/favorites').get(protect, getFavoriteRestaurants);
+ProfileRouter.route('/favorites/:restaurantId')
+    .post(protect, addFavoriteRestaurants)
+    .delete(protect, removeFavoriteRestaurants);
+ProfileRouter.route('/reviews').get(protect, getReviews);
+export default ProfileRouter;

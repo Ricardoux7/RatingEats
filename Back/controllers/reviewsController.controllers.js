@@ -34,15 +34,15 @@ const createReview = asyncHandler(async (req, res) => {
 
     } catch (error) {
         if (error.code === 11000) {
-            res.status(400);
-            throw new Error('You have already submitted a review for this restaurant.');
+            res.status(409);
+            throw new Error('You have already submitted a review for this restaurant');
         }
         throw error;
     }
 });
 const getReviewsByRestaurant = asyncHandler(async (req, res) => {
     const restaurantId = req.params.id;
-    const reviews = await Review.find({ restaurantId, deleted: false }).populate('userId', 'name');
+    const reviews = await Review.find({ restaurantId, deleted: false }).populate('userId', 'username');
     res.json(reviews);
 });
 const deleteReview = asyncHandler(async (req, res) => {

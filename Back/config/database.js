@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-mongoose.connect('mongodb://localhost:27017/rating_eats')
+dotenv.config();
+mongoose.connect(process.env.MONGODB_URI, {})
     .then(() => console.log('Conectado a MongoDB'))
     .catch(err => console.error('Error de conexión', err))
 

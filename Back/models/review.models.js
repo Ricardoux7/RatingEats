@@ -16,5 +16,7 @@ const reviewSchema = new mongoose.Schema({
     },
     deleted: { type: Boolean, default: false },
 }, { timestamps: true });
+
 reviewSchema.index({ restaurantId: 1, userId: 1 }, { unique: true });
+
 export const Review = mongoose.model('Review', reviewSchema);

@@ -91,8 +91,22 @@ const deleteRestaurant = asyncHandler(async (req, res) => {
 });
 
 const getAllRestaurants = asyncHandler(async (req, res) => {
-    const restaurants = await Restaurant.find({ isDeleted: false });
-    res.status(200).json(restaurants);
+    const page = parseInt(req.query.page) || 1; 
+    const limit = parseInt(req.query.limit) || 12; 
+    const skip = (page - 1) * limit; 
+    const baseFilter = { isDeleted: false };
+    const restaurants = await Restaurant.find(baseFilter)
+        .limit(limit)
+        .skip(skip);
+    const totalCount = await Restaurant.countDocuments(baseFilter);
+    const totalPages = Math.ceil(totalCount / limit);
+    res.status(200).json({
+        restaurants: restaurants,
+        page: page,
+        totalPages: totalPages,
+        totalCount: totalCount,
+        limit: limit
+    });
 });
 
 const uploadImage = asyncHandler(async (req, res) => {

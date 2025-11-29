@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
                 validator: function(v){
                     return /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*$/.test(v);
                 },
-                message: props => `${props.value} is not a valid name`
+                message: props => `${props.value} is not a valid name, It must contain only letters.`
             }
         },
         lastName: {
@@ -44,10 +44,13 @@ const userSchema = new mongoose.Schema({
         },
         password: {
             type: String,
-            required: true,
+            required: function() {
+                return this.isNew; 
+            },
             minlength: 8,
             validate: {
                 validator: function(v){
+                    if (!this.isModified('password')) return true;
                     return RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/).test(v);
                 },
                 message: props => `Password must be 8-20 characters long, include uppercase and lowercase letters, a number, and a special character.`
@@ -56,18 +59,21 @@ const userSchema = new mongoose.Schema({
         username: {
             type: String,
             required: true,
-            unique: true,
+            unique: { value: true, message: 'Username already in use' },
             trim: true,
-            minlength: 4,
-            maxlength: 20,
-            match: [/^[a-z0-9]{4,20}$/, 'El nombre de usuario solo puede contener minúsculas y números (4-20 caracteres).']
+            validate: {
+                validator: function(v){
+                    return RegExp(/^[a-z0-9]{4,20}$/).test(v);
+                },
+                message: props => `Username ${props.value} is not valid. It should contain only lowercase letters and numbers (4-20 characters).`
+                
+            }
         },
         favoriteRestaurants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant' }],
         reservations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reservation' }],
         biography: {
             type: String,
-            maxlength: 500,
-            minlength: 5
+            maxlength: 500
         },
         deleted: { type: Boolean, default: false }
 }, { timestamps: true });

@@ -3,21 +3,29 @@ import { User } from '../models/users.models.js';
 import asyncHandler from 'express-async-handler'; 
 
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+};
+
+const extractMongooseErrorMessage = (err) => {
+    if (err.code === 11000) {
+        const field = Object.keys(err.keyPattern)[0];
+        let capitalizedField = field.charAt(0).toUpperCase() + field.slice(1);
+        if (capitalizedField === 'Lastname') {
+            capitalizedField = 'Last Name';
+        }
+    return [`${capitalizedField} is already in use.`];
+    }
+    if (err.name === 'ValidationError') {
+        const errors = Object.values(err.errors).map((e) => e.message);
+        return errors;
+    }
+    return ['An unexpected error occurred during registration.'];
 };
 
 const registerUser = asyncHandler(async (req, res) => { 
     const { name, lastName, email, password, username } = req.body;
-    let userExists = await User.findOne({ $or: [{ email }, { username }] });
-    
-    if (userExists) {
-        res.status(400); 
-        throw new Error('Email or username already in use'); 
-    }
-    
-    const newUser = await User.create({ name, lastName, email, password, username });
-
-    if (newUser) {
+    try {
+        const newUser = await User.create({ name, lastName, email, password, username });
         const token = generateToken(newUser._id);
         res.status(201).json({
             _id: newUser._id,
@@ -26,9 +34,10 @@ const registerUser = asyncHandler(async (req, res) => {
             username: newUser.username,
             token,
         });
-    } else {
-        res.status(400);
-        throw new Error('Invalid user data');
+    } catch (error) {
+        const errors = extractMongooseErrorMessage(error);
+        res.status(400).json({ errors });
+        return;
     }
 });
 
@@ -43,6 +52,7 @@ const loginUser = asyncHandler(async (req, res) => {
             _id: user._id,
             name: user.name,
             email: user.email,
+            role: user.role,
             token,
         });
     } else {
