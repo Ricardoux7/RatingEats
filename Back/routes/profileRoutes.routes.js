@@ -1,6 +1,6 @@
 import express from 'express';
 import { protect } from '../middlewares/authMiddleware.middlewares.js';
-import { getProfile, editProfile, addFavoriteRestaurants, removeFavoriteRestaurants, getFavoriteRestaurants, getReviews } from '../controllers/profileController.controllers.js';
+import { getProfile, editProfile, addFavoriteRestaurants, removeFavoriteRestaurants, getFavoriteRestaurants, getReviews, getMyRestaurants } from '../controllers/profileController.controllers.js';
 
 const ProfileRouter = express.Router();
 
@@ -10,4 +10,6 @@ ProfileRouter.route('/favorites/:restaurantId')
     .post(protect, addFavoriteRestaurants)
     .delete(protect, removeFavoriteRestaurants);
 ProfileRouter.route('/reviews').get(protect, getReviews);
+ProfileRouter.route('/:userId/my-restaurants').get(protect, getMyRestaurants);
+
 export default ProfileRouter;

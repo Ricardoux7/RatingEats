@@ -30,7 +30,6 @@ svg {
  transform-origin: center;
  animation: rotate4 2s linear infinite;
 }
-
 circle {
  fill: none;
  stroke: hsl(214, 97%, 59%);

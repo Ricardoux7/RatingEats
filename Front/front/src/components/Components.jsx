@@ -1,22 +1,40 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 
-const HeaderMobile = () => {
+const HeaderMobile = ({ tab, setTab }) => {
   const navigate = useNavigate();
-  return <header className="h-20 justify-between top-0 left-0 right-0 flex  p-4 border-gray-300 bg-white items-center display md:hidden">
-    <div>
-      <img src="../icons/hamburger.svg" alt="menu-hamburger" className="h-[50px]" />
-    </div>
-    <div>
-      <img src="../icons/logo2.png" alt="RatingEats" className="h-20" onClick={() => navigate('/')} />
-    </div>
-    <div>
-      <img src="../icons/user.svg" alt="user-icon" className="h-[50px]" />
-    </div>
-  </header>
+  return (
+    <header className="h-20 justify-between top-0 left-0 right-0 flex flex-col p-4 border-gray-300 bg-white items-center md:hidden">
+      <div className="w-full flex flex-row justify-between items-center">
+        <img src="../icons/hamburger.svg" alt="menu-hamburger" className="h-[50px]" />
+        <img src="../icons/logo2.png" alt="RatingEats" className="h-20" onClick={() => navigate('/')} />
+        <img src="../icons/user.svg" alt="user-icon" className="h-[50px]" />
+      </div>
+      {tab && setTab && (
+        <div className="flex justify-center gap-4 mt-2 w-full">
+          <button
+            className={tab === 'general'
+              ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
+              : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
+            onClick={() => setTab('general')}
+          >
+            General
+          </button>
+          <button
+            className={tab === 'posts'
+              ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
+              : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
+            onClick={() => setTab('posts')}
+          >
+            Posts
+          </button>
+        </div>
+      )}
+    </header>
+  );
 }
 
-const HeaderDesktop = () => {
+const HeaderDesktop = ( { tab, setTab } ) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef();
@@ -35,15 +53,35 @@ const HeaderDesktop = () => {
     };
   }, [showMenu]);
 
-  return <header className="h-20 justify-between top-0 left-0 right-0 p-4 border-gray-300 bg-white items-center hidden md:flex">
-    <div>
-      <img src="../icons/logo2.png" alt="RatingEats" className="h-20 cursor-pointer" onClick={() => setShowMenu(!showMenu)} />
-    </div>
-    <div className='relative' ref={menuRef}>
-      <img src="../icons/user.svg" alt="user-icon" className="h-10" onClick={() => setShowMenu(!showMenu)}/>
-      {showMenu && <UserMenu onClose={() => setShowMenu(false)} />}
-    </div>
-  </header>
+  return <header className="h-20 justify-between top-0 left-0 right-0 p-4 border-gray-300 bg-white items-center hidden md:flex flex-row">
+      <div className="w-full flex flex-row justify-between items-center">
+        <img src="../icons/logo2.png" alt="RatingEats" className="h-20 cursor-pointer" onClick={() => navigate('/')} />
+      </div>
+      {tab && setTab && (
+        <div className="flex justify-start gap-6 mt-2 w-full">
+          <button
+            className={tab === 'general'
+              ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
+              : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
+            onClick={() => setTab('general')}
+          >
+            General
+          </button>
+          <button
+            className={tab === 'posts'
+              ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
+              : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
+            onClick={() => setTab('posts')}
+          >
+            Posts
+          </button>
+        </div>
+      )}
+        <div className='relative ml-40' ref={menuRef}>
+          <img src="../icons/user.svg" alt="user-icon" className="h-20" onClick={() => setShowMenu(!showMenu)}/>
+          {showMenu && <UserMenu onClose={() => setShowMenu(false)} />}
+        </div>
+    </header>
 }
 
 const SearchBarMobile = () => {
@@ -78,10 +116,9 @@ const SearchBarDesktop = () => {
         <div className="relative w-full">
           <input
             type="text"
-            className='h-12 w-full pl-10 pr-15 border border-[#DEE1E6]  focus:outline-none focus:ring-2 focus:ring-green-500 rounded-l-4xl rounded-r-4xl text-black'
+            className='h-12 w-full pl-5 pr-15 border border-[#DEE1E6] focus:outline-none focus:ring-2 focus:ring-green-500 rounded-l-4xl rounded-r-4xl text-black'
             placeholder="Search by name, categories..."
           />
-          <img src="../icons/magnifying-glass-bar.svg" alt="search-icon" className="absolute h-6 w-6" />
           <button className="h-12 w-[50px] bg-[#258A00] rounded-xl flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 rounded-l-4xl rounded-r-4xl">
             <img src="../icons/magnifying-glass-v2.svg" alt="search-icon" className="h-[70%] w-[80%]" />
           </button>
@@ -147,14 +184,18 @@ const HeaderProfile = ({ title, setTitle, name }) => {
   );
 }
 
-const HeaderProfileDesktop = ({ name }) => {
+const HeaderProfileDesktop = ({ title, setTitle }) => {
   const navigate = useNavigate();
   return (
-    <header className="h-20 top-0 left-0 p-4 border-gray-300  items-center justify-start md:flex hidden">
-      <div className='flex flex-row gap-25 items-center ml-[7%]'>
-        <button className='transition-transform duration-300 text-left h-[30px] rounded-md text-[#2DA800] flex items-center justify-center w-full text-[2rem] font-bold'>Profile</button>
-        <button className='transition-transform duration-300 text-left h-[30px] rounded-md text-[#2DA800] flex items-center justify-center w-full text-[2rem] font-bold'>Reviews</button>
-        <button className='transition-transform duration-300 text-left h-[30px] rounded-md text-[#2DA800] flex items-center justify-center w-full text-[2rem] font-bold'>Restaurants</button>
+    <header className="h-20 max-h-screen top-0 left-0 p-4 border-gray-300  items-center justify-start md:flex hidden">
+      <div className='grid grid-cols-[300px_1fr] '>
+        <img src="../icons/logo2.png" alt="logo" className="w-70 object-contain mt-8 cursor-pointer" onClick={() => navigate('/')}/>
+        <div className='flex justify-end gap-6 items-center w-full'>
+          <button className={title === 'My Profile' ? 'text-[#2DA800] h-[30px] text-[2rem] font-semibold cursor-pointer' : 'text-[#171A1F] h-[30px] rounded-md text-[2rem] font-semibold cursor-pointer'} onClick={() => setTitle('My Profile')}>My Profile</button>
+          <button className={title === 'My Reviews' ? 'text-[#2DA800] h-[30px] text-[2rem] font-semibold cursor-pointer' : 'text-[#171A1F] h-[30px] rounded-md text-[2rem] font-semibold cursor-pointer'} onClick={() => setTitle('My Reviews')}>My Reviews</button>
+          <button className={title === 'My Restaurants' ? 'text-[#2DA800] h-[30px] text-[2rem] font-semibold cursor-pointer' : 'text-[#171A1F] h-[30px] rounded-md text-[2rem] font-semibold cursor-pointer'} onClick={() => setTitle('My Restaurants')}>My Restaurants</button>
+          
+        </div>
       </div>
     </header>
   );

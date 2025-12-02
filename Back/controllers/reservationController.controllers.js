@@ -58,6 +58,14 @@ const getReservationsToRestaurant = asyncHandler(async (req, res) => {
     res.status(200).json(reservations);
 });
 
+const getReservationsToManage = asyncHandler(async (req, res) => {
+    const restaurantId = req.params.restaurantId;
+    const reservations = await Reservation.find({ restaurantId, state: 'pending' })
+        .sort({ dateReservation: 1, time: 1 })
+        .populate('userId', 'customerName phoneNumber');
+    res.status(200).json(reservations);
+})
+
 const confirmReservation = asyncHandler(async (req, res) => {
     const reservationId = req.params.reservationId;
     const reservation = await Reservation.findOneAndUpdate(
@@ -157,4 +165,4 @@ const markAsCompleted = asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Reservation successfully completed.', reservation });
 });
 
-export { createReservation, getReservationsToUser, getReservationsToRestaurant, confirmReservation, rejectReservation, cancelReservation, markAsCompleted };
+export { createReservation, getReservationsToUser, getReservationsToRestaurant, confirmReservation, rejectReservation, cancelReservation, markAsCompleted, getReservationsToManage };

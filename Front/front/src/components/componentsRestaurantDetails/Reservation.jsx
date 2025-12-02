@@ -93,7 +93,7 @@ const CreateReservation = () => {
         </div>
       </div>
     )}
-    <div className='flex flex-col md:hidden items-center justify-center w-full bg-[#ECFFE6] p-4'>
+    <div className='flex flex-col md:hidden items-center justify-center w-full bg-[#ECFFE6] p-4 '>
       <h2 className='font-bold text-4xl self-start text-[#171A1F] mb-4'>Make a reservation</h2>
       <form onSubmit={handleReservationSubmit} className='w-full flex flex-col gap-4'>
         <label className='flex flex-col'>
@@ -158,10 +158,10 @@ const CreateReservation = () => {
       </form>
     </div>
     <div>
-      <div className='hidden md:flex flex-col items-center justify-center w-full h-auto bg-white p-4 sticky top-8 z-10 border-b mx-auto border-gray-300'>
+      <div className='hidden md:flex flex-col items-center justify-center w-full h-auto gap-5 bg-white p-4 sticky top-8 z-10 border-b mx-auto border-gray-300'>
         <h2 className='font-bold text-4xl text-[#171A1F] mb-4'>Make a reservation</h2>
         <p className='text-2xl justify-center'>Secure your spot for a delightful dining experience.</p>
-        <form onSubmit={handleReservationSubmit} className='w-full flex flex-col gap-4'>
+        <form onSubmit={handleReservationSubmit} className='w-full max-w-lg flex flex-col gap-4 mx-auto'>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Date:</p>
             <input

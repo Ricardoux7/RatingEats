@@ -7,44 +7,44 @@ import path from 'path';
 const createPost = asyncHandler(async (req, res) => {
     const uploadedFile = req.file;
     try{
-            const restaurantId = req.params.id || req.params.restaurantId;
-    const { content } = req.body;
-    const authorUserId = req.user._id;
-    const userRole = req.user.role; 
-    const userRestaurantId = req.user.restaurantId;
+         const restaurantId = req.params.id || req.params.restaurantId;
+        const { content } = req.body;
+        const authorUserId = req.user._id;
+        const userRole = req.user.role; 
+        const userRestaurantId = req.user.restaurantId;
 
-    if (!uploadedFile || !uploadedFile.filename) {
-        res.status(400);
-        throw new Error('Image is required');
-    }
-    const restaurant = await Restaurant.findOne({ _id: restaurantId, isDeleted: false });
-    if (!restaurant) {
-        res.status(404);
-        throw new Error('Restaurant not found');
-    }
+        if (!uploadedFile || !uploadedFile.filename) {
+            res.status(400);
+            throw new Error('Image is required');
+        }
+        const restaurant = await Restaurant.findOne({ _id: restaurantId, isDeleted: false });
+        if (!restaurant) {
+            res.status(404);
+            throw new Error('Restaurant not found');
+        }
 
-    const image = {
-        url: '/uploads/posts/' + uploadedFile.filename,
-        alt: content ? content.substring(0, 200) : 'Post image',
-        size: uploadedFile.size
-    }
-    const isOperatorOfDestination = (userRole === 'owner' || userRole === 'operator') && (String(userRestaurantId) === String(restaurantId));
-    let postState = isOperatorOfDestination ? 'accepted' : 'pending';
+        const image = {
+            url: '/uploads/posts/' + uploadedFile.filename,
+            alt: content ? content.substring(0, 200) : 'Post image',
+            size: uploadedFile.size
+        }
+        const isOperatorOfDestination = (userRole === 'owner' || userRole === 'operator') && (String(userRestaurantId) === String(restaurantId));
+        let postState = isOperatorOfDestination ? 'accepted' : 'pending';
 
-    const post = new Post({
-        authorUserId: authorUserId, 
-        authorRestaurantId: restaurantId,
-        image: image,
-        content: content || '',
-        state: postState
-    });
+        const post = new Post({
+            authorUserId: authorUserId, 
+            authorRestaurantId: restaurantId,
+            image: image,
+            content: content || '',
+            state: postState
+        });
 
-    await post.save();
-    await Restaurant.findOneAndUpdate({ _id: restaurantId }, { $push: { posts: post._id } });
-    
-    const message = postState === 'accepted' ? 'Post created successfully' : 'Post created successfully and is pending approval';
+        await post.save();
+        await Restaurant.findOneAndUpdate({ _id: restaurantId }, { $push: { posts: post._id } });
+        
+        const message = postState === 'accepted' ? 'Post created successfully' : 'Post created successfully and is pending approval';
 
-    res.status(201).json({ message: message, post });
+        res.status(201).json({ message: message, post });
     }
     catch (error) {
         if (uploadedFile) {
@@ -92,8 +92,9 @@ const acceptPost = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Cannot accept a rejected post.');
     }
-    if (res.user.state === 'rejected'){
+    if (req.user.state === 'rejected') {
         res.status(403);
+        throw new Error('User is rejected and cannot accept posts.');
     }
     post.state = 'accepted';
     await post.save();
@@ -171,4 +172,14 @@ const deletePost = asyncHandler(async (req, res) => {
     res.status(204).send(); 
 });
 
-export { createPost, getPostsByRestaurant, acceptPost, rejectPost, deletePost };
+const getPendingPosts = asyncHandler(async (req, res) => {
+    const restaurantId = req.params.restaurantId;
+    const posts = await Post.find({authorRestaurantId: restaurantId, state: 'pending'}).populate('authorUserId', 'username');
+    if (!posts) {
+        res.status(404);
+        throw new Error('No pending posts found for this restaurant.');
+    }
+    res.status(200).json(posts);
+})
+
+export { createPost, getPostsByRestaurant, acceptPost, rejectPost, deletePost, getPendingPosts };

@@ -22,14 +22,17 @@ const postSchema = new mongoose.Schema({
     deleted: { 
         type: Boolean, 
         default: false 
-    }
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 }, {
     validate: {
         validator: function () {
             return !!(this.authorUserId || this.authorRestaurantId);
         },
         message: 'The post must be made by a user or a restaurant.'
-    }
+    },
+    timestamps: true
 });
 
 export default mongoose.model('Post', postSchema);

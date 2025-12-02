@@ -5,6 +5,7 @@ import api from '../api/api';
 import { HeaderProfile, HeaderProfileDesktop } from '../components/Components.jsx';
 import  EditProfile  from '../components/Profile/EditProfile.jsx';
 import  MyReviews from '../components/Profile/MyReviews.jsx';
+import MyRestaurants from '../components/Profile/MyRestaurants.jsx';
 
 const Profile = () => {
   const { id } = useParams();
@@ -114,7 +115,8 @@ const Profile = () => {
         {title === 'My Reviews' && <MyReviews user={userData} />}
       </section>
       <section className='hidden md:block'>
-        <HeaderProfileDesktop />
+        <HeaderProfileDesktop title={title} setTitle={setTitle} name={userData ? `${userData.name ?? ''} ${userData.lastName ?? ''}` : ''} className='cursor-pointer' />
+        {title === 'My Profile' &&
         <div className='md:grid grid-cols-[350px_1fr]'>
           <div className='left-0 h-full w-full flex flex-col items-center'>
             <img src="../icons/user.svg" alt="user" className='rounded-full w-50 h-50 bg-gray-200 mt-10' />
@@ -124,9 +126,10 @@ const Profile = () => {
               <img src="../icons/calendar.svg" alt="calendar" className='w-10' />
               <p>joined on {userData ? userData.createdAt.slice(0, 10) : 'Unknown'}</p>
             </div>
-            <button className='border border-gray-400 rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-[#45484C]'><img src="../icons/pencil.svg" alt="edit" className='w-5' />Edit Profile</button>
+            <button className={showEdit ? "border border-red-500 rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-red-500 cursor-pointer" : "border border-[#2DA800] rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-[#2DA800] cursor-pointer"} onClick={() => setShowEdit(!showEdit)}><img src={showEdit ? "../icons/close.svg" : "../icons/pencil.svg"} alt="edit" className='w-5'/>{showEdit ? 'Close' : 'Edit Profile'}</button>
           </div>
           <div className='mt-20'>
+            {showEdit && <EditProfile id={userData._id} user={userData} onClose={() => setShowEdit(false)} />}
             <p className='text-[2rem] font-bold'>About {userData ? userData.name : ''}</p>
             <p className='text-[#45484C] text-[1.5rem]'>{userData ? userData.biography : ''}</p>
             <div>
@@ -151,6 +154,14 @@ const Profile = () => {
             </div>
           </div>
       </div>
+      }
+      {title === 'My Reviews' && <MyReviews user={userData} />}
+      </section>
+      <section className='hidden md:block'>
+      {title === 'My Restaurants' && <MyRestaurants user={userData} />}
+      </section>
+      <section className='block md:hidden'>
+      {title === 'My Restaurants' && <MyRestaurants user={userData} />}
       </section>
     </>
   )

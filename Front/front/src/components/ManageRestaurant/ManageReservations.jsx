@@ -1,0 +1,126 @@
+import api from '../../api/api';
+import { useState, useEffect, useParams } from 'react';
+import { useAuth } from '../../context/AuthContext.jsx';
+
+const ManageReservations = ({ restaurantId }) => {
+  const { user } = useAuth();
+  const [reservations, setReservations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
+
+  const fetchReservations = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get(`/reservations/manage/${restaurantId}`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setReservations(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Coulnt fetch reservations. Please try again later.');
+    } finally {
+      setIsLoading(false);
+      setFirstLoad(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, [user.token, restaurantId]);
+
+  const acceptReservation = async (reservationId) => {
+    try {
+      await api.patch(`reservations/${reservationId}/confirm`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      fetchReservations();
+      setPopupMessage('Reservation accepted successfully.');
+      setShowPopup(true);
+      setTimeout(() => {
+        setShowPopup(false);
+        setPopupMessage('');
+      }, 2000);
+    } catch (err) {
+      console.error('Error accepting reservation:', err);
+    }
+  };
+
+  const rejectReservation = async (reservationId) => {
+    try {
+      await api.patch(`reservations/${reservationId}/reject`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      fetchReservations();
+      setPopupMessage('Reservation rejected successfully.');
+      setShowPopup(true);
+      setTimeout(() => {
+        setShowPopup(false);
+        setPopupMessage('')}, 2000);
+    } catch (err) {
+      console.error('Error rejecting reservation:', err);
+    }
+  };
+  
+  const ReservationPopup = ({ message }) => (
+    <div className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+      {message}
+    </div>
+  );
+
+  return ( 
+  <div className="p-5 font-sans">
+    {firstLoad ? (
+      <p className="text-center text-gray-600">Loading...</p>    
+    ) : error ? (
+      <p className="text-center text-red-500">{error}</p>
+    ) : (
+      <div className='w-full'>
+        {isLoading && (
+            <p className="text-center text-gray-400 text-sm">Updating...</p>
+          )}
+        <h2 className="text-2xl font-bold mb-4">Pending reservations</h2>
+        <div className='border border-[#258A00] rounded-2xl p-4 mt-8 bg-white '>
+          {reservations.length === 0 ? (
+            <p className="text-center text-gray-600">No reservations found.</p>
+          ) : (
+            <table className='min-w-full table-fixed text-left'>
+              <thead className=''>
+                <tr>
+                  <th className="w-1/5">Customer Name</th>
+                  <th className="w-1/5">Date</th>
+                  <th className="w-1/5">Time</th>
+                  <th className="w-1/5">Guests</th>
+                  <th className="w-1/5">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservations.map((reservation) => (
+                  <tr key={reservation._id} className="border-b border-gray-200">
+                    <td className="text-gray-600 w-1/5">{reservation.customerName}</td>
+                    <td className="text-gray-600 w-1/5">{reservation.dateReservation.slice(0, 10)}</td>
+                    <td className="text-gray-600 w-1/5">{reservation.time}</td>
+                    <td className="text-gray-600 w-1/5">{reservation.numberOfGuests}</td>
+                    <td className='flex gap-2'><button className='bg-[#258A00] text-white p-2 rounded' onClick={() => acceptReservation(reservation._id)}>Accept</button>
+                      <button className='bg-red-500 text-white p-2 rounded' onClick={() => rejectReservation(reservation._id)}>Reject</button>
+                    </td>
+                  </tr>
+              ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        {showPopup && <ReservationPopup message={popupMessage} />}
+      </div>
+    )}
+  </div>);
+};
+export default ManageReservations;

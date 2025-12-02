@@ -68,7 +68,7 @@ const Reviews = () => {
   }
 
   return (
-    <div className="w-full md:w-[60%] md:ml-4 px-2 md:px-0 py-4">
+    <div className="w-full md:w-[90%] md:ml-4 px-2 md:px-0 py-4">
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-opacity-90 z-50 ">
           <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center gap-4 text-center">
@@ -91,8 +91,8 @@ const Reviews = () => {
         <div>
           <form onSubmit={leaveReview} className='bg-gray-100 my-6 flex flex-col gap-10 w-full h-auto items-center rounded-xl'>
             <div className="flex flex-col ml-2 w-full">
-              <label htmlFor="rating" className='font-bold mb-1 text-[#171A1F] text-[2rem]'>Write a review</label>
-              <div className="flex gap-1">
+              <label htmlFor="rating" className='font-bold mb-1 text-[#171A1F] text-[2rem] ml-4'>Write a review</label>
+              <div className="flex gap-1 ml-4">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     type="button"
