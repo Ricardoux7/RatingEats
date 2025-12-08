@@ -36,9 +36,7 @@ const hasRestaurantRole = (requiredRoles, idParamName = 'id') => asyncHandler(as
         res.status(500);
         throw new Error("Missing restaurant ID in request parameters.");
     }
-
     const businessUser = await BusinessUser.findOne({ user: userId, restaurant: restaurantId });
-
     if (!businessUser) {
         res.status(403);
         throw new Error('You have no permission to manage this restaurant');

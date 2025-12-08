@@ -1,11 +1,5 @@
 import mongoose from "mongoose";
 
-const scheduleItemSchema = new mongoose.Schema({
-    day: { type: String, required: true },
-    open: { type: String, required: true },
-    close: { type: String, required: true },
-})
-
 const imagesSchema = new mongoose.Schema({
     url: {
         type: String,
@@ -73,13 +67,16 @@ const restaurantSchema = new mongoose.Schema({
         }
     },
     schedule: {
-        type: [scheduleItemSchema],
+        type: String,
         required: true,
+        trim: true,
+        minlength: 3,
+        maxlength: 200,
         validate: {
-            validator: function(v) {
-                return Array.isArray(v) && v.length > 0;
+            validator: function(v){
+                return typeof v === 'string' && v.length >= 3 && v.length <= 200;
             },
-            message: props => `Schedule must be a non-empty array of objects with day, open, and close properties`
+            message: props => `Schedule must be a string between 3 and 200 characters`
         }
     },
     capacity: {

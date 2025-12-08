@@ -37,10 +37,10 @@ const MyReviews = ({ user }) => {
           {reviews.map((review) => (
             <div
               key={review._id}
-              className="border border-[#258A00] rounded-lg p-4 bg-white w-[80%]"
+              className="border border-[#258A00] rounded-lg p-4 bg-white w-full"
             >
               <div className='flex justify-between items-start'>
-                <div className='flex flex-row text-2xl gap-1'>
+                <div className='flex flex-row flex-wrap text-2xl gap-1 w-1/2'>
                   <p className="mb-2 text-[2rem] font-normal text-[#171A1F]">{review.restaurantId?.name}</p>
                   {Array.from({ length: 5 }).map((_, i) => (
                     i < Math.round(review.rating) ? (
@@ -50,7 +50,7 @@ const MyReviews = ({ user }) => {
                     )
                   ))}
                 </div>
-                <button className='text-[#B70000] flex items-center gap-1 border-2 border-[#D9D9D9] rounded-lg p-2 font-semibold'><img src="../icons/delete.svg" alt="delete" className='w-6' /> Delete</button>
+                <button className='text-[#B70000] flex items-center gap-1 border-2 border-[#D9D9D9] rounded-lg p-2 font-semibold truncate'><img src="../../icons/delete.svg" alt="delete" className='w-6' /> Delete</button>
               </div>
               <p className="mb-2 text-[1rem] text-[#171A1F]">{review.comment}</p>
               <p className="mb-2 text-[1rem]">

@@ -22,7 +22,7 @@ const createRestaurant = asyncHandler(async (req, res) => {
             capacity,
             email,
             phoneNumber,
-            ownerId,
+            ownerId: ownerId,
         });
         const businessUser = await BusinessUser.create({
             user: ownerId,
@@ -48,29 +48,42 @@ const getRestaurant = asyncHandler(async (req, res) => {
 });
 
 const updateRestaurant = asyncHandler(async (req, res) => {
-    const { name, description, adress, categories, geoLocation, schedule, capacity, email, phoneNumber } = req.body;
+    const restaurantId = req.params.id;
     const restaurant = await Restaurant.findOne({
-        _id: req.params.id,
+        _id: restaurantId,
         isDeleted: false 
     });
-    if (restaurant) {
-        restaurant.name = name || restaurant.name;
-        restaurant.description = description || restaurant.description;
-        restaurant.adress = adress || restaurant.adress;
-        restaurant.categories = categories || restaurant.categories;
-        restaurant.geoLocation = geoLocation || restaurant.geoLocation;
-        restaurant.schedule = schedule || restaurant.schedule;
-        restaurant.capacity = capacity || restaurant.capacity;
-        restaurant.email = email || restaurant.email;
-        restaurant.phoneNumber = phoneNumber || restaurant.phoneNumber;
-
-        const updatedRestaurant = await restaurant.save();
-        res.status(200).json(updatedRestaurant);
-
-    } else{ 
+    if(!restaurant){ 
         res.status(404);
         throw new Error('Restaurant not found');
     }
+    const fields = [ 'name', 'description', 'adress', 'categories', 'schedule', 'capacity', 'phoneNumber' ];
+    const updates = {};
+    for (const field of fields) {
+        const newValue = req.body[field];
+        const oldValue = restaurant[field];
+        if (newValue === undefined || newValue === '') continue;
+        if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+            if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+                updates[field] = newValue;
+            }
+        }
+        else if (typeof oldValue === 'number') {
+            if (Number(newValue) !== oldValue) {
+                updates[field] = newValue;
+            }
+        }
+        else if (newValue !== oldValue) {
+            updates[field] = newValue;
+        }
+    }
+    if (Object.keys(updates).length === 0) {
+        res.status(400);
+        throw new Error('No changes detected to update.');
+    }
+
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(restaurantId, { $set: updates }, { new: true, runValidators: true });
+    res.status(200).json(updatedRestaurant);
 });
 
 const deleteRestaurant = asyncHandler(async (req, res) => {
@@ -221,4 +234,37 @@ const deleteOperator = asyncHandler(async (req, res) => {
     res.status(204).send();
 });
 
-export { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, addOperator, deleteOperator };
+const getRestaurantsToManage = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const restaurantId = req.params.id;
+    console.log(userId, restaurantId);
+        if (!userId) {
+        console.log('userId missing');
+        res.status(401);
+        throw new Error('User not authenticated');
+    }
+
+    if (!restaurantId) {
+        console.log('restaurantId missing');
+        res.status(400);
+        throw new Error('Restaurant ID is required');
+    }
+
+    const businessUser = await BusinessUser.findOne({
+        user: userId,
+        restaurant: restaurantId
+    }).populate('restaurant');
+    console.log('businessUser:', businessUser);
+    if (businessUser) {
+        res.status(200).json(businessUser.restaurant);
+        console.log('Access granted to manage restaurant');
+    } else {
+        console.log('Access denied to manage restaurant');
+        res.status(403);
+        throw new Error('No management rights for this restaurant');
+    }
+    console.log('userId:', userId);
+console.log('restaurantId:', restaurantId);
+})
+
+export { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, addOperator, deleteOperator, getRestaurantsToManage  };

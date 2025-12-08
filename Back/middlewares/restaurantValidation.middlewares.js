@@ -46,7 +46,8 @@ const restaurantValidationRules = [
 
     body('schedule')
         .notEmpty().withMessage('Schedule is required.')
-        .isArray({ min: 1 }).withMessage('Schedule must be an array with at least one scheduled day.'),
+        .isString().withMessage('Schedule must be a string.')
+        .isLength({ min: 3, max: 200 }).withMessage('Schedule must be between 3 and 200 characters.'),
 
     body('adress')
         .notEmpty().withMessage('Adress is required.')
@@ -61,21 +62,21 @@ const updateRestaurantValidationRules = [
     body('name')
         .optional()
         .trim()
-        .isLength({ min: 3, max: 80 }).withMessage('El nombre debe tener entre 3 y 80 caracteres.'),
+        .isLength({ min: 3, max: 80 }).withMessage('Name must be between 3 and 80 characters.'),
 
     body('email')
         .optional()
-        .isEmail().withMessage('El formato de email no es válido.')
+        .isEmail().withMessage('Invalid email format.')
         .normalizeEmail(),
 
     body('phoneNumber')
         .optional()
         .matches(/^(\+58[\s-]?)?(0?4(1[2-9]|2[0-9]|3[0-9]|4[0-8])[\s-]?[0-9]{3}[\s-]?[0-9]{4})$/)
-        .withMessage('El formato del número de teléfono no es válido (ej. 0412xxxxxxx).'),
+        .withMessage('The phone number format is invalid (e.g. 0412xxxxxxx) and must have at least 11 characters.'),
 
     body('capacity')
         .optional()
-        .isInt({ min: 1, max: 150 }).withMessage('La capacidad debe ser un número entero entre 1 y 150.'),
+        .isInt({ min: 1, max: 150 }).withMessage('Capacity must be an integer between 1 and 150.'),
 
     body('categories')
         .optional()
@@ -87,12 +88,13 @@ const updateRestaurantValidationRules = [
 
     body('schedule')
         .optional()
-        .isArray({ min: 1 }).withMessage('Schedule must be an array with at least one scheduled day.'),
+        .isString().withMessage('Schedule must be a string.')
+        .isLength({ min: 3, max: 200 }).withMessage('Schedule must be between 3 and 200 characters.'),
 
     body('adress')
         .optional()
         .trim()
-        .isLength({ min: 5, max: 200 }).withMessage('La dirección debe tener entre 5 y 200 caracteres.'),
+        .isLength({ min: 5, max: 200 }).withMessage('Address must be between 5 and 200 characters.'),
 
 ];
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
-import SkeletonsMainPage from "../components/SkeletonsMainPage.jsx";
+import { SkeletonsMainPage } from "../components/SkeletonsMainPage.jsx";
 import { useNavigate } from "react-router-dom";
-
+import Maps from "../components/Maps.jsx";
+import Switch from "../components/FavoriteButton.jsx";
 const MainPage = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -11,6 +12,7 @@ const MainPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filter, setFilter] = useState(null);
+  const [favorites, setFavorites] = useState([]);
   const limit = 10;
   const { user } = useAuth();
 
@@ -37,6 +39,47 @@ const MainPage = () => {
     fetchRestaurants();
   }, [page, user]);
 
+  useEffect(() => {
+    const fetchFavorites = async () => {
+    if(user){
+      try {
+        const response = await api.get(`/profile/favorites`);
+        setFavorites(response.data);
+      } catch (err) {
+        console.error("Couldnt fetch favorite restaurants.");
+      }
+    }
+    };
+    fetchFavorites();
+  }, [user]);
+
+  const handleFavoriteToggle = async (restaurantId) => {
+    if (!user) {
+      alert("You need to be logged in to manage favorites.");
+      return;
+    }
+    try {
+      const isFavorite = favorites.some(fav => fav._id === restaurantId);
+      if (isFavorite) { 
+        await api.delete(`profile/favorites/${restaurantId}`);
+        setFavorites(favorites.filter(fav => fav._id !== restaurantId));
+      } else {
+        await api.post(`profile/favorites/${restaurantId}`);
+        setFavorites([...favorites, { _id: restaurantId }]);
+      }
+    } catch (err) {
+      console.error("Error updating favorites:", err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          alert("You need to be logged in to manage favorites.");
+        } else {
+          alert("An error occurred while updating favorites. Please try again.");
+    }
+      }
+    }
+  }
+
+
   const filteredRestaurants = filter
     ? restaurants.filter((restaurant) =>
         restaurant.categories.includes(filter)
@@ -55,12 +98,6 @@ const MainPage = () => {
     }
   };
 
-  /*const addToFavorites = async (restaurantId) => {
-    try {
-      await api.post()
-    }
-  };*/
-
   const getRestaurantId = (restaurant) => {
     return restaurant._id || restaurant.id;
   }
@@ -76,15 +113,25 @@ const MainPage = () => {
         className="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-[1.02]"
         onClick={handleViewDetails}
       >
-        <img
-          className="w-full h-48 object-cover "
-          src={imageUrl}
-          alt={
-            restaurant.images && restaurant.images[0]?.alt
-              ? restaurant.images[0].alt
-              : restaurant.name
-          }
+        <div className="relative ">
+          <img
+            className="w-full h-48 object-cover "
+            src={imageUrl}
+            alt={
+              restaurant.images && restaurant.images[0]?.alt
+                ? restaurant.images[0].alt
+                : restaurant.name
+            }
         />
+        <div className="absolute top-2 right-2 z-10" onClick={(e) => e.stopPropagation()}>
+          <Switch
+  id={`favorite-${restaurant._id}`}
+  isFav={Array.isArray(favorites) && favorites.some(fav => fav._id === restaurant._id)}
+  onChange={() => handleFavoriteToggle(restaurant._id)}
+/>
+        </div>
+        </div>
+        
         <div className="p-4">
           <h2 className="text-xl font-bold text-[#1D2025]">
             {restaurant.name}
@@ -110,12 +157,12 @@ const MainPage = () => {
     );
   };
   return (
-    <div className="min-h-screen bg-white">
-      <main className="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white min-w-[400px] sm:min-w-full">
+      <main className="max-w-7xl mx-auto py-2 px-4 ">
         <h1 className="text-2xl font-bold mt-5  text-[#2DA800]">
           Discover
         </h1>
-        <div className="flex space-x-4 mb-6">
+        <div className="flex gap-2 mb-6">
         <button
           onClick={() => setFilter(null)}
           className={`px-4 py-2 rounded-lg ${
@@ -206,6 +253,7 @@ const MainPage = () => {
       </main>
     </div>
   );
+  
 };
 
 export default MainPage;

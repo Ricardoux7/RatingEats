@@ -5,8 +5,12 @@ import HomePage from './pages/HomePage';
 import  RestaurantDetails  from './pages/RestaurantDetails.jsx';
 import Profile from './pages/Profile.jsx';
 import MyRestaurant from './pages/ManageRestaurant.jsx';
+import HandleCreate from './components/ManageRestaurant/CreateRestaurant.jsx';
+import NoPermission from './components/ManageRestaurant/NoPermission.jsx';
+import { useAuth } from './context/AuthContext.jsx';
 import 'animate.css';
 function App() {
+  const { user } = useAuth();
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -14,7 +18,9 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/restaurants/:id" element={<RestaurantDetails />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/manage/restaurants/:id" element={<MyRestaurant restaurantId={":id"} />} />
+      <Route path="/manage/restaurants/create" element={<HandleCreate user={user} />} />
+      <Route path="/manage/restaurants/:id" element={<MyRestaurant />} />
+      <Route path="/no-permission" element={<NoPermission />} />
     </Routes>
   )
 }

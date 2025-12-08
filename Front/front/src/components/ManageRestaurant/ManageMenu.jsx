@@ -1,0 +1,110 @@
+import api from "../../api/api";
+import { useState, useEffect } from "react";
+import '../../components.css';
+import Zoom from 'react-medium-image-zoom'
+import UploadImage from "./UploadImage.jsx";
+import { set } from "mongoose";
+
+const ManageMenu = ({ restaurantId }) => {
+  const [menuItems, setMenuItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const [replaceImageId, setReplaceImageId] = useState(null);
+  const [popupMessage, setPopupMessage] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        const response = await api.get(`/restaurants/${restaurantId}/menu/images`);
+        setMenuItems(response.data.menu || response.data);
+      } catch (err) {
+        setError('Failed to fetch menu items.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchMenuItems();
+  }, [restaurantId]);
+
+  const deleteMenuImage = async (imageId) => {
+    try {
+      await api.delete(`/restaurants/${restaurantId}/menu/images/${imageId}`);
+      setMenuItems(menuItems.filter(item => item._id !== imageId));
+      setPopupMessage('Menu item deleted successfully.');
+      setShowPopup(true);
+      setTimeout(() => {
+        setShowPopup(false);
+        setPopupMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError('Failed to delete menu item.');
+      setPopupMessage('Error deleting menu item.');
+      setShowPopup(true);
+      setTimeout(() => {
+        setShowPopup(false);
+        setPopupMessage(null);
+      }, 3000);
+    }
+  }
+
+  return (
+    <div className="p-5">
+      {showPopup && popupMessage && (
+        <div className={`fixed top-8 left-1/2 transform -translate-x-1/2 ${popupMessage.includes('Error') ? 'bg-red-500' : 'bg-green-500'} text-white px-6 py-3 rounded-lg shadow-lg z-50`}>
+          <p>{popupMessage}</p>
+        </div>
+      )}
+      <h2 className="text-2xl font-bold mb-4 text-[#258A00]">Manage Menu Images</h2>
+      {isLoading ? (
+        <p>Loading menu items...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+          {menuItems.map((item) => (
+            <div key={item._id} className="bg-gray-100 p-2 relative shadow-md rounded-lg h-auto">
+              <div className="absolute top-10 right-2 text-white flex flex-col gap-2">
+              <button onClick={() => deleteMenuImage(item._id)} className=" bg-red-500 px-2 py-1 rounded-md">Delete</button>
+              <button onClick={() => setReplaceImageId(item._id)} className="bg-blue-500 px-2 py-1 rounded-md">Replace</button>
+              </div>
+              {replaceImageId === item._id && (
+                <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center p-4 z-10">
+                  <div className="w-full">
+                    <UploadImage
+                      restaurantId={restaurantId}
+                      imageId={replaceImageId}
+                      mode="replace"
+                      onUploadSuccess={() => {
+                        setReplaceImageId(null);
+                        api.get(`/restaurants/${restaurantId}/menu/images`).then(response => {
+                          setMenuItems(response.data.menu || response.data);
+                        });
+                      }}
+                      onClear={() => setReplaceImageId(null)}
+                    />
+                  </div>
+                </div>
+              )}
+              <Zoom>
+                <img
+                  src={`${BACKEND_URL}${item.url}`}
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                />
+              </Zoom>
+            </div>
+          ))}
+        </div>
+        
+      )}
+      <div className="mt-10">
+          <UploadImage restaurantId={restaurantId} mode="add" onUploadSuccess={() => api.get(`/restaurants/${restaurantId}/menu/images`).then(response => setMenuItems(response.data.menu || response.data))} />
+      </div>
+    </div>
+  );
+}
+
+export default ManageMenu;

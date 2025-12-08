@@ -1,9 +1,11 @@
 import api from '../../api/api';
 import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import '../../components.css';
 
-const MyRestaurants = ({ user }) => {
+const MyRestaurants = () => {
+  const { user } = useAuth();
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +23,7 @@ const MyRestaurants = ({ user }) => {
         const admin = response.data.admin?.restaurant ? [response.data.admin.restaurant] : [];
         setRestaurants([...owner, ...admin]);
       } catch (err) {
-        console.error('Error fetching restaurants:', err);
+        console.error(err.message);
         setError('Coulnt fetch restaurants. Please try again later.');
       } finally {
         setIsLoading(false);
@@ -33,6 +35,7 @@ const MyRestaurants = ({ user }) => {
 
   return (
     <div className="p-5 font-sans">
+      <button className='bg-[#258A00] text-white py-2 px-4 rounded hover:bg-[#2DA800]' onClick={() => navigate('/manage/restaurants/create')}>Create Restaurant</button>
       {isLoading ? (
         <p className="text-center text-gray-600">Loading...</p>
       ) : error ? (

@@ -10,7 +10,6 @@
   box-shadow: -10px -10px 10px #59f8a1, 0px -10px 10px 0px #32e27b,
     10px -10px 10px #10831a, 10px 0 10px #06f006, 10px 10px 10px 0px #a4ff3d,
     0 10px 10px 0px #3fffcf, -10px 10px 10px 0px #99f10b;
-  animation: rot55 0.7s linear infinite;
   position: relative;
 }
 
@@ -23,11 +22,17 @@
   transform: translate(-50%, -50%);
 }
 
+.loader-rotate {
+  animation: rot55 0.7s linear infinite;
+}
+
 /* Loader reservation */
 
 svg {
  width: 3.25em;
  transform-origin: center;
+}
+.svg-loader {
  animation: rotate4 2s linear infinite;
 }
 circle {

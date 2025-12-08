@@ -49,16 +49,21 @@ const editProfile = asyncHandler(async (req, res) => {
 const addFavoriteRestaurants = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const { restaurantId } = req.params;
-    const user = await User.findById(userId);
-    if (user) {
-        if (!user.favoriteRestaurants.includes(restaurantId)) {
-            user.favoriteRestaurants.push(restaurantId);
-            await user.save();
+    const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $addToSet: { favoriteRestaurants: restaurantId } }, 
+        { new: true, runValidators: true }
+    );
+
+    if (updatedUser) {
+        const added = updatedUser.favoriteRestaurants.some(id => id.toString() === restaurantId);
+        if (added) {
             res.status(200).json({ message: 'Restaurant added to favorites.' });
         } else {
             res.status(400);
             throw new Error('Restaurant already in favorites.');
         }
+
     } else {
         res.status(404);
         throw new Error('User not found');
@@ -68,12 +73,13 @@ const addFavoriteRestaurants = asyncHandler(async (req, res) => {
 const removeFavoriteRestaurants = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const { restaurantId } = req.params;
-    const user = await User.findById(userId);
+    const user = await User.findByIdAndUpdate(userId, 
+        { $pull: { favoriteRestaurants: restaurantId } },
+        { new: true, runValidators: true }
+    );
     if (user) {
-        const index = user.favoriteRestaurants.indexOf(restaurantId);
-        if (index > -1 ){
-            user.favoriteRestaurants.splice(index, 1);
-            await user.save();
+        const stillExists = user.favoriteRestaurants.some(id => id.toString() === restaurantId);
+        if (!stillExists) {
             res.status(200).json({ message: 'Restaurant removed from favorites.' });
         } else {
             res.status(400);

@@ -7,7 +7,7 @@ import path from 'path';
 const createPost = asyncHandler(async (req, res) => {
     const uploadedFile = req.file;
     try{
-         const restaurantId = req.params.id || req.params.restaurantId;
+        const restaurantId = req.params.id || req.params.restaurantId;
         const { content } = req.body;
         const authorUserId = req.user._id;
         const userRole = req.user.role; 

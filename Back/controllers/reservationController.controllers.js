@@ -46,10 +46,12 @@ const getReservationsToRestaurant = asyncHandler(async (req, res) => {
     const restaurantId = req.params.restaurantId;
     const { state } = req.query;
     let query = { 
-        restaurantId 
+        restaurantId
     };
     if (state) {
         query.state = state;
+    } else{
+        query.state = { $ne: 'pending' };
     }
     const reservations = await Reservation.find(query)
         .sort({ dateReservation: 1, time: 1 }) 

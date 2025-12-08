@@ -1,12 +1,12 @@
 import express from 'express';
-import { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, deleteOperator, addOperator } from '../controllers/restaurantController.controllers.js';
+import { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, deleteOperator, addOperator, getRestaurantsToManage } from '../controllers/restaurantController.controllers.js';
 import { restaurantValidationRules, validate, updateRestaurantValidationRules } from '../middlewares/restaurantValidation.middlewares.js';
 import { protect } from '../middlewares/authMiddleware.middlewares.js';
 import upload from '../middlewares/MiddlewaresImages/multerConfig.middlewares.js';
 import { multerErrorHandler } from '../middlewares/MiddlewaresImages/multerErrorMiddleware.middlewares.js';
 import { hasRestaurantRole } from '../middlewares/roleMiddleware.middlewares.js';
 import { createReview, getReviewsByRestaurant, deleteReview } from '../controllers/reviewsController.controllers.js';
-import { uploadMenuImage, deleteMenuImage } from '../controllers/menuController.controllers.js';
+import { uploadMenuImage, deleteMenuImage, getMenuImages, changeThisImage } from '../controllers/menuController.controllers.js';
 import uploadMenu from '../middlewares/MiddlewaresImages/multerMenuConfig.middlewares.js';
 const router = express.Router();
 
@@ -29,7 +29,8 @@ router.route('/:id/operator').post(
 );
 router.route('/:id/reviews').post(protect, createReview).get(getReviewsByRestaurant);
 router.route('/reviews/:reviewId').delete(protect, deleteReview);
-router.route('/:id/menu/images').post(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(uploadMenu.single('image')), uploadMenuImage);
-router.route('/:id/menu/images/:imageId').delete(protect, hasRestaurantRole(['owner', 'operator']), deleteMenuImage);
-
+router.route('/:id/menu/images').post(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(uploadMenu.array('images')), uploadMenuImage);
+router.route('/:id/menu/images/:imageId').delete(protect, hasRestaurantRole(['owner', 'operator']), deleteMenuImage).patch(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(uploadMenu.single('image')), changeThisImage);
+router.route('/:id/menu/images').get(protect, hasRestaurantRole(['owner', 'operator']), getMenuImages);
+router.route('/manage/restaurant/:id').get(protect, hasRestaurantRole(['owner', 'operator']), getRestaurantsToManage);
 export default router;

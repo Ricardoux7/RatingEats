@@ -69,7 +69,7 @@ const ManagePosts = ({ restaurantId, userToken }) => {
   return (
     <>
     <h2 className='text-[1.5rem] font-bold ml-5'>Manage Posts</h2>
-    <div className='border border-[#258A00] rounded-2xl mt-8 bg-white mx-auto p-5'>
+    <div className='bg-white mx-auto p-5'>
       {posts.length === 0 ? (
         <p className='text-center'>No pending posts.</p>
       ) : (
@@ -77,12 +77,12 @@ const ManagePosts = ({ restaurantId, userToken }) => {
         {posts.map((post) => {
           const imageUrl = post.image && post.image.url ? `${BACKEND_URL}${post.image.url}` : null;
           return (
-            <div key={post._id} className='w-full border rounded-lg shadow-md text-[1.2rem] text-[#171a1f] break-words h-auto flex flex-col gap-1 p-4'>
+            <div key={post._id} className='w-full rounded-lg shadow-lg text-[1.2rem] text-[#171a1f] break-words h-auto flex flex-col gap-4 p-4'>
               {imageUrl && <img src={imageUrl} alt="" className='w-full h-[200px]'/>}
-              <p>Uploaded by: {post.authorUserId.username}</p>
-              <p>Requested at: {post.createdAt.slice(0, 10)}</p>
-              <p>{post.content}</p>
+              <p>Uploaded by: <span className='font-bold'>{post.authorUserId.username}</span></p>
+              <p className='text-[1.2rem] text-[#171a1f] italic'>{post.content}</p>
               <p className='bg-[#FEF9C3] px-2 rounded-full fit-content w-fit h-fit text-[#854D0E]'>{post.state}</p>
+              <p className='text-[1rem] text-[#313338]'>Requested at: {post.createdAt.slice(0, 10)}</p>
               <div className='flex items-end mt-auto'>
                 <button onClick={() => acceptPost(post._id)} className='text-green-400 w-[50%] border-[#171a1f]'>Accept</button>
                 <button onClick={() => rejectPost(post._id)} className='text-red-400 w-[50%] border-l border-[#171a1f]'>Reject</button>

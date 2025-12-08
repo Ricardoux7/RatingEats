@@ -11,7 +11,7 @@ const CreateReservation = () => {
   const [reservationDate, setReservationDate] = useState('');
   const [reservationTime, setReservationTime] = useState('');
   const [numberOfPeople, setNumberOfPeople] = useState(1);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [showPopup, setShowPopup] = useState(false);
@@ -19,7 +19,6 @@ const CreateReservation = () => {
   useEffect(() => {
     const fetchRestaurantDetails = async () => {
       setIsLoading(true);
-      setError(null);
       try {
         const response = await api.get(`/restaurants/${id}`);
         setRestaurant(response.data);
@@ -34,7 +33,7 @@ const CreateReservation = () => {
   }, [id]);
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
-    setSuccessMessage('');
+    setMessage('');
     setError(null);
     try {
       const token = localStorage.getItem('userToken');
@@ -52,7 +51,7 @@ const CreateReservation = () => {
         },
       }
     );
-      setSuccessMessage(response.data.message || 'Reservation created successfully!');
+      setMessage('Reservation created successfully!');
       setShowPopup(true);
       setReservationDate('');
       setReservationTime('');
@@ -60,7 +59,8 @@ const CreateReservation = () => {
       setCustomerName('');
       setCustomerPhone('');
     } catch (err) {
-      setError('Error creating reservation:', err);
+      setMessage('Error creating reservation. Please try again.');
+      setShowPopup(true);
     } finally {
       setIsLoading(false);
     }
@@ -68,22 +68,18 @@ const CreateReservation = () => {
   if (isLoading) {
   return (
     <div>
-      <svg viewBox="25 25 50 50">
+      <svg className="loader-loader" viewBox="25 25 50 50">
         <circle r="20" cy="50" cx="50"></circle>
       </svg>
     </div>
   );
 }
-  if (error) {
-    return <div>{error}</div>;
-  }
   return (
     <>
     {showPopup && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+      <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
-          {successMessage && <p className="text-green-600 text-lg font-bold">{successMessage}</p>}
-          {error && <p className="text-red-600 text-lg font-bold">{error}</p>}
+          {message && <p className={`${message.includes('Error') ? 'text-red-600' : 'text-green-600'} text-lg font-bold`}>{message}</p>}
           <button
             className="mt-4 px-4 py-2 bg-[#258A00] text-white rounded hover:bg-[#45A049]"
             onClick={() => setShowPopup(false)}
@@ -106,6 +102,7 @@ const CreateReservation = () => {
             placeholder='DD/MM/YYYY'
             min={new Date().toISOString().split('T')[0]}
           />
+          {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Time:</p>
@@ -115,6 +112,7 @@ const CreateReservation = () => {
             onChange={(e) => setReservationTime(e.target.value)}
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
           />
+          {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Number of People:</p>
@@ -125,6 +123,7 @@ const CreateReservation = () => {
             min="1"
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
           />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Customer Name:</p>
@@ -135,6 +134,7 @@ const CreateReservation = () => {
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             placeholder='John Doe'
           />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Customer Phone:</p>
@@ -145,6 +145,7 @@ const CreateReservation = () => {
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             placeholder='+584141234567'
           />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
         </label>
         <button
           type="submit"
@@ -153,8 +154,6 @@ const CreateReservation = () => {
         >
           Submit
         </button>
-        {error && <div className='text-red-600 font-medium mt-2 w-[100px] h-[50px] z-50'>{error}</div>}
-        {successMessage && <div className='text-green-600 font-medium mt-2 w-[100px] h-[50px] z-50'>{successMessage}</div>}
       </form>
     </div>
     <div>
@@ -172,6 +171,7 @@ const CreateReservation = () => {
               placeholder='DD/MM/YYYY'
               min = {new Date().toISOString().split('T')[0]}
             />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Time:</p>
@@ -181,6 +181,7 @@ const CreateReservation = () => {
               onChange={(e) => setReservationTime(e.target.value)}
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Number of People:</p>
@@ -191,6 +192,7 @@ const CreateReservation = () => {
               min="1"
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Customer Name:</p>
@@ -201,6 +203,7 @@ const CreateReservation = () => {
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
               placeholder='John Doe'
             />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Customer Phone:</p>
@@ -211,6 +214,7 @@ const CreateReservation = () => {
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
               placeholder='+584141234567'
             />
+            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
           </label>
           <button
             type="submit"
@@ -219,8 +223,6 @@ const CreateReservation = () => {
           >
             Submit
           </button>
-          {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
-          {successMessage && <div className='text-green-600 font-medium mt-2 '>{successMessage}</div>}        
         </form>
       </div>
     </div>

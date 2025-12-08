@@ -1,13 +1,21 @@
 import api from '../api/api';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import ManageReservations from '../components/ManageRestaurant/ManageReservations.jsx';
 import ManagePosts from '../components/ManageRestaurant/ManagePosts.jsx';
 import BringPosts from '../components/componentsRestaurantDetails/BringPosts.jsx';
+import BringReservations from '../components/ManageRestaurant/BringReservations.jsx';
+import EditInfo from '../components/ManageRestaurant/EditInfo.jsx';
 import '../components.css';
 import { useAuth } from '../context/AuthContext.jsx';
 import { HeaderMobile, HeaderDesktop } from '../components/Components.jsx';
-import Statistics from '../components/componentsRestaurantDetails/Statistics.jsx';
+import Statistics from '../components/ManageRestaurant/Statistics.jsx';
+import ManageMenu from '../components/ManageRestaurant/ManageMenu.jsx';
+import UploadPost from '../components/ManageRestaurant/UploadPost.jsx';
+import BringMenu from '../components/BringMenu.jsx';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 const MyRestaurant = () => {
   const { id } = useParams();
@@ -15,70 +23,107 @@ const MyRestaurant = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showImage, setShowImage] = useState(false);
   const [activeSection, setActiveSection] = useState('details');
+  const [content, setContent] = useState('');
+  const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const imageUrl = restaurant && restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant?.images[0].url}` : '/icons/image-not-found.png';
   const imagesMenuUrl = restaurant?.menu && restaurant.menu.length > 0;
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const fetchRestaurant = async () => {
-      try {
-        const response = await api.get(`/restaurants/${id}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-        setRestaurant(response.data);
-      } catch (err) {
-        setError('Coulnt fetch restaurant. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchRestaurant();
-  }, [id, user.token]);
+  const fetchRestaurant = async () => {
+    try {
+      const response = await api.get(`restaurants/manage/restaurant/${id}`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setRestaurant(response.data);
+    } catch (err) {
+  if (err.response && err.response.status === 403) {
+    navigate('/no-permission');
+  } else if (err.response && err.response.status === 500) {
+    setError('Internal server error. Please try again later.');
+    navigate('/no-permission');
+  } else {
+    setError('Could not fetch restaurant. Please try again later.');
+  }
+} finally {
+      setIsLoading(false);
+    }
+  };
+  fetchRestaurant();
+}, [id, user.token]);
+
+  const handleUpdate = (updatedRestaurant) => {
+    setRestaurant(updatedRestaurant);
+  };
 
   return (
     <>
       <HeaderDesktop />
+      <HeaderMobile tab={activeSection} setTab={setActiveSection} manage={true} />
       <div className='hidden md:grid md:grid-cols-[1fr_3fr_1fr] gap-4 pb-10'>
-        <aside className="hidden bg-white rounded-2xl p-4 md:flex md:flex-col gap-4">
+        {showImage && selectedImage && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.8)] p-4 w-full h-full'>
+          <div className='relative'>
+            <img
+              src={selectedImage}
+              alt="Selected"
+              className="max-w-[90vw] max-h-[90vh] rounded-2xl shadow-2xl border-4 border-white"
+            />
+            <button
+              className='absolute top-2 right-2 rounded-full p-2 bg-white hover:bg-gray-200'
+              onClick={() => setShowImage(false)}
+            >
+              <img src="../icons/cancel.svg" alt="close" className='w-6'/>
+            </button>
+          </div>
+        </div>
+      )}
+        <aside className="hidden bg-white rounded-2xl p-4 md:flex md:flex-col gap-4 break-words items-center">
           <button
-            className='h-auto w-[70%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem]'
+            className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'
             onClick={() => setActiveSection('details')}
           >
             Restaurant Details
           </button>
           <button
-            className='h-auto w-[70%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem]'
+            className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'
             onClick={() => setActiveSection('reservations')}
           >
             Reservations history
           </button>
           <button
-            className='h-auto w-[70%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem]'
+            className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'
             onClick={() => setActiveSection('pending')}
           >
             Pending Reservations
           </button>
           <button
-            className='h-auto w-[70%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem]'
+            className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'
             onClick={() => setActiveSection('posts')}
           >
             Posts Management
           </button>
           <button
-            className='h-auto w-[70%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem]'
+            className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'
             onClick={() => setActiveSection('postsHistory')}
           >
             Posts History
           </button>
           <button
-            className='h-auto w-[70%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem]'
+            className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'
             onClick={() => setActiveSection('menu')}
           >
             Menu Management
+          </button>
+          <button className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]' onClick={() => setActiveSection('editInfo')}>
+            Edit information
+          </button>
+          <button className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]' onClick={() => setActiveSection('postsUpload')}>
+            Upload posts
           </button>
         </aside>
         <div>
@@ -90,11 +135,11 @@ const MyRestaurant = () => {
             <>
               {activeSection === 'details' && restaurant && (
                 <div className="bg-white overflow-hidden transform transition duration-700 mt-8 shadow-lg rounded-2xl p-6">
-                  <div className='relative h-[300px] w-full z-0 rounded-2xl flex flex-row items-start'>
-                    <img src={imageUrl} alt={restaurant.name} className="w-full h-[300px] object-cover rounded-2xl relative z-0" />
+                  <div className='relative w-full aspect-video rounded-2xl flex flex-row items-start'>
+                    <img src={imageUrl} alt={restaurant.name} className="w-full h-full object-cover rounded-2xl relative z-0" />
                   </div>
                   <h2 className="text-4xl font-bold text-[#171A1F] mt-2 mr-2">{restaurant.name}</h2>
-                  <div className='flex items-center flex-row w-[30%]'>
+                  <div className='flex items-center flex-row w-[30%]  break-words'>
                     {Array.from({ length: 5 }).map((_, i) => (
                       i < Math.round(restaurant.averageRating) ? (
                         <img key={i} src="../../icons/star.svg" alt="star" className='w-6 mt-5' />
@@ -123,7 +168,7 @@ const MyRestaurant = () => {
                   <p className='text-[#171A1F] text-[1rem]'>{restaurant.phoneNumber}</p>
                   <h2 className='text-[2rem] font-bold text-[#171A1F] pb-4 '>Our Menu</h2>
                   <div className='flex gap-4 p-4 object-cover overflow-x-scroll scrollbar-thin w-full menu-scrollbar'>
-                    {imagesMenuUrl ? (
+                    {/*imagesMenuUrl ? (
                       restaurant.menu.map((menuItem, i) => {
                         const menuImageUrl = `${BACKEND_URL}${menuItem.url}`;
                         return (
@@ -134,7 +179,8 @@ const MyRestaurant = () => {
                       })
                     ) : (
                       <p>No menu images available</p>
-                    )}
+                    )*/}
+                    <BringMenu restaurantId={restaurant._id} />
                   </div>
                   <div>
                   </div>
@@ -149,6 +195,18 @@ const MyRestaurant = () => {
               {activeSection === 'postsHistory' && restaurant && (
                 <BringPosts restaurantId={restaurant._id} userToken={user.token} />
               )}
+              {activeSection === 'reservations' && restaurant && (
+                <BringReservations restaurantId={restaurant._id} userToken={user.token} />
+              )}
+              {activeSection === 'editInfo' && restaurant && (
+                <EditInfo restaurantId={restaurant._id} userToken={user.token} onUpdate={handleUpdate} initialData={restaurant} />
+              )}
+              {activeSection === 'menu' && restaurant && (
+                <ManageMenu restaurantId={restaurant._id} />
+              )}
+              {activeSection === 'postsUpload' && restaurant && (
+                <UploadPost restaurantId={restaurant._id} />
+              )}
             </>
           )}
         </div>
@@ -156,17 +214,83 @@ const MyRestaurant = () => {
           <div className='ml-4 mt-4 flex flex-col gap-2'>
             <p className='text-[#171A1F] font-light text-[2rem] mt-4 mb-2'>Operating hours</p>
             {restaurant && restaurant.schedule ? (
-              restaurant.schedule.map((item, i) => (
-                <p key={item._id} className='text-[#171A1F] text-[1.5rem]'>
-                  {item.day}: {item.open} - {item.close}
-                </p>
-              ))
+                <p className='text-[#171A1F] text-[1.5rem]'>{restaurant.schedule}</p>
             ) : (
               <p>No schedule available</p>
             )}
           </div>
           <Statistics restaurantId={id} userToken={user.token}/>
         </aside>
+      </div>
+      <div className="flex flex-col md:hidden gap-4 p-4 pb-10">
+        {activeSection === 'details' && restaurant && (
+          <>
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden py-2">
+              <div className='relative h-[200px] w-full'>
+                <img src={imageUrl} alt={restaurant.name} className="w-full h-full object-cover" />
+              </div>
+              <h2 className="text-3xl font-bold text-[#171A1F] p-4 pb-0">{restaurant.name}</h2>
+            </div>
+            <div className="bg-white rounded-lg shadow-lg p-4 flex flex-col gap-2">
+              <h2 className="text-2xl font-bold">Restaurant Details</h2>
+              <p>{restaurant.description || "No description available"}</p>
+              <p>{restaurant.adress || "No specifieadress"}</p>
+              <p>{restaurant.schedule || "No schedule available"}</p>
+              <div className='flex flex-row flex-wrap w-full mt-2'>
+                <p className='text-2xl text-[#171A1F] mr-1 font-bold'>Cuisine: </p>
+                  {restaurant.categories.map((category, idx) => (
+                    <span key={category} className="mt-2 mr-1">
+                      {category}{idx < restaurant.categories.length - 1 ? ', ' : ''}
+                    </span>
+                  ))}
+              </div>
+              <div className="mt-3 flex flex-col items-start space-y-2 h-full">
+                <p className="">{restaurant.description || "Nspecified description"}</p>
+              </div>
+              <div className='flex items-center flex-row mt-2'>
+                <span >{restaurant.adress || "No specifieadress"}</span>
+              </div>
+              <p className='text-[#171A1F] font-bold text-[1.5rem] mt-4 mb-2'>Contact</p>
+              <p className='text-[1.5rem]'>{restaurant.phoneNumber}</p>
+              <h2 className='text-[2rem] font-bold text-[#171A1F] pb-4 '>Our Menu</h2>
+              <div className='flex gap-4 p-4 object-cover overflow-x-scroll scrollbar-thin w-full menu-scrollbar'>
+                {imagesMenuUrl ? (
+                  restaurant.menu.map((menuItem, i) => {
+                    const menuImageUrl = `${BACKEND_URL}${menuItem.url}`;
+                    return (
+                      <div key={i} className='w-fit shrink-0'>
+                        <img src={menuImageUrl} alt="Menu Image" className="w-[200px] h-[200px] object-cover rounded-lg cursor-pointer" onClick={() => { setSelectedImage(menuImageUrl); setShowImage(true); }} />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p>No menu images available</p>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+        {activeSection === 'pending' && restaurant && (
+          <ManageReservations restaurantId={restaurant._id} userToken={user.token} />
+        )}
+        {activeSection === 'posts' && restaurant && (
+          <ManagePosts restaurantId={restaurant._id} userToken={user.token} />
+        )}
+        {activeSection === 'statistics' && (
+          <Statistics restaurantId={id} userToken={user.token} />
+        )}
+        {activeSection === 'postsHistory' && restaurant && (
+          <BringPosts restaurantId={restaurant._id} userToken={user.token} />
+        )}
+        {activeSection === 'reservations' && restaurant && (
+          <BringReservations restaurantId={restaurant._id} userToken={user.token} />
+        )}
+        {activeSection === 'editInfo' && restaurant && (
+          <EditInfo restaurantId={restaurant._id} userToken={user.token} onUpdate={handleUpdate} initialData={restaurant} />
+        )}
+        {activeSection === 'menu' && restaurant && (
+          <ManageMenu restaurantId={restaurant._id} />
+        )}
       </div>
     </>
   )
