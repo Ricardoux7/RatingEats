@@ -94,7 +94,7 @@ const RestaurantDetails = () => {
                 <hr className='border-0 h-px bg-[#258A00] w-[60%] rounded-lg my-4' />
               </div>
               <h2 className='text-[2rem] font-bold text-[#171A1F] pb-4 ml-4'>Our Menu</h2>
-              <div className='flex gap-4 p-4 object-cover  inset-0'>
+              <div className='max-w-[800px] mx-auto'>
                 {imagesMenuUrl ? (
                   <BringMenu
                     restaurantId={id}
@@ -146,7 +146,7 @@ const RestaurantDetails = () => {
                   <p className="text-[1rem] text-black-200 mt-2 w-fit flex flex-wrap gap-2">{Array.from({ length: restaurant.categories.length }).map((_, i) => <span key={i} className='bg-gray-200 rounded-full px-3 py-1'>{restaurant.categories[i]}</span>)}</p>
               </div>
               <h2 className='text-[2rem] font-bold text-[#171A1F] p-4'>Our Menu</h2>
-              <div className='flex gap-4 p-4  mb-7'>
+              <div className='max-w-[400px] mx-auto mb-4'>
                 {imagesMenuUrl ? (
                   <BringMenu
                     restaurantId={id}

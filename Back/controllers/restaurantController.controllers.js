@@ -237,15 +237,12 @@ const deleteOperator = asyncHandler(async (req, res) => {
 const getRestaurantsToManage = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const restaurantId = req.params.id;
-    console.log(userId, restaurantId);
         if (!userId) {
-        console.log('userId missing');
         res.status(401);
         throw new Error('User not authenticated');
     }
 
     if (!restaurantId) {
-        console.log('restaurantId missing');
         res.status(400);
         throw new Error('Restaurant ID is required');
     }
@@ -254,17 +251,43 @@ const getRestaurantsToManage = asyncHandler(async (req, res) => {
         user: userId,
         restaurant: restaurantId
     }).populate('restaurant');
-    console.log('businessUser:', businessUser);
     if (businessUser) {
         res.status(200).json(businessUser.restaurant);
-        console.log('Access granted to manage restaurant');
     } else {
-        console.log('Access denied to manage restaurant');
         res.status(403);
         throw new Error('No management rights for this restaurant');
     }
-    console.log('userId:', userId);
-console.log('restaurantId:', restaurantId);
 })
 
-export { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, addOperator, deleteOperator, getRestaurantsToManage  };
+const updateBannerImage = asyncHandler(async (req, res) => {
+    const restaurantId = req.params.id;
+    if (!req.file) {
+        res.status(400);
+        throw new Error('No image uploaded for banner update.');
+    }
+    const restaurant = await Restaurant.findOne({
+        _id: restaurantId,
+        isDeleted: false,
+        });
+    if (!restaurant) {
+        res.status(404);
+        throw new Error('Restaurant not found');
+    }
+    if (restaurant.images && restaurant.images.length > 0) {
+        restaurant.images = restaurant.images.filter(img => !img.isHeader);
+    }
+
+    const { filename } = req.file;
+
+    const newBannerImage = {
+        url: `/uploads/${filename}`,
+        alt: req.body.alt || restaurant.name + ' banner image', 
+        size: req.file.size,
+        isHeader: true
+    };
+    restaurant.images.push(newBannerImage);
+    await restaurant.save();
+    res.status(200).json(restaurant);
+});
+
+export { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, addOperator, deleteOperator, getRestaurantsToManage, updateBannerImage  };

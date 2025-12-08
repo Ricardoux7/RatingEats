@@ -1,5 +1,5 @@
 import express from 'express';
-import { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, deleteOperator, addOperator, getRestaurantsToManage } from '../controllers/restaurantController.controllers.js';
+import { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, deleteOperator, addOperator, getRestaurantsToManage, updateBannerImage } from '../controllers/restaurantController.controllers.js';
 import { restaurantValidationRules, validate, updateRestaurantValidationRules } from '../middlewares/restaurantValidation.middlewares.js';
 import { protect } from '../middlewares/authMiddleware.middlewares.js';
 import upload from '../middlewares/MiddlewaresImages/multerConfig.middlewares.js';
@@ -15,6 +15,7 @@ router.route('/:id')
     .get(getRestaurant)
     .patch(protect, hasRestaurantRole(['owner', 'operator']), ...updateRestaurantValidationRules, validate, updateRestaurant)
     .delete(protect, hasRestaurantRole(['owner']), deleteRestaurant);
+router.route('/:id/images/banner').patch(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(upload.single('image')), updateBannerImage);
 router.route('/:id/images').post(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(upload.single('image')), uploadImage);
 router.route('/:id/operators/:businessUserId') 
     .delete(

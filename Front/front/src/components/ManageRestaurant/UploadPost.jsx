@@ -1,7 +1,4 @@
-import api from "../../api/api";
-import { useState, useEffect } from "react";
 import UploadImage from "./UploadImage.jsx";
-import Zoom from 'react-medium-image-zoom';
 
 const UploadPost = ({ restaurantId }) => {
   return(

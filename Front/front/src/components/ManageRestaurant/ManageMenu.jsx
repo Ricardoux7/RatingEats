@@ -13,7 +13,6 @@ const ManageMenu = ({ restaurantId }) => {
   const [replaceImageId, setReplaceImageId] = useState(null);
   const [popupMessage, setPopupMessage] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -51,7 +50,7 @@ const ManageMenu = ({ restaurantId }) => {
   }
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-7xl mx-auto">
       {showPopup && popupMessage && (
         <div className={`fixed top-8 left-1/2 transform -translate-x-1/2 ${popupMessage.includes('Error') ? 'bg-red-500' : 'bg-green-500'} text-white px-6 py-3 rounded-lg shadow-lg z-50`}>
           <p>{popupMessage}</p>
@@ -63,16 +62,29 @@ const ManageMenu = ({ restaurantId }) => {
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {menuItems.map((item) => (
-            <div key={item._id} className="bg-gray-100 p-2 relative shadow-md rounded-lg h-auto">
-              <div className="absolute top-10 right-2 text-white flex flex-col gap-2">
-              <button onClick={() => deleteMenuImage(item._id)} className=" bg-red-500 px-2 py-1 rounded-md">Delete</button>
-              <button onClick={() => setReplaceImageId(item._id)} className="bg-blue-500 px-2 py-1 rounded-md">Replace</button>
+            <div
+              key={item._id}
+              className="bg-gray-100 p-2 relative shadow-md rounded-lg h-auto flex flex-col items-center"
+            >
+              <div className="absolute top-6 right-2 text-white flex flex-col gap-2 z-20">
+                <button
+                  onClick={() => deleteMenuImage(item._id)}
+                  className="bg-red-500 px-2 py-1 rounded-md hover:bg-red-600 transition"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => setReplaceImageId(item._id)}
+                  className="bg-blue-500 px-2 py-1 rounded-md hover:bg-blue-600 transition"
+                >
+                  Replace
+                </button>
               </div>
               {replaceImageId === item._id && (
-                <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center p-4 z-10">
-                  <div className="w-full">
+                <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center p-4 z-30">
+                  <div className="w-full max-w-xs">
                     <UploadImage
                       restaurantId={restaurantId}
                       imageId={replaceImageId}
@@ -92,19 +104,26 @@ const ManageMenu = ({ restaurantId }) => {
                 <img
                   src={`${BACKEND_URL}${item.url}`}
                   alt={item.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-48 md:h-56 lg:h-64 xl:h-72 object-cover rounded-md"
                 />
               </Zoom>
             </div>
           ))}
         </div>
-        
       )}
-      <div className="mt-10">
-          <UploadImage restaurantId={restaurantId} mode="add" onUploadSuccess={() => api.get(`/restaurants/${restaurantId}/menu/images`).then(response => setMenuItems(response.data.menu || response.data))} />
+      <div className="mt-10 max-w-lg mx-auto">
+        <UploadImage
+          restaurantId={restaurantId}
+          mode="add"
+          onUploadSuccess={() =>
+            api.get(`/restaurants/${restaurantId}/menu/images`).then(response =>
+              setMenuItems(response.data.menu || response.data)
+            )
+          }
+        />
       </div>
     </div>
   );
-}
+};
 
 export default ManageMenu;

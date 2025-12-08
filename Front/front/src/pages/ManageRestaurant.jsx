@@ -13,9 +13,8 @@ import { HeaderMobile, HeaderDesktop } from '../components/Components.jsx';
 import Statistics from '../components/ManageRestaurant/Statistics.jsx';
 import ManageMenu from '../components/ManageRestaurant/ManageMenu.jsx';
 import UploadPost from '../components/ManageRestaurant/UploadPost.jsx';
+import UpdateBanner from '../components/ManageRestaurant/UpdateBanner.jsx';
 import BringMenu from '../components/BringMenu.jsx';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
 
 const MyRestaurant = () => {
   const { id } = useParams();
@@ -26,7 +25,7 @@ const MyRestaurant = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showImage, setShowImage] = useState(false);
   const [activeSection, setActiveSection] = useState('details');
-  const [content, setContent] = useState('');
+  const [showBanner, setShowBanner] = useState(false);  
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const imageUrl = restaurant && restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant?.images[0].url}` : '/icons/image-not-found.png';
@@ -135,7 +134,16 @@ const MyRestaurant = () => {
             <>
               {activeSection === 'details' && restaurant && (
                 <div className="bg-white overflow-hidden transform transition duration-700 mt-8 shadow-lg rounded-2xl p-6">
-                  <div className='relative w-full aspect-video rounded-2xl flex flex-row items-start'>
+                  <div className='relative w-full aspect-video rounded-2xl flex flex-row items-start' >
+                    <button className='absolute top-2 right-2 z-10 bg-[#21C45D] bg-opacity-70 px-3 py-1 rounded-lg text-sm hover:bg-opacity-100 transition font-semibold text-white' onClick={() => setShowBanner(true)}
+                      >Update banner
+                      </button>
+                      {showBanner && (
+                        <UpdateBanner
+                          restaurantId={restaurant._id}
+                          onClose={() => setShowBanner(false)}
+                        />
+                      )}
                     <img src={imageUrl} alt={restaurant.name} className="w-full h-full object-cover rounded-2xl relative z-0" />
                   </div>
                   <h2 className="text-4xl font-bold text-[#171A1F] mt-2 mr-2">{restaurant.name}</h2>
@@ -167,7 +175,7 @@ const MyRestaurant = () => {
                   <p className='text-[#171A1F] font-bold text-[2rem] mt-4 mb-2'>Contact</p>
                   <p className='text-[#171A1F] text-[1rem]'>{restaurant.phoneNumber}</p>
                   <h2 className='text-[2rem] font-bold text-[#171A1F] pb-4 '>Our Menu</h2>
-                  <div className='flex gap-4 p-4 object-cover overflow-x-scroll scrollbar-thin w-full menu-scrollbar'>
+                  
                     {/*imagesMenuUrl ? (
                       restaurant.menu.map((menuItem, i) => {
                         const menuImageUrl = `${BACKEND_URL}${menuItem.url}`;
@@ -180,8 +188,9 @@ const MyRestaurant = () => {
                     ) : (
                       <p>No menu images available</p>
                     )*/}
+                    {/*<div className='max-w-[800px] mx-auto'>
                     <BringMenu restaurantId={restaurant._id} />
-                  </div>
+                    </div>*/}
                   <div>
                   </div>
                 </div>
@@ -227,6 +236,15 @@ const MyRestaurant = () => {
           <>
             <div className="bg-white rounded-lg shadow-lg overflow-hidden py-2">
               <div className='relative h-[200px] w-full'>
+                <button className='absolute top-2 right-2 z-10 bg-[#21C45D] bg-opacity-70 px-3 py-1 rounded-lg text-sm hover:bg-opacity-100 transition font-semibold text-white' onClick={() => setShowBanner(true)}
+                      >Update banner
+                </button>
+                {showBanner && (
+                  <UpdateBanner
+                    restaurantId={restaurant._id}
+                    onClose={() => setShowBanner(false)}
+                  />
+                )}
                 <img src={imageUrl} alt={restaurant.name} className="w-full h-full object-cover" />
               </div>
               <h2 className="text-3xl font-bold text-[#171A1F] p-4 pb-0">{restaurant.name}</h2>
