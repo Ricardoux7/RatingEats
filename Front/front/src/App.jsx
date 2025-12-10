@@ -9,6 +9,7 @@ import HandleCreate from './components/ManageRestaurant/CreateRestaurant.jsx';
 import NoPermission from './components/ManageRestaurant/NoPermission.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 import './App.css';
+import './index.css';
 function App() {
   const { user } = useAuth();
   return (

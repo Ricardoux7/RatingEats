@@ -154,7 +154,7 @@ const SearchBarDesktop = ( {setRestaurants }) => {
       }
     }
   return (
-    <section className=' h-20 items-center justify-center mt-2 mb-4 hidden md:flex md:flex-col'>
+    <section className=' h-20 items-center justify-center mt-25 mb-4 hidden md:flex md:flex-col mx-auto'>
       <h1 className="text-3xl text-black mt-10">Discover your next culinary adventure</h1>
       <p className="text-[#565D6D] mb-8">Explore local flavors, book tables, and share your dining experiences with DineSpot.</p>
       <div className="flex items-center w-[60%] h-full">

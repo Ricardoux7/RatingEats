@@ -1,6 +1,7 @@
 @import "tailwindcss";
-/*.custom-img, .custom-svg {
+body img:not(.swiper-slide img),
+body svg:not(.swiper-slide svg) {
   max-width: 100% !important;
   max-height: 100% !important;
   object-fit: cover !important;
-}*/
+}

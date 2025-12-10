@@ -4,9 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import { HeaderMobile, HeaderDesktop } from '../../components/Components.jsx';
 import { useNavigate } from 'react-router-dom';
 import '../../components.css';
-import SwiperShadows, { SwiperSlide } from './SwiperShadows.jsx';
+import { Swiper } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import { SwiperSlide } from 'swiper/react';
 const inputStyles = "border border-[#DEE1E6] rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-[#258A00] transition";
 const labelStyles = "w-full text-left font-semibold text-gray-700 mb-1";
+import 'swiper/css';
 const slideStyles = "h-80 flex flex-col items-center justify-center gap-3 px-4";
 
 const HandleCreate = ({ user }) => {
@@ -161,7 +164,7 @@ const HandleCreate = ({ user }) => {
       <h2 className="text-3xl font-bold mb-6 text-[#258A00] text-center">Create New Restaurant</h2>
       {showPopup && <ShowPopup />}
       <form onSubmit={handleCreateRestaurant} className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 border border-blue-200 mx-auto">
-        {<SwiperShadows><Swiper
+        {<Swiper
           modules={[Pagination]}
           pagination={{ clickable: true }}
           controller={true}
@@ -178,7 +181,9 @@ const HandleCreate = ({ user }) => {
                 className="mt-4 bg-[#258A00] text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-[#1e6b00] transition"
                 onClick={(e) => {
                   e.preventDefault();
-                  swiperRef.current.slideNext();
+                  if (swiperRef.current) {
+    swiperRef.current.slideNext();
+  }
                 }}
                 type="button"
               >
@@ -278,7 +283,7 @@ const HandleCreate = ({ user }) => {
               </button>
             </div>
           </SwiperSlide>
-        </Swiper> </SwiperShadows>}
+        </Swiper>}
       </form>
     </div>
     </>

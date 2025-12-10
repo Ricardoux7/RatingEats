@@ -5,6 +5,7 @@ import { SkeletonsMainPage } from "../components/SkeletonsMainPage.jsx";
 import { useNavigate } from "react-router-dom";
 import Switch from "../components/FavoriteButton.jsx";
 import Filter from "../components/Filter.jsx";
+import '../components.css';
 const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -166,18 +167,24 @@ const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
     );
   };
   return (
-    <div className="min-h-screen bg-white min-w-[400px] sm:min-w-full md:grid grid-cols-[300px_minmax(900px,1fr)] gap-4 items-stretch ">
+    <div className="min-h-screen bg-white min-w-[400px] sm:min-w-full md:grid grid-cols-[25vw_minmax(40vw,1fr)] lg:grid-cols-[20vw_minmax(60vw,1fr)] gap-4 items-stretch ">
       <div>
       <Filter filters={filters} setFilters={setFilters}/>
       </div>
       <main className="py-5 px-4 md:px-8 h-full w-full">
-        <h1 className="text-2xl font-bold mt-5  text-[#2DA800]">
+        <h1 className="text-2xl font-bold my-10  text-[#2DA800]">
           Discover
         </h1>
         {isLoading && (
+          <>
+          
+          <div className=' items-center justify-center min-h-screen flex flex-col'>
+      <div className='w-12 h-12 loader-rotate'></div>
+    </div>
           <div className="text-center py-10 ">
             <SkeletonsMainPage />
           </div>
+          </>
         )}
 
         {error && (
@@ -196,7 +203,7 @@ const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
 
         {!isLoading && restaurants.length > 0 && (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredRestaurants.map(renderRestaurantCard)}
               {searchRestaurants.map(renderRestaurantCard)}
             </div>

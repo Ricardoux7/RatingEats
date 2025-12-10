@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import '../../components.css';
 import Zoom from 'react-medium-image-zoom'
 import UploadImage from "./UploadImage.jsx";
-import { set } from "mongoose";
 
 const ManageMenu = ({ restaurantId }) => {
   const [menuItems, setMenuItems] = useState([]);
