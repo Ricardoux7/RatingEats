@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import Zoom from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
 
-const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onClear, onClose }) => {
+const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onClear, onClose, onBannerUpdate }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showForm, setShowForm] = useState(true);
   const [content, setContent] = useState('');
@@ -122,7 +122,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
     if (mode === 'bannerUpload'){
       formData.append('image', selectedFiles[0]);
       try {
-        await api.patch(`restaurants/${restaurantId}/images/banner`, formData, {
+        const response =await api.patch(`restaurants/${restaurantId}/images/banner`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${user.token}`,
@@ -131,6 +131,9 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         setSelectedFiles([]);
         setPopupMessage('Banner image uploaded successfully.');
         setShowPopup(true);
+        if (onBannerUpdate && response.data?.bannerUrl) {
+          onBannerUpdate(response.data.bannerUrl);
+        }
         setTimeout(() => {
           if (onClose) onClose();
           setShowPopup(false);
@@ -144,7 +147,9 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         }, 3000);
       } finally {
         setUploading(false);
-        if (onUploadSuccess) onUploadSuccess();
+        if (onUploadSuccess) {
+          onUploadSuccess()
+        };
       }
     }
   };

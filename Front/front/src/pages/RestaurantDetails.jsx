@@ -85,13 +85,13 @@ const RestaurantDetails = () => {
                   </div>
                 </div>
               </div>
-              <div className='ml-4 mt-4 flex flex-col gap-4 w-[90%]'>
+              <div className='ml-4 mt-4 flex flex-col gap-4 w-full'>
                 <p className='text-[2rem] font-bold'>Restaurant details</p>
                 <p className='text-[#171A1F] font-light text-[2rem] mt-4 mb-2'>Operating hours</p>
                 <p className='text-[#171A1F] text-[1.5rem]'>{restaurant.schedule}</p>
                 <p className='text-[#171A1F] font-light text-[2rem] mt-4 mb-2'>Contact</p>
                 <p className='text-[#171A1F] text-[1.5rem]'>{restaurant.phoneNumber}</p>
-                <hr className='border-0 h-px bg-[#258A00] w-[60%] rounded-lg my-4' />
+                <hr className='border-0 h-px bg-[#258A00] w-full rounded-lg my-4' />
               </div>
               <h2 className='text-[2rem] font-bold text-[#171A1F] pb-4 ml-4'>Our Menu</h2>
               <div className='max-w-[800px] mx-auto'>
@@ -104,7 +104,7 @@ const RestaurantDetails = () => {
                 )}
               </div>
               <div>
-                <hr className='border-0 h-px bg-[#258A00] w-[60%] rounded-lg my-4' />
+                <hr className='border-0 h-px bg-[#258A00] w-full rounded-lg my-4' />
                 <h2 className='text-[2rem] font-bold text-[#171A1F] p-4'>Reviews</h2>
                 <Reviews />
               </div>

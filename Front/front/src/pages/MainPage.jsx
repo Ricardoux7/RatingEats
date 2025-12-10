@@ -3,16 +3,16 @@ import api from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { SkeletonsMainPage } from "../components/SkeletonsMainPage.jsx";
 import { useNavigate } from "react-router-dom";
-import Maps from "../components/Maps.jsx";
 import Switch from "../components/FavoriteButton.jsx";
-const MainPage = () => {
+import Filter from "../components/Filter.jsx";
+const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filter, setFilter] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [filters, setFilters] = useState({ categories: [], rating: null });
   const limit = 10;
   const { user } = useAuth();
 
@@ -53,6 +53,10 @@ const MainPage = () => {
     fetchFavorites();
   }, [user]);
 
+  useEffect(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}, [page]);
+
   const handleFavoriteToggle = async (restaurantId) => {
     if (!user) {
       alert("You need to be logged in to manage favorites.");
@@ -80,11 +84,15 @@ const MainPage = () => {
   }
 
 
-  const filteredRestaurants = filter
-    ? restaurants.filter((restaurant) =>
-        restaurant.categories.includes(filter)
-      )
-    : restaurants;
+  const filteredRestaurants = restaurants.filter((restaurant) => {
+    const matchesCategory =
+      filters.categories.length === 0 ||
+      filters.categories.some((cat) => restaurant.categories.includes(cat));
+    const matchesRating =
+      filters.rating === null ||
+      restaurant.averageRating >= filters.rating;
+    return matchesCategory && matchesRating;
+  });
 
   const handleNextPage = () => {
     if (page < totalPages) {
@@ -117,6 +125,7 @@ const MainPage = () => {
           <img
             className="w-full h-48 object-cover "
             src={imageUrl}
+            loading="lazy"
             alt={
               restaurant.images && restaurant.images[0]?.alt
                 ? restaurant.images[0].alt
@@ -125,10 +134,10 @@ const MainPage = () => {
         />
         <div className="absolute top-2 right-2 z-10" onClick={(e) => e.stopPropagation()}>
           <Switch
-  id={`favorite-${restaurant._id}`}
-  isFav={Array.isArray(favorites) && favorites.some(fav => fav._id === restaurant._id)}
-  onChange={() => handleFavoriteToggle(restaurant._id)}
-/>
+            id={`favorite-${restaurant._id}`}
+            isFav={Array.isArray(favorites) && favorites.some(fav => fav._id === restaurant._id)}
+            onChange={() => handleFavoriteToggle(restaurant._id)}
+          />
         </div>
         </div>
         
@@ -157,45 +166,14 @@ const MainPage = () => {
     );
   };
   return (
-    <div className="min-h-screen bg-white min-w-[400px] sm:min-w-full">
-      <main className="max-w-7xl mx-auto py-2 px-4 ">
+    <div className="min-h-screen bg-white min-w-[400px] sm:min-w-full md:grid grid-cols-[300px_minmax(900px,1fr)] gap-4 items-stretch ">
+      <div>
+      <Filter filters={filters} setFilters={setFilters}/>
+      </div>
+      <main className="py-5 px-4 md:px-8 h-full w-full">
         <h1 className="text-2xl font-bold mt-5  text-[#2DA800]">
           Discover
         </h1>
-        <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setFilter(null)}
-          className={`px-4 py-2 rounded-lg ${
-            filter === null ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Todos
-        </button>
-        <button
-          onClick={() => setFilter("Italian")}
-          className={`px-4 py-2 rounded-lg ${
-            filter === "Italian" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Italian
-        </button>
-        <button
-          onClick={() => setFilter("Latina")}
-          className={`px-4 py-2 rounded-lg ${
-            filter === "Latina" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Latina
-        </button>
-        <button
-          onClick={() => setFilter("Chinese")}
-          className={`px-4 py-2 rounded-lg ${
-            filter === "Chinese" ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Chinese
-        </button>
-      </div>
         {isLoading && (
           <div className="text-center py-10 ">
             <SkeletonsMainPage />
@@ -220,6 +198,7 @@ const MainPage = () => {
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {filteredRestaurants.map(renderRestaurantCard)}
+              {searchRestaurants.map(renderRestaurantCard)}
             </div>
             <div className="mt-12 flex justify-center items-center space-x-4">
               <button
@@ -248,6 +227,7 @@ const MainPage = () => {
                 Siguiente
               </button>
             </div>
+            
           </>
         )}
       </main>

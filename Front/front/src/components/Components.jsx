@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import MyRestaurant from '../pages/ManageRestaurant';
 import MyRestaurants from './Profile/MyRestaurants';
+import Results from './Search.jsx';
+import api from '../api/api.js';
 
 const HeaderMobile = ({ tab, setTab, manage }) => {
   const navigate = useNavigate();
@@ -85,9 +87,9 @@ const HeaderDesktop = ( { tab, setTab } ) => {
     };
   }, [showMenu]);
 
-  return <header className="h-20 justify-between top-0 left-0 right-0 p-4 border-gray-300 bg-white items-center hidden md:flex flex-row">
+  return <header className="h-20 justify-between top-0 left-0 right-0 p-4 border-gray-300 bg-white items-center hidden md:flex flex-row fixed z-50">
       <div className="w-full flex flex-row justify-between items-center">
-        <img src="/icons/logo2.png" alt="RatingEats" className="h-20 cursor-pointer" onClick={() => navigate('/')} />
+        <img src="/icons/logo2.png" alt="RatingEats" className="h-20 cursor-pointer " onClick={() => {navigate('/'); location.reload();}}/>
       </div>
       {tab && setTab && (
         <div className="flex justify-start gap-6 mt-2 w-full">
@@ -117,6 +119,9 @@ const HeaderDesktop = ( { tab, setTab } ) => {
 }
 
 const SearchBarMobile = () => {
+  const Search = (value) => {
+
+  }
   return (
     <section className='bg-[#ECFFE6] h-20 flex items-center justify-center mt-2 mb-4 md:hidden min-w-[400px] sm:min-w-full'>
       <div className="flex items-center w-[90%] h-full">
@@ -138,7 +143,16 @@ const SearchBarMobile = () => {
   );
 }
 
-const SearchBarDesktop = () => {
+const SearchBarDesktop = ( {setRestaurants }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+    const handleSearch = async () => {
+      try {
+        const response = await api.get('/filter/search', { params: { searchBar: searchTerm } });
+        setRestaurants(response.data);
+      } catch (err) {
+        console.error('Error fetching restaurants:', err);
+      }
+    }
   return (
     <section className=' h-20 items-center justify-center mt-2 mb-4 hidden md:flex md:flex-col'>
       <h1 className="text-3xl text-black mt-10">Discover your next culinary adventure</h1>
@@ -149,8 +163,10 @@ const SearchBarDesktop = () => {
             type="text"
             className='h-12 w-full pl-5 pr-15 border border-[#DEE1E6] focus:outline-none focus:ring-2 focus:ring-green-500 rounded-l-4xl rounded-r-4xl text-black'
             placeholder="Search by name, categories..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="h-12 w-[50px] bg-[#258A00] rounded-xl flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 rounded-l-4xl rounded-r-4xl">
+          <button className="h-12 w-[50px] bg-[#258A00] rounded-xl flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 rounded-l-4xl rounded-r-4xl" onClick={handleSearch}>
             <img src="/icons/magnifying-glass-v2.svg" alt="search-icon" className="h-[70%] w-[80%]" />
           </button>
         </div>

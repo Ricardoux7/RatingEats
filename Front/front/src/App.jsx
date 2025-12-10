@@ -8,7 +8,7 @@ import MyRestaurant from './pages/ManageRestaurant.jsx';
 import HandleCreate from './components/ManageRestaurant/CreateRestaurant.jsx';
 import NoPermission from './components/ManageRestaurant/NoPermission.jsx';
 import { useAuth } from './context/AuthContext.jsx';
-import 'animate.css';
+import './App.css';
 function App() {
   const { user } = useAuth();
   return (

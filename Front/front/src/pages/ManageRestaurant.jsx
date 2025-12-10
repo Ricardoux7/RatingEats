@@ -59,6 +59,17 @@ const MyRestaurant = () => {
     setRestaurant(updatedRestaurant);
   };
 
+  const handleUpdateBanner = async (newBannerUrl) => {
+    try {
+      const response = await api.get(`restaurants/manage/restaurant/${id}`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setRestaurant(response.data);
+    } catch (err) {
+      }
+  }
   return (
     <>
       <HeaderDesktop />
@@ -142,6 +153,7 @@ const MyRestaurant = () => {
                         <UpdateBanner
                           restaurantId={restaurant._id}
                           onClose={() => setShowBanner(false)}
+                          onBannerUpdate={handleUpdateBanner}
                         />
                       )}
                     <img src={imageUrl} alt={restaurant.name} className="w-full h-full object-cover rounded-2xl relative z-0" />
@@ -188,9 +200,9 @@ const MyRestaurant = () => {
                     ) : (
                       <p>No menu images available</p>
                     )*/}
-                    {/*<div className='max-w-[800px] mx-auto'>
+                    <div className='max-w-[800px] mx-auto'>
                     <BringMenu restaurantId={restaurant._id} />
-                    </div>*/}
+                    </div>*
                   <div>
                   </div>
                 </div>
