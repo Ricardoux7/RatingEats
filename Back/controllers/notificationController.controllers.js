@@ -63,6 +63,55 @@ const notiRejectedReservation = asyncHandler(async (req, res) => {
   res.status(200).json(await newNotification.save());
 });
 
+const notiCanceledReservation = asyncHandler(async (req, res) => {
+  const { userId, restaurantId, reservationId } = req.body;
+  const restaurant = await Restaurant.findById(restaurantId);
+  const user = await User.findById(userId);
+  const reservation = await Reservation.findOne({ _id: reservationId, userId: userId, restaurantId: restaurantId });
+  if (!restaurant) {
+    throw new Error('Restaurant not found');
+  }
+  if(!user) {
+    throw new Error('User not found');
+  }
+  if(!reservation) {
+    throw new Error('Reservation not found');
+  }
+  const newNotification = new Notifications({
+    notifUserId: userId,
+    notifRestaurantId: restaurantId,
+    type: 'reservation',
+    message: `Your reservation has been canceled at ${restaurant.name} on ${reservation.dateReservation ? reservation.dateReservation.toISOString().slice(0, 10) : ''} at ${reservation.time || ''} for ${reservation.numberOfGuests || ''} people for ${reservation.customerName || ''}.`,
+    date: Date.now(),
+  });
+  res.status(200).json(await newNotification.save());
+});
+
+const notiCompletedReservation = asyncHandler(async (req, res) => {
+  const { userId, restaurantId, reservationId } = req.body;
+  const restaurant = await Restaurant.findById(restaurantId);
+  const user = await User.findById(userId);
+  const reservation = await Reservation.findOne({ _id: reservationId, userId: userId, restaurantId: restaurantId });
+
+  if (!restaurant) {
+    throw new Error('Restaurant not found');
+  }
+  if(!user) {
+    throw new Error('User not found');
+  }
+  if(!reservation) {
+    throw new Error('Reservation not found');
+  }
+  const newNotification = new Notifications({
+    notifUserId: userId,
+    notifRestaurantId: restaurantId,
+    type: 'reservation',
+    message: `Your reservation has been completed at ${restaurant.name} on ${reservation.dateReservation ? reservation.dateReservation.toISOString().slice(0, 10) : ''} at ${reservation.time || ''} for ${reservation.numberOfGuests || ''} people for ${reservation.customerName || ''}.`,
+    date: Date.now(),
+  });
+  res.status(200).json(await newNotification.save());
+});
+
 const notiacceptedPost = asyncHandler(async (req, res) => {
   const { userId, restaurantId, postId } = req.body;
   const restaurant = await Restaurant.findById(restaurantId);
@@ -113,4 +162,4 @@ const notiRejectedPost = asyncHandler(async (req, res) => {
   res.status(200).json(await newNotification.save());
 });
 
-export { getNotifications, notiAcceptedReservation, notiRejectedReservation, notiacceptedPost, notiRejectedPost };
+export { getNotifications, notiAcceptedReservation, notiRejectedReservation, notiacceptedPost, notiRejectedPost, notiCompletedReservation, notiCanceledReservation };

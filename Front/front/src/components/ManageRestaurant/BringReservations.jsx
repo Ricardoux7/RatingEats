@@ -1,6 +1,7 @@
-import Restaurant from '../../../../../Back/models/restaurant.models';
 import api from '../../api/api';
 import { useState, useEffect } from 'react';
+import { handleCancelReservationNoti, handleCompleteReservationNoti } from '../NotiReservation.jsx';
+
 
 const BringReservations = ({ restaurantId, userToken }) => {
   const [reservations, setReservations] = useState([]);
@@ -19,6 +20,7 @@ const BringReservations = ({ restaurantId, userToken }) => {
         });
         setReservations(response.data);
         setError(null);
+        fetchReservations();
       } catch (err) {
         setError('Could not fetch reservations. Please try again later.');
       } finally {
@@ -37,10 +39,12 @@ const BringReservations = ({ restaurantId, userToken }) => {
   }
 
   const ReservationPopup = ({ message }) => (
-    <div className={`fixed top-8 left-1/2 transform -translate-x-1/2 ${message.includes('Error') ? 'bg-red-500' : 'bg-green-500'} text-white px-6 py-3 rounded-lg shadow-lg z-50`}>
-      <p>{message}</p>
-    </div>
-  )
+    message && message.trim() ? (
+      <div className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${message.includes('Error') ? 'bg-red-500' : 'bg-green-500'} text-white px-6 py-3 min-w-[250px] min-h-[40px] flex items-center justify-center rounded-lg shadow-lg z-50`}>
+        <p className="text-center w-full">{message}</p>
+      </div>
+    ) : null
+  );
 
   const handleCancelReservation = async (reservationId) => {
     try {
@@ -52,16 +56,21 @@ const BringReservations = ({ restaurantId, userToken }) => {
       setReservations((prevReservations) =>
         prevReservations.filter((reservation) => reservation._id !== reservationId)
       );
-      setShowPopup(true);
       setMessage('Reservation cancelled successfully.');
+      setTimeout(() => setShowPopup(true), 10);
+      handleCancelReservationNoti({
+        userId: reservations.find(r => r._id === reservationId).userId,
+        restaurantId: restaurantId,
+        reservationId: reservationId,
+      });
       setTimeout(() => {
         setMessage(null);
         setShowPopup(false);
       }, 5000);
     } catch (err) {
       console.error('Error cancelling the reservation:', err);
-      setShowPopup(true);
       setMessage('Error cancelling the reservation. Please try again.');
+      setTimeout(() => setShowPopup(true), 10);
       setTimeout(() => {
         setMessage(null);
         setShowPopup(false);
@@ -79,16 +88,21 @@ const BringReservations = ({ restaurantId, userToken }) => {
       setReservations((prevReservations) =>
         prevReservations.filter((reservation) => reservation._id !== reservationId)
       );
-      setShowPopup(true);
       setMessage('Reservation accepted successfully.');
+      setTimeout(() => setShowPopup(true), 10);
+      handleCompleteReservationNoti({
+        userId: reservations.find(r => r._id === reservationId).userId,
+        restaurantId: restaurantId,
+        reservationId: reservationId,
+      });
       setTimeout(() => {
         setMessage(null);
         setShowPopup(false);
       }, 5000);
     } catch (err) {
       console.error('Error marking as complete the reservation:', err);
-      setShowPopup(true);
       setMessage('Error marking as complete the reservation. Please try again.');
+      setTimeout(() => setShowPopup(true), 10);
       setTimeout(() => {
         setMessage(null);
         setShowPopup(false);
@@ -99,7 +113,7 @@ const BringReservations = ({ restaurantId, userToken }) => {
   return (
     <div className="w-full">
       <h2 className="text-3xl font-bold mb-4">Reservations</h2>
-      {showPopup && <ReservationPopup message={message} />}
+      {showPopup && message && <ReservationPopup message={message} />}
       <div className="overflow-x-auto">
         <table className="min-w-full table-fixed text-left border border-[#258A00] rounded-2xl bg-white shadow-md">
           <thead>

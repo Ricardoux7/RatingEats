@@ -12,14 +12,14 @@ const Notifications = () => {
       try {
         const response = await api.get('/notifications');
         const sorted = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-        setNotifications(response.data);
+        setNotifications(sorted);
       } catch (err) {
         setError('Failed to load notifications.');
       } finally {
         setLoading(false);
       }
     };
-    fetchNotifications().sort;
+    fetchNotifications();
   }, []);
 
   if (loading) return <div>Loading notifications...</div>;

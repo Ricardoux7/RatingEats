@@ -21,3 +21,25 @@ export const handleRejectReservation = async ({ userId, restaurantId, reservatio
   } catch (err) {
   }
 };
+
+export const handleCancelReservationNoti = async ({ userId, restaurantId, reservationId }) => {
+  try {
+    await api.post('/notifications/reservation/canceled', {
+      userId,
+      restaurantId,
+      reservationId,
+    });
+  } catch (err) {
+  }
+}
+
+export const handleCompleteReservationNoti = async ({ userId, restaurantId, reservationId }) => {
+  try {
+    await api.post('/notifications/reservation/completed', {
+      userId,
+      restaurantId,
+      reservationId,
+    });
+  } catch (err) {
+  }
+};
