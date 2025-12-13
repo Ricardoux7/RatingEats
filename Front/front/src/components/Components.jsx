@@ -1,27 +1,36 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import MyRestaurant from '../pages/ManageRestaurant';
+//import MyRestaurant from '../pages/ManageRestaurant';
 import MyRestaurants from './Profile/MyRestaurants';
-import Results from './Search.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+//import Results from './Search.jsx';
 import api from '../api/api.js';
+import Notifications from './Notifications.jsx';
+import { set } from 'mongoose';
+//import { set } from 'mongoose';
 
 const HeaderMobile = ({ tab, setTab, manage }) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
+  const [showNoti, setShowNoti] = useState(false);
   const menuRef = useRef();
-  useEffect(() =>{
+  const notiRef = useRef();
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);
       }
+      if (notiRef.current && !notiRef.current.contains(event.target)) {
+        setShowNoti(false);
+      }
     };
-    if (showMenu) {
+    if (showMenu || showNoti) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showMenu]);
+  }, [showMenu, showNoti]);
   return (
     <header className={`${tab ? 'h-20' : 'h-20'} top-0 left-0 right-0 flex flex-col p-4 border-gray-300 bg-white items-center md:hidden`}>
       <div className="w-full flex flex-row items-center justify-between">
@@ -32,16 +41,38 @@ const HeaderMobile = ({ tab, setTab, manage }) => {
           <img
             src="/icons/logo2.png"
             alt="RatingEats"
-            className="h-20 max-w-[220px] object-contain" 
-            onClick={() => navigate('/')}
+            className="h-18 max-w-[220px] object-contain" 
+            onClick={() => {navigate('/'); location.reload();}}
           />
         </div>
-        <div className="flex items-center min-w-auto" ref={menuRef} onClick={() => setShowMenu(!showMenu)}>
+        <div className="flex items-center min-w-auto mr-2" ref={notiRef}>
+          {showNoti && <NotificationMenu onClose={() => setShowNoti(false)} />}
+          <div>
+            <img
+              src="/icons/bell.svg"
+              alt=""
+              className='h-[50px]'
+              onClick={() => {
+                setShowNoti((prev) => {
+                  if (!prev) setShowMenu(false);
+                  return !prev;
+                });
+              }}
+            />
+          </div>
+        </div>
+        <div className="flex items-center min-w-auto" ref={menuRef}>
           {showMenu && <UserMenu onClose={() => setShowMenu(false)} />}
           <img
             src="/icons/user.svg"
             alt="user-icon"
             className="h-[50px]"
+            onClick={() => {
+              setShowMenu((prev) => {
+                if (!prev) setShowNoti(false);
+                return !prev;
+              });
+            }}
           />
         </div>
       </div>
@@ -71,23 +102,28 @@ const HeaderMobile = ({ tab, setTab, manage }) => {
 const HeaderDesktop = ( { tab, setTab } ) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
+  const [showNoti, setShowNoti] = useState(false);
   const menuRef = useRef();
+  const notiRef = useRef();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);
       }
+      if (notiRef.current && !notiRef.current.contains(event.target)) {
+        setShowNoti(false);
+      }
     };
-    if (showMenu) {
+    if (showMenu || showNoti) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showMenu]);
+  }, [showMenu, showNoti]);
 
-  return <header className="h-20 justify-between top-0 left-0 right-0 p-4 border-gray-300 bg-white items-center hidden md:flex flex-row fixed z-50">
+  return <header className="h-20 justify-between top-0 left-0 right-0 p-4 border-gray-300 bg-white items-center hidden md:flex flex-row sticky z-5000 ">
       <div className="w-full flex flex-row justify-between items-center">
         <img src="/icons/logo2.png" alt="RatingEats" className="h-20 cursor-pointer " onClick={() => {navigate('/'); location.reload();}}/>
       </div>
@@ -111,48 +147,105 @@ const HeaderDesktop = ( { tab, setTab } ) => {
           </button>
         </div>
       )}
-        <div className='relative ml-40' ref={menuRef}>
-          <img src="/icons/user.svg" alt="user-icon" className="h-20" onClick={() => setShowMenu(!showMenu)}/>
-          {showMenu && <UserMenu onClose={() => setShowMenu(false)} />}
+        <div className='flex gap-6 items-center'>
+          <div className='relative' ref={notiRef}>
+            {showNoti && <NotificationMenu onClose={() => setShowNoti(false)} />}
+            <img
+              src="/icons/bell.svg"
+              alt="noti-icon"
+              className={tab && setTab ? 'w-[115px]' : 'w-[50px]'}
+              onClick={() => {
+                setShowNoti((prev) => {
+                  if (!prev) setShowMenu(false);
+                  return !prev;
+                });
+              }}
+            />
+          </div>
+          <div className='relative' ref={menuRef}>
+            <img
+              src="/icons/user.svg"
+              alt="user-icon"
+              className={tab && setTab ? 'w-[115px]' : 'w-[50px]'}
+              onClick={() => {
+                setShowMenu((prev) => {
+                  if (!prev) setShowNoti(false);
+                  return !prev;
+                });
+              }}
+            />
+            {showMenu && <UserMenu onClose={() => setShowMenu(false)} />}
+          </div>
         </div>
     </header>
 }
 
-const SearchBarMobile = () => {
-  const Search = (value) => {
 
-  }
+const SearchBarMobile = ({ setRestaurants, searchError, setSearchError, onFilterClick }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
+  useEffect(() => {
+    if (searchError) setSearchError('');
+  }, [searchTerm]);
+  const handleSearch = async () => {
+    try {
+      const response = await api.get('/filter/search', { params: { searchBar: searchTerm } });
+      setRestaurants(response.data);
+    } catch (err) {
+      console.error('No matching restaurants found:');
+      if (err.response && err.response.data && err.response.data.message) {
+        setSearchError(err.response.data.message);
+        setRestaurants([]);
+      } else {
+        setSearchError("An error occurred.");
+        setRestaurants([]);
+      }
+    }
+  };
   return (
     <section className='bg-[#ECFFE6] h-20 flex items-center justify-center mt-2 mb-4 md:hidden min-w-[400px] sm:min-w-full'>
       <div className="flex items-center w-[90%] h-full">
         <div className="relative w-full">
           <input
-          type="text"
-          className='h-12 w-full pl-10 pr-25 bg-white border border-[#DEE1E6]  focus:outline-none focus:ring-2 focus:ring-green-500 rounded-l-4xl rounded-r-4xl text-black'
-          placeholder="Search by name, categories..."
-        />
-        <button className="h-full w-[50px] bg-[#258A00] flex items-center justify-center absolute top-1/2 right-12 transform -translate-y-1/2 ml-2 rounded-l-4xl ">
-          <img src="/icons/magnifying-glass-v2.svg" alt="search-icon" className="h-[60%] w-[80%]" />
-        </button>
-          <button className="h-full w-[50px] bg-[#258A00] border-l-2 border-white flex items-center justify-center ml-2 absolute right-0 top-1/2 transform -translate-y-1/2 rounded-r-4xl">
-          <img src="/icons/filter-v2.svg" alt="filter-icon" className="h-[60%] w-[80%]" />
-        </button>
+            type="text"
+            className='h-12 w-full pl-10 pr-25 bg-white border border-[#DEE1E6]  focus:outline-none focus:ring-2 focus:ring-green-500 rounded-l-4xl rounded-r-4xl text-black'
+            placeholder="Search by name, categories..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+          />
+          <button className="h-full w-[50px] bg-[#258A00] flex items-center justify-center absolute top-1/2 right-12 transform -translate-y-1/2 ml-2 rounded-l-4xl " onClick={handleSearch}>
+            <img src="/icons/magnifying-glass-v2.svg" alt="search-icon" className="h-[60%] w-[70%]" />
+          </button>
+          <button className="h-full w-[50px] bg-[#258A00] border-l-2 border-white flex items-center justify-center ml-2 absolute right-0 top-1/2 transform -translate-y-1/2 rounded-r-4xl" type="button" onClick={() => onFilterClick()}>
+            <img src="/icons/filter-v2.svg" alt="filter-icon" className="h-[60%] w-[70%]" />
+          </button>
         </div>
       </div>
     </section>
   );
 }
 
-const SearchBarDesktop = ( {setRestaurants }) => {
+const SearchBarDesktop = ( {setRestaurants, searchError, setSearchError }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  useEffect(() => {
+    if (searchError) setSearchError('');
+  }, [searchTerm]);
     const handleSearch = async () => {
       try {
         const response = await api.get('/filter/search', { params: { searchBar: searchTerm } });
         setRestaurants(response.data);
       } catch (err) {
-        console.error('Error fetching restaurants:', err);
+        console.error('Error fetching restaurants:');
+        if (err.response && err.response.data && err.response.data.message) {
+          setSearchError(err.response.data.message);
+          setRestaurants([]);
+        } else {
+          setSearchError("An error occurred.");
+          setRestaurants([]);
+        }
       }
-    }
+    };
   return (
     <section className=' h-20 items-center justify-center mt-25 mb-4 hidden md:flex md:flex-col mx-auto'>
       <h1 className="text-3xl text-black mt-10">Discover your next culinary adventure</h1>
@@ -165,6 +258,7 @@ const SearchBarDesktop = ( {setRestaurants }) => {
             placeholder="Search by name, categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
           />
           <button className="h-12 w-[50px] bg-[#258A00] rounded-xl flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 rounded-l-4xl rounded-r-4xl" onClick={handleSearch}>
             <img src="/icons/magnifying-glass-v2.svg" alt="search-icon" className="h-[70%] w-[80%]" />
@@ -177,17 +271,69 @@ const SearchBarDesktop = ( {setRestaurants }) => {
 
 const UserMenu = ({ onClose }) => {
   const navigate = useNavigate();
+  const [buttonName, setButtonName] = useState('Login');
+    const { user, logOut } = useAuth();
+  useEffect(() => {
+    if (user) {
+      setButtonName('Profile');
+    }
+  }, [user]);
+
   const handleLogout = () => {
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('userInfo');
-    navigate('/login');
-    onClose();
-    };
+      logOut();
+      onClose && onClose();
+      navigate('/login', { replace: true });
+  };
+
+  const handleLogIn = () =>{
+    if (!user) {
+      navigate('/login');
+    }
+  }
 
   return (
-    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200">
-      <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => {navigate('/profile'); onClose();}}>Perfil</button>
-      <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" onClick={handleLogout}>Logout</button>
+    <div
+      className="absolute right-0 mt-50 md:mt-0 w-56 bg-white rounded-xl shadow-2xl z-50 border border-gray-200 p-2 flex flex-col gap-2 animate-fade-in"
+      onClick={e => e.stopPropagation()}
+    >
+      <button
+        className="w-full text-left px-5 py-3 rounded-lg font-semibold text-[#1D2025] transition-all duration-150 bg-gradient-to-r from-[#f8fff8] to-[#e6fbe6] hover:from-[#e6fbe6] hover:to-[#c6f7c6] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2DA800]/40"
+        onClick={() => {buttonName === 'Login' ? handleLogIn() : navigate('/profile'); onClose();}}
+      >
+        {buttonName}
+      </button>
+      {buttonName === 'Login' && (
+        <button
+          className="w-full text-left px-5 py-3 rounded-lg font-semibold text-[#2DA800] border border-[#2DA800] bg-gradient-to-r from-[#e6fbe6] to-[#f8fff8] hover:from-[#c6f7c6] hover:to-[#e6fbe6] shadow-sm hover:shadow-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#2DA800]/40"
+          onClick={() => { navigate('/register'); onClose(); }}
+        >
+          Register
+        </button>
+      )}
+      {buttonName === 'Profile' && (
+        <button
+          className="w-full text-left px-5 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff5f5f] to-[#ff2d2d] hover:from-[#ff2d2d] hover:to-[#b80000] shadow-sm hover:shadow-md transition-all duration-150 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      )}
+    </div>
+  );
+};
+
+const NotificationMenu = ({ onClose }) => {
+  const [buttonName, setButtonName] = useState('Notifications');
+    const { user, notifications } = useAuth();
+  useEffect(() => {
+    if (user) {
+      setButtonName('Notifications');
+    }
+  }, [user]);
+
+  return (
+    <div onClick={e => e.stopPropagation()}>
+      <Notifications onClose={onClose} />
     </div>
   );
 };
@@ -241,9 +387,7 @@ const AsideManager = ({  setTitle }) => {
         htmlFor="menu-toggle"
         className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-40 hidden peer-checked:block"
       />
-      <div className="w-[50vw] fixed top-0 left-0 h-full bg-white shadow-lg z-50 flex flex-col gap-4 p-6
-        -translate-x-full peer-checked:translate-x-0 transition-transform duration-300
-        peer-checked:visible invisible">
+      <div className="w-[50vw] fixed top-0 left-0 h-full bg-white shadow-lg z-50 flex flex-col gap-4 p-6 -translate-x-full peer-checked:translate-x-0 transition-transform duration-300 peer-checked:visible invisible overflow-y-scroll">
         <label htmlFor="menu-toggle" className="self-end cursor-pointer">
           <span className="text-2xl"></span>
         </label>
@@ -285,6 +429,15 @@ const AsideManager = ({  setTitle }) => {
           </button>
           <button className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center' onClick={() => setTitle('editInfo')}>
             Edit information
+          </button>
+          <button onClick={() => setTitle('addOperator')} className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'>
+            Add Operator
+          </button>
+          <button onClick={() => setTitle('deleteOperator')} className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'>
+            Delete Operator
+          </button>
+          <button className='h-auto w-[80%] bg-red-500 text-white font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center' onClick={() => setTitle('deleteRestaurant')}>
+            delete Restaurant
           </button>
       </div>
     </aside>

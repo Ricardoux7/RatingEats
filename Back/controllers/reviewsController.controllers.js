@@ -19,6 +19,13 @@ const createReview = asyncHandler(async (req, res) => {
         throw new Error('Rating must be between 1 and 5');
     }
 
+    // Verificar si existe una review activa (no eliminada) para este usuario y restaurante
+    const existingActiveReview = await Review.findOne({ restaurantId, userId, deleted: false });
+    if (existingActiveReview) {
+        res.status(409);
+        throw new Error('You have already submitted a review for this restaurant');
+    }
+    // Si existe una review eliminada, se permite crear una nueva
     try {
         const review = new Review({
             restaurantId,
@@ -27,16 +34,9 @@ const createReview = asyncHandler(async (req, res) => {
             comment
         });
         await review.save();
-        
         await updateRating(restaurantId);
-        
         res.status(201).json({ message: 'Review created and rating updated.', review });
-
     } catch (error) {
-        if (error.code === 11000) {
-            res.status(409);
-            throw new Error('You have already submitted a review for this restaurant');
-        }
         throw error;
     }
 });
@@ -45,6 +45,7 @@ const getReviewsByRestaurant = asyncHandler(async (req, res) => {
     const reviews = await Review.find({ restaurantId, deleted: false }).populate('userId', 'username');
     res.json(reviews);
 });
+
 const deleteReview = asyncHandler(async (req, res) => {
     const { reviewId } = req.params;
     const userId = req.user._id;
@@ -73,4 +74,5 @@ const updateRating = (async (restaurantId) => {
     const average = Math.round((totalRating / reviews.length) * 10) / 10;
     await Restaurant.findByIdAndUpdate(restaurantId, { averageRating: average, numReviews: reviews.length });
 })
+
 export { createReview, getReviewsByRestaurant, deleteReview, updateRating };

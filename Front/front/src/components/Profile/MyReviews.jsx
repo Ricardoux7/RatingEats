@@ -1,5 +1,6 @@
 import api from '../../api/api';
 import React, { useEffect, useState } from 'react';
+import DeleteReview from '../DeleteReview.jsx';
 
 const MyReviews = ({ user }) => {
   const [reviews, setReviews] = useState([]);
@@ -9,7 +10,7 @@ const MyReviews = ({ user }) => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await api.get('/profile/reviews', {
+        const response = await api.get(`/profile/reviews`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -17,17 +18,21 @@ const MyReviews = ({ user }) => {
         setReviews(response.data);
       } catch (err) {
         console.error('Error fetching reviews:', err);
-        setError('Coulnt fetch reviews. Please try again later.');
+        setError(reviews && reviews.length===0 ? 'No reviews found' : 'Coulnt fetch reviews. Please try again later.');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchReviews();
-  }, [user.token]);
+  }, [reviews]);
+
+  if (!user) {
+    return <p className="text-center text-red-500">User not found. Please log in again.</p>;
+  }
 
   return (
-    <div className="p-5 font-sans">
+    <div className="p-5 font-sans mt-5">
       {isLoading ? (
         <p className="text-center text-gray-600">Loading...</p>
       ) : error ? (
@@ -40,17 +45,17 @@ const MyReviews = ({ user }) => {
               className="border border-[#258A00] rounded-lg p-4 bg-white w-full"
             >
               <div className='flex justify-between items-start'>
-                <div className='flex flex-row flex-wrap text-2xl gap-1 w-1/2'>
+                <div className='flex flex-row flex-wrap text-2xl gap-1 w-1/2 items-center'>
                   <p className="mb-2 text-[2rem] font-normal text-[#171A1F]">{review.restaurantId?.name}</p>
                   {Array.from({ length: 5 }).map((_, i) => (
                     i < Math.round(review.rating) ? (
-                      <img key={i} src="../../icons/star-green.svg" alt="star" className='w-6 mb-2'/>
+                      <img key={i} src="../../icons/star-green.svg" alt="star" className='h-6 mb-2'/>
                     ) : (
-                      <img key={i} src="../../icons/star-gray-com.svg" alt="star" className='w-6 mb-2' />
+                      <img key={i} src="../../icons/star-gray-com.svg" alt="star" className='h-6 mb-2' />
                     )
                   ))}
                 </div>
-                <button className='text-[#B70000] flex items-center gap-1 border-2 border-[#D9D9D9] rounded-lg p-2 font-semibold truncate'><img src="../../icons/delete.svg" alt="delete" className='w-6' /> Delete</button>
+                <DeleteReview reviewId={review._id} onDelete={() => setReviews(reviews.filter((r) => r._id !== review._id))}/>
               </div>
               <p className="mb-2 text-[1rem] text-[#171A1F]">{review.comment}</p>
               <p className="mb-2 text-[1rem]">

@@ -2,6 +2,7 @@ import api from '../../api/api';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import DeleteReview from '../DeleteReview';
 
 const Reviews = () => {
   const { id } = useParams();
@@ -58,11 +59,18 @@ const Reviews = () => {
         setError('You have already submitted a review for this restaurant.');
         setShowPopup(true);
       } else if (err.response && err.response.status === 400) {
-      setError('Invalid review. Please check your rating and comment.');
-      setShowPopup(true);
+        setError('Invalid review. Please check your rating and comment.');
+        setShowPopup(true);
+      } else if (err.response && err.response.status === 403) {
+        setError('You must be logged in to submit a review.');
+        setShowPopup(true);
+      } else if (err.response && err.response.status === 500) {
+        setError('Server error. Please try again later.');
+        setShowPopup(true);
       } else {
         console.error('Error submitting review:', err);
         setError('Could not submit review. Please try again later.');
+        setShowPopup(true);
       }
     }
   }
@@ -122,6 +130,14 @@ const Reviews = () => {
             return new Date(b.createdAt) - new Date(a.createdAt);
           }).slice(0, visibleCount).map((review) => (
             <div key={review._id} className="mb-4 p-3 rounded-lg bg-gray-100 shadow-sm flex flex-col gap-1 md:p-4 md:gap-2">
+              {review.userId?._id === user?._id && (
+                <div>
+                  <p className="text-sm text-gray-500">You</p>
+                  <div className='flex justify-end'>
+                    <DeleteReview reviewId={review._id} onDelete={() => setReviews(reviews.filter((r) => r._id !== review._id))} />
+                  </div>
+                </div>
+              )}
               <h2 className="text-base md:text-xl font-semibold wrap-break-word">
                 {review.userId?.username || 'Usuario'}
               </h2>

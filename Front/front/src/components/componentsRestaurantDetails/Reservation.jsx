@@ -1,10 +1,12 @@
 import api from '../../api/api';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import '../../components.css';
 
 const CreateReservation = () => {
   const { id } = useParams();
+  const { user } = useAuth();
   const [restaurant, setRestaurant] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,7 +53,11 @@ const CreateReservation = () => {
         },
       }
     );
-      setMessage('Reservation created successfully!');
+    if (response.data && response.data.state === 'confirmed') {
+      setMessage('Reservation created and confirmed successfully!');
+    } else {
+      setMessage('Your reservation request was sent successfully!');
+    }
       setShowPopup(true);
       setReservationDate('');
       setReservationTime('');

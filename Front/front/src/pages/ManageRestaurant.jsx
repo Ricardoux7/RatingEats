@@ -15,7 +15,9 @@ import ManageMenu from '../components/ManageRestaurant/ManageMenu.jsx';
 import UploadPost from '../components/ManageRestaurant/UploadPost.jsx';
 import UpdateBanner from '../components/ManageRestaurant/UpdateBanner.jsx';
 import BringMenu from '../components/BringMenu.jsx';
-
+import DeleteRestaurant from '../components/ManageRestaurant/DeleteREstaurant.jsx';
+import AddOperator from '../components/ManageRestaurant/AddOperator.jsx';
+import DeleteOperator from '../components/ManageRestaurant/DeleteOperator.jsx';
 const MyRestaurant = () => {
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState(null);
@@ -31,29 +33,31 @@ const MyRestaurant = () => {
   const imageUrl = restaurant && restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant?.images[0].url}` : '/icons/image-not-found.png';
   const imagesMenuUrl = restaurant?.menu && restaurant.menu.length > 0;
   useEffect(() => {
-  const fetchRestaurant = async () => {
-    try {
-      const response = await api.get(`restaurants/manage/restaurant/${id}`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      setRestaurant(response.data);
-    } catch (err) {
-  if (err.response && err.response.status === 403) {
-    navigate('/no-permission');
-  } else if (err.response && err.response.status === 500) {
-    setError('Internal server error. Please try again later.');
-    navigate('/no-permission');
-  } else {
-    setError('Could not fetch restaurant. Please try again later.');
-  }
-} finally {
-      setIsLoading(false);
-    }
-  };
-  fetchRestaurant();
-}, [id, user.token]);
+    const fetchRestaurant = async () => {
+      try {
+        const token = localStorage.getItem('userToken');
+        const response = await api.get(`restaurants/manage/restaurant/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setRestaurant(response.data);
+      } catch (err) {
+        if (err.response && err.response.status === 403) {
+          navigate('/no-permission', { replace: true });
+          console.log(err)
+        } else if (err.response && err.response.status === 500) {
+          setError('Internal server error. Please try again later.');
+          console.log(err)
+        } else {
+          setError('Could not fetch restaurant. Please try again later.');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchRestaurant();
+  }, [id]);
 
   const handleUpdate = (updatedRestaurant) => {
     setRestaurant(updatedRestaurant);
@@ -74,7 +78,7 @@ const MyRestaurant = () => {
     <>
       <HeaderDesktop />
       <HeaderMobile tab={activeSection} setTab={setActiveSection} manage={true} />
-      <div className='hidden md:grid md:grid-cols-[1fr_3fr_1fr] gap-4 pb-10'>
+      <div className='hidden md:grid md:grid-cols-[1fr_3fr_1fr] gap-4 pb-10 '>
         {showImage && selectedImage && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.8)] p-4 w-full h-full'>
           <div className='relative'>
@@ -135,6 +139,11 @@ const MyRestaurant = () => {
           <button className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]' onClick={() => setActiveSection('postsUpload')}>
             Upload posts
           </button>
+          <button onClick={() => setActiveSection('addOperator')} className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'>Add Operator</button>
+          <button onClick={() => setActiveSection   ('deleteOperator')} className='h-auto w-[90%]     border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'>
+            Delete Operator
+          </button>
+          <button className='h-auto w-[90%]  bg-red-600 text-white font-semibold rounded-md p-2 text-[80%]' onClick={() => setActiveSection('deleteRestaurant')}>Delete Restaurant</button>
         </aside>
         <div>
           {isLoading ? (
@@ -187,19 +196,6 @@ const MyRestaurant = () => {
                   <p className='text-[#171A1F] font-bold text-[2rem] mt-4 mb-2'>Contact</p>
                   <p className='text-[#171A1F] text-[1rem]'>{restaurant.phoneNumber}</p>
                   <h2 className='text-[2rem] font-bold text-[#171A1F] pb-4 '>Our Menu</h2>
-                  
-                    {/*imagesMenuUrl ? (
-                      restaurant.menu.map((menuItem, i) => {
-                        const menuImageUrl = `${BACKEND_URL}${menuItem.url}`;
-                        return (
-                          <div key={i} className='w-fit shrink-0'>
-                            <img src={menuImageUrl} alt="Menu Image" className="w-[200px] h-[200px] object-cover rounded-lg cursor-pointer" onClick={() => { setSelectedImage(menuImageUrl); setShowImage(true); }} />
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <p>No menu images available</p>
-                    )*/}
                     <div className='max-w-[800px] mx-auto'>
                     <BringMenu restaurantId={restaurant._id} />
                     </div>*
@@ -227,6 +223,15 @@ const MyRestaurant = () => {
               )}
               {activeSection === 'postsUpload' && restaurant && (
                 <UploadPost restaurantId={restaurant._id} />
+              )}
+              {activeSection === 'deleteRestaurant' && restaurant && (
+                <DeleteRestaurant restaurantId={restaurant._id} userToken={user.token} />
+              )}
+              {activeSection === 'addOperator' && restaurant && (
+                <AddOperator restaurantId={restaurant._id} userToken={user.token} />
+              )}
+              {activeSection === 'deleteOperator' && restaurant && (
+                <DeleteOperator restaurantId={restaurant._id} userToken={user.token} />
               )}
             </>
           )}
@@ -320,6 +325,18 @@ const MyRestaurant = () => {
         )}
         {activeSection === 'menu' && restaurant && (
           <ManageMenu restaurantId={restaurant._id} />
+        )}
+        {activeSection === 'postsUpload' && restaurant && (
+          <UploadPost restaurantId={restaurant._id} />
+        )}
+        {activeSection === 'addOperator' && restaurant && (
+          <AddOperator restaurantId={restaurant._id} userToken={user.token} />
+        )}
+        {activeSection === 'deleteOperator' && restaurant && (
+          <DeleteOperator restaurantId={restaurant._id} userToken={user.token} />
+        )}
+        {activeSection === 'deleteRestaurant' && restaurant && (
+          <DeleteRestaurant restaurantId={restaurant._id} userToken={user.token} />
         )}
       </div>
     </>

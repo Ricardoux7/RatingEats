@@ -1,7 +1,7 @@
 import express from 'express';
-import { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, deleteOperator, addOperator, getRestaurantsToManage, updateBannerImage } from '../controllers/restaurantController.controllers.js';
+import { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, deleteOperator, addOperator, getRestaurantsToManage, updateBannerImage, getOperators } from '../controllers/restaurantController.controllers.js';
 import { restaurantValidationRules, validate, updateRestaurantValidationRules } from '../middlewares/restaurantValidation.middlewares.js';
-import { protect } from '../middlewares/authMiddleware.middlewares.js';
+import { protect, isOwner } from '../middlewares/authMiddleware.middlewares.js';
 import upload from '../middlewares/MiddlewaresImages/multerConfig.middlewares.js';
 import { multerErrorHandler } from '../middlewares/MiddlewaresImages/multerErrorMiddleware.middlewares.js';
 import { hasRestaurantRole } from '../middlewares/roleMiddleware.middlewares.js';
@@ -14,9 +14,14 @@ router.route('/').post(protect, ...restaurantValidationRules, validate, createRe
 router.route('/:id')
     .get(getRestaurant)
     .patch(protect, hasRestaurantRole(['owner', 'operator']), ...updateRestaurantValidationRules, validate, updateRestaurant)
-    .delete(protect, hasRestaurantRole(['owner']), deleteRestaurant);
+    .delete(protect, hasRestaurantRole(['owner']), isOwner, deleteRestaurant);
 router.route('/:id/images/banner').patch(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(upload.single('image')), updateBannerImage);
 router.route('/:id/images').post(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(upload.single('image')), uploadImage);
+router.route('/:idRestaurant/operators').get(
+    protect, 
+    hasRestaurantRole(['owner'], 'idRestaurant'),
+    getOperators
+);
 router.route('/:id/operators/:businessUserId') 
     .delete(
         protect, 
@@ -28,7 +33,7 @@ router.route('/:id/operator').post(
     hasRestaurantRole(['owner'], 'id'), 
     addOperator
 );
-router.route('/:id/reviews').post(protect, createReview).get(getReviewsByRestaurant);
+router.route('/:id/reviews').post(protect, createReview).get(getReviewsByRestaurant)
 router.route('/reviews/:reviewId').delete(protect, deleteReview);
 router.route('/:id/menu/images').post(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(uploadMenu.array('images')), uploadMenuImage);
 router.route('/:id/menu/images/:imageId').delete(protect, hasRestaurantRole(['owner', 'operator']), deleteMenuImage).patch(protect, hasRestaurantRole(['owner', 'operator']), multerErrorHandler(uploadMenu.single('image')), changeThisImage);

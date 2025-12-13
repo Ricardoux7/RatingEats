@@ -41,10 +41,15 @@ const createPost = asyncHandler(async (req, res) => {
 
         await post.save();
         await Restaurant.findOneAndUpdate({ _id: restaurantId }, { $push: { posts: post._id } });
-        
-        const message = postState === 'accepted' ? 'Post created successfully' : 'Post created successfully and is pending approval';
 
-        res.status(201).json({ message: message, post });
+        let message;
+        if (isOperatorOfDestination) {
+            message = 'Post created and uploaded successfully';
+        } else {
+            message = 'The post was sent and is pending acceptance.';
+        }
+
+        res.status(201).json({ message, post });
     }
     catch (error) {
         if (uploadedFile) {

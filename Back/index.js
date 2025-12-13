@@ -8,6 +8,7 @@ import FilterRouter from './routes/filterRoutes.routes.js';
 import routerPosts from './routes/postsRoutes.routes.js';
 import reservationRoutes from './routes/reservationRoutes.routes.js';
 import errorHandler from './middlewares/profileMiddleware.middlewares.js';
+import routerNotifications from './routes/notificationRoutes.routes.js';
 import cors from 'cors';
 import path from 'path';
 
@@ -42,6 +43,7 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/api/filter', FilterRouter);
 app.use('/search', FilterRouter);
+app.use('/api/notifications', routerNotifications);
 app.use(errorHandler);
 
 

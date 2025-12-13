@@ -6,6 +6,8 @@ import { HeaderProfile, HeaderProfileDesktop } from '../components/Components.js
 import  EditProfile  from '../components/Profile/EditProfile.jsx';
 import  MyReviews from '../components/Profile/MyReviews.jsx';
 import MyRestaurants from '../components/Profile/MyRestaurants.jsx';
+import { useFavorites } from '../components/Favorites.jsx';
+import Switch from "../components/FavoriteButton.jsx";
 
 const Profile = () => {
   const { id } = useParams();
@@ -13,6 +15,7 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
+  const { favorites, handleFavoriteToggle } = useFavorites();
   const [title, setTitle] = useState('My Profile');
   const [showEdit, setShowEdit] = useState(false);
   const navigate = useNavigate(); 
@@ -35,24 +38,6 @@ const Profile = () => {
       };
     fetchUserData();
   }, [id]);
-
-  const fetchFavoriteRestaurants = async () => {
-    try {
-      const response = await api.get('/profile/favorites', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('userToken')}`,
-        },
-      });
-      setFavoriteRestaurants(response.data);
-    } catch (err) {
-      setError('Coulnt fetch favorite restaurants. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchFavoriteRestaurants();
-  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -85,16 +70,25 @@ const Profile = () => {
             </div>
             <div className='mt-5'>
               <p className='text-[2rem]'>Favorite Restaurants</p>
-                {favoriteRestaurants.length === 0 ? (
+                {favorites.length === 0 ? (
                   <p>No favorite restaurants added yet.</p>
                 ) : (
                   <div className='grid grid-cols-2 md:grid-cols-3 gap-4 mt-4'>
-                    {favoriteRestaurants.map((restaurant) => {
+                    {favorites.map((restaurant) => {
                       const imageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : "../icons/image-not-found.png";
                       return (
                         <div key={restaurant._id} className="p-4 mb-4 rounded-lg cursor-pointer transition" onClick={() => navigate(`/restaurants/${restaurant._id}`)}> 
                           <div>
-                            <img src={imageUrl} alt={restaurant.name} className="w-full h-[120px] object-cover mb-2 rounded-lg" />
+                            <div className='relative'>
+                              <img src={imageUrl} alt={restaurant.name} className="w-full h-[120px] object-cover mb-2 rounded-lg" />
+                              <div className='absolute top-2 right-2 z-10'>
+                                <Switch 
+                                  id={`favorite-${restaurant._id}`}
+                                  isFav={Array.isArray(favorites) && favorites.some(fav => fav._id === restaurant._id)}
+                                  onChange={() => handleFavoriteToggle(restaurant._id)}
+                                />
+                              </div>
+                            </div>
                             <h3 className='text-xl font-semibold'>{restaurant.name}</h3>
                             <p className='text-[#565D6D] font-bold'>{restaurant.categories[0] || 'No specified category'}</p>
                             <div className='flex flex-row gap-1 items-center'>
@@ -134,12 +128,22 @@ const Profile = () => {
             <p className='text-[#45484C] text-[1.5rem]'>{userData ? userData.biography : ''}</p>
             <div>
               <p className='text-[2rem] mt-10 mb-5 font-medium'>Favorite Restaurants</p>
-              <div className='flex flex-wrap md:items-center md:justify-center xl:justify-start'>{favoriteRestaurants.map((restaurant) => {
+              <div className='flex flex-wrap md:items-center md:justify-center xl:justify-start'>{favorites.map((restaurant) => {
                 const imageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : "../icons/image-not-found.png";
                 return (
                   <div key={restaurant._id} className="p-4 mb-4 rounded-lg cursor-pointer transition border-b border-gray-200 " onClick={() => navigate(`/restaurants/${restaurant._id}`)}> 
                     <div className='w-[400px] h-[450px] border-r border-gray-200 flex flex-col gap-2'>
+                      <div className='relative'>
                       <img src={imageUrl} alt={restaurant.name} className="w-[400px] h-[250px] object-cover mb-2 rounded-lg" />
+                      <div className='absolute top-2 right-2 z-10'>
+                        <Switch 
+                          id={`favorite-${restaurant._id}`}
+                          isFav={Array.isArray(favorites) && favorites.some(fav => fav._id === restaurant._id)}
+                          onChange={() => handleFavoriteToggle(restaurant._id)}
+                        />
+                        </div>
+                      </div>
+
                       <h3 className='text-xl text-[1.5rem] font-medium'>{restaurant.name}</h3>
                       <div className='flex flex-row items-center  '>
                         <p className='text-white font-bold bg-gray-600 border rounded-4xl px-3 py-1 w-fit'>{restaurant.categories[0] || 'No specified category'}</p>

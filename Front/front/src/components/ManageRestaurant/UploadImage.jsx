@@ -96,7 +96,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
       formData.append('image', selectedFiles[0]);
       formData.append('content', content);
       try {
-        await api.post(`/${restaurantId}/posts`, formData, {
+        const submitting = await api.post(`/${restaurantId}/posts`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${user.token}`,
@@ -104,7 +104,11 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         });
         setSelectedFiles([]);
         setContent('');
-        setPopupMessage('Post image uploaded successfully.');
+        if(submitting.data?.message === 'Post created and uploaded successfully'){
+          setPopupMessage('Post image uploaded successfully.');
+        } else {
+          setPopupMessage('Post image sent and is pending acceptance.');
+        }
         setShowPopup(true);
         setTimeout(() => {
           if (onClose) onClose();

@@ -8,6 +8,9 @@ import BringRestaurants from '../components/componentsRestaurantDetails/BringRes
 import BringMenu from '../components/BringMenu.jsx';
 import Maps from '../components/Maps.jsx';
 import api from '../api/api'; 
+import UploadImage from '../components/ManageRestaurant/UploadPost.jsx';
+import { useFavorites } from '../components/Favorites.jsx';
+import Switch from '../components/FavoriteButton.jsx';
 import '../components.css';
 
 
@@ -16,8 +19,9 @@ const RestaurantDetails = () => {
   const [restaurant, setRestaurant] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { favorites, handleFavoriteToggle } = useFavorites();
   const [reservationSuccess, setReservationSuccess] = useState(false);
-  const [bringRestaurant, setBringRestaurant] = useState(null);
+  //const [bringRestaurant, setBringRestaurant] = useState(null);
   const [tab, setTab] = useState('general');
   const limitRestaurants = 3;
 
@@ -52,17 +56,31 @@ const RestaurantDetails = () => {
   const imageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : '../icons/image-not-found.png';
   const imagesMenuUrl = restaurant.menu && restaurant.menu.length > 0;
 
+  if(favorites.some(fav => fav._id === restaurant._id)){
+    var isFavorite = true;
+  } else {
+    var isFavorite = false;
+  }
+
   return (
     <>
       <HeaderMobile tab={tab} setTab={setTab} />
       <HeaderDesktop tab={tab} setTab={setTab} />
-      
       {tab === 'general' && (
         <div>
           <div className="hidden md:grid md:grid-cols-3 gap-8 bg-white overflow-hidden transform transition duration-700">
             <div className="col-span-2 p-6">
               <div className='relative h-[600px] w-full z-0 rounded-2xl flex flex-row items-start'>
                 <img src={imageUrl} alt={restaurant.name} className="w-full h-[600px] object-cover rounded-2xl  relative z-0" />
+                <div>
+                  <div className='absolute top-4 right-4 z-20'>
+                    <Switch restaurantId={id} 
+                      id={`favorite-${restaurant._id}`}
+                      isFav={isFavorite}
+                      onChange={() => handleFavoriteToggle(restaurant._id)}
+                      />
+                  </div>
+                </div>
                 <div className='absolute bottom-0 left-0 h-[50%] w-full rounded-2xl bg-linear-to-t from-black/70 via-black/30 to-transparent z-10 flex flex-col justify-end p-6'>
                   <h2 className="text-4xl font-bold text-white z-10">{restaurant.name}</h2>
                   <div className='flex items-end flex-row '>
@@ -110,15 +128,25 @@ const RestaurantDetails = () => {
               </div>
             </div>
             <div className="flex flex-col">
-              <div className="w-full gap-4 flex flex-col items-center justify-center bg-gray-100 p-6 rounded-2xl shadow-md">
+              <div className="w-full gap-4 flex flex-col items-center justify-center bg-gray-100 border border-[#258A00] p-6 rounded-2xl shadow-md">
                 <CreateReservation onSuccess={() => setReservationSuccess(true)} />
                 <Maps geoLocation={restaurant.geoLocation} restaurantName={restaurant.name} />
+                <UploadImage mode="postUpload" restaurantId={id} />
               </div>
             </div>
           </div>
           <div className="flex flex-col items-center justify-center bg-gray-100 md:hidden">
             <div className="bg-white overflow-hidden transform transition duration-700 hover:shadow-xl w-full">
-              <img src={imageUrl} alt={restaurant.name} className="w-full h-64 object-cover" />
+              <div className='relative h-64 w-full z-0 rounded-t-lg flex flex-row items-start'>
+                <img src={imageUrl} alt={restaurant.name} className="w-full h-64 object-cover" />
+                <div className='absolute top-4 right-4 z-20'>
+                  <Switch restaurantId={id} 
+                    id={`favorite-${restaurant._id}`}
+                    isFav={isFavorite}
+                    onChange={() => handleFavoriteToggle(restaurant._id)}
+                    />
+                </div>
+              </div>
               <div className="p-4 space-y-2">  
                 <h2 className="text-2xl font-bold text-[#171A1F]">{restaurant.name}</h2>
                 <div className='flex items-center flex-row'>
@@ -163,6 +191,7 @@ const RestaurantDetails = () => {
             <Reviews>
             </Reviews>
             <Maps geoLocation={restaurant.geoLocation} restaurantName={restaurant.name} />
+            <UploadImage mode="postUpload" restaurantId={id} />
           </div>
           <hr className='border-0 h-px bg-[#258A00] w-[60%] rounded-lg my-4' />
           <h2 className='text-[2rem] font-bold text-[#171A1F] p-4'>You might also like</h2>

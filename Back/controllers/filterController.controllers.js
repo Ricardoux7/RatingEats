@@ -27,7 +27,7 @@ const filterRestaurants = asyncHandler(async (req, res) =>{
     return res.status(200).json(restaurants);
 })
 
-const searchInBar = asyncHandler(async (req, res) => {
+const searchInBar = asyncHandler(async (req, res, next) => {
   const { searchBar } = req.query;
   let restaurants = await Restaurant.find({ isDeleted: false });
   if (searchBar && searchBar.trim() !== '' && restaurants.length > 0) {
@@ -36,17 +36,18 @@ const searchInBar = asyncHandler(async (req, res) => {
       restaurant.name.toLowerCase().includes(searchTerm) ||
       restaurant.description.toLowerCase().includes(searchTerm) ||
       (Array.isArray(restaurant.categories) && restaurant.categories.some(category => category.includes(category.toLowerCase()))
-));
+    ));
     restaurants = restaurants.sort((a, b) =>{
       const ratingA = a.averageRating || 0;
       const ratingB = b.averageRating || 0;
       return ratingB - ratingA;
-    })
-    return res.status(200).json(restaurants);
+    });
+    res.locals.results = restaurants;
+    return next();
   } else {
     res.status(400);
     throw new Error('Search term is required');
   }
-})
+});
 
 export { filterRestaurants, searchInBar };

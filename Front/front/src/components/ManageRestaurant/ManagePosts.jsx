@@ -1,5 +1,6 @@
 import api from '../../api/api';
 import React, { useEffect, useState } from 'react';
+import { handleAcceptPost, handleRejectPost } from '../NotiPost.jsx';
 
 const ManagePosts = ({ restaurantId, userToken }) => {
   const [posts, setPosts] = useState([]);
@@ -38,6 +39,7 @@ const ManagePosts = ({ restaurantId, userToken }) => {
       setPosts(posts.filter(post => post._id !== postId));
       setPopupMessage('Post has been accepted successfully!');
       setShowPopup(true);
+      handleAcceptPost({ userId: posts.find(post => post._id === postId).authorUserId._id, restaurantId, postId });
       setTimeout(() => {
         setShowPopup(false);
         setPopupMessage('');
@@ -57,6 +59,7 @@ const ManagePosts = ({ restaurantId, userToken }) => {
       setPosts(posts.filter(post => post._id !== postId));
       setPopupMessage('Post has been rejected successfully!');
       setShowPopup(true);
+      handleRejectPost({ userId: posts.find(post => post._id === postId).authorUserId._id, restaurantId, postId });
       setTimeout(() => {
         setShowPopup(false);
         setPopupMessage('');

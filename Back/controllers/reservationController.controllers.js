@@ -1,6 +1,8 @@
 import { Reservation } from '../models/reservations.models.js';
 import asyncHandler from 'express-async-handler';
 import Restaurant from '../models/restaurant.models.js';
+import BusinessUser from '../models/businessUser.models.js';
+import { User } from '../models/users.models.js';
 
 const createReservation = asyncHandler(async (req, res) => {
     const userId = req.user._id;
@@ -8,7 +10,6 @@ const createReservation = asyncHandler(async (req, res) => {
     const staffRestaurantId = req.user.restaurantId;
     const { restaurantId, dateReservation, time, numberOfGuests, customerName, phoneNumber } = req.body;
     const restaurant = await Restaurant.findOne({ _id: restaurantId, isDeleted: false});
-    
     let stateReservation = 'pending';
     const isStaff = (userRole === 'owner' || userRole === 'operator');
     const isOperatorOfDestination = isStaff && staffRestaurantId && (staffRestaurantId.toString() === restaurantId.toString());
@@ -16,6 +17,7 @@ const createReservation = asyncHandler(async (req, res) => {
     if (isOperatorOfDestination) {
         stateReservation = 'confirmed';
     }
+    
     const reservation = new Reservation({
         userId,
         restaurantId,

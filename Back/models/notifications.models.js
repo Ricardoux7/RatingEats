@@ -5,7 +5,7 @@ const notificationSchema = new mongoose.Schema({
     notifRestaurantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Restaurant' },
     type: { 
         type: String, 
-        enum: ['reservation', 'review', 'message', 'other'],
+        enum: ['reservation', 'review', 'post', 'other'],
     },
     message: { type: String, required: true, trim: true, maxlength: 500 },
     read: { type: Boolean, default: false },

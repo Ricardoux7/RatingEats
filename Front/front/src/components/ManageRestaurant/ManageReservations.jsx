@@ -1,6 +1,7 @@
 import api from '../../api/api';
 import { useState, useEffect, useParams } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { handleAcceptReservation, handleRejectReservation } from '../NotiReservation.jsx';
 
 const ManageReservations = ({ restaurantId }) => {
   const { user } = useAuth();
@@ -40,9 +41,14 @@ const ManageReservations = ({ restaurantId }) => {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      fetchReservations();
       setPopupMessage('Reservation accepted successfully.');
       setShowPopup(true);
+      fetchReservations();
+      handleAcceptReservation({
+        userId: reservations.find(r => r._id === reservationId).userId,
+        restaurantId: restaurantId,
+        reservationId: reservationId,
+      });
       setTimeout(() => {
         setShowPopup(false);
         setPopupMessage('');
@@ -59,19 +65,25 @@ const ManageReservations = ({ restaurantId }) => {
           Authorization: `Bearer ${user.token}`,
         },
       });
-      fetchReservations();
       setPopupMessage('Reservation rejected successfully.');
       setShowPopup(true);
+      fetchReservations();
+      handleRejectReservation({
+        userId: reservations.find(r => r._id === reservationId).userId,
+        restaurantId: restaurantId,
+        reservationId: reservationId,
+      });
       setTimeout(() => {
         setShowPopup(false);
-        setPopupMessage('')}, 2000);
+        setPopupMessage('');
+      }, 2000);
     } catch (err) {
       console.error('Error rejecting reservation:', err);
     }
   };
   
   const ReservationPopup = ({ message }) => (
-    <div className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+    <div className="fixed top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-[9999]">
       {message}
     </div>
   );

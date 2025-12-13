@@ -5,15 +5,15 @@ import { SkeletonsMainPage } from "../components/SkeletonsMainPage.jsx";
 import { useNavigate } from "react-router-dom";
 import Switch from "../components/FavoriteButton.jsx";
 import Filter from "../components/Filter.jsx";
+import { useFavorites } from "../components/Favorites.jsx"; '../components/favorites.jsx'
 import '../components.css';
-const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
+const MainPage = ({searchRestaurants, setSearchRestaurants, searchError, filters, setFilters}) => {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [favorites, setFavorites] = useState([]);
-  const [filters, setFilters] = useState({ categories: [], rating: null });
+  const { favorites, handleFavoriteToggle } = useFavorites();
   const limit = 10;
   const { user } = useAuth();
 
@@ -41,49 +41,8 @@ const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
   }, [page, user]);
 
   useEffect(() => {
-    const fetchFavorites = async () => {
-    if(user){
-      try {
-        const response = await api.get(`/profile/favorites`);
-        setFavorites(response.data);
-      } catch (err) {
-        console.error("Couldnt fetch favorite restaurants.");
-      }
-    }
-    };
-    fetchFavorites();
-  }, [user]);
-
-  useEffect(() => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }, [page]);
-
-  const handleFavoriteToggle = async (restaurantId) => {
-    if (!user) {
-      alert("You need to be logged in to manage favorites.");
-      return;
-    }
-    try {
-      const isFavorite = favorites.some(fav => fav._id === restaurantId);
-      if (isFavorite) { 
-        await api.delete(`profile/favorites/${restaurantId}`);
-        setFavorites(favorites.filter(fav => fav._id !== restaurantId));
-      } else {
-        await api.post(`profile/favorites/${restaurantId}`);
-        setFavorites([...favorites, { _id: restaurantId }]);
-      }
-    } catch (err) {
-      console.error("Error updating favorites:", err);
-      if (err.response) {
-        if (err.response.status === 401) {
-          alert("You need to be logged in to manage favorites.");
-        } else {
-          alert("An error occurred while updating favorites. Please try again.");
-    }
-      }
-    }
-  }
-
 
   const filteredRestaurants = restaurants.filter((restaurant) => {
     const matchesCategory =
@@ -150,7 +109,7 @@ const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
             {restaurant.adress || "No specified address"}
           </p>
           <p className="bg-gray-200 rounded-full px-3 py-1 text-sm text-black-200 mt-2 w-fit">
-            {restaurant.categories[0] || "No specified category"}
+            {restaurant.categories.map(category => category.charAt(0).toUpperCase() + category.slice(1)).join(', ')}
           </p>
           <div className="mt-3 flex flex-col items-start space-y-2 h-full">
             <span className="text-lg font-semibold text-[#21C45D]">
@@ -171,20 +130,20 @@ const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
       <div>
       <Filter filters={filters} setFilters={setFilters}/>
       </div>
-      <main className="py-5 px-4 md:px-8 h-full w-full">
-        <h1 className="text-2xl font-bold my-10  text-[#2DA800]">
+      <main className="md:py-5 px-4 md:px-8 h-full w-full">
+        <h1 className="text-2xl font-bold my-2 md:my-10  text-[#2DA800]">
           Discover
         </h1>
+
         {isLoading && (
-          <>
-          
-          <div className=' items-center justify-center min-h-screen flex flex-col'>
-      <div className='w-12 h-12 loader-rotate'></div>
-    </div>
-          <div className="text-center py-10 ">
-            <SkeletonsMainPage />
+          <div className="relative min-h-screen flex items-center justify-center">
+            <div className="w-full">
+              <SkeletonsMainPage />
+            </div>
+            <div className="absolute top-0 left-0 right-0 flex items-center justify-center pointer-events-none">
+              <div className="w-12 h-12 loader-rotate"></div>
+            </div>
           </div>
-          </>
         )}
 
         {error && (
@@ -204,8 +163,15 @@ const MainPage = ({searchRestaurants, setSearchRestaurants}) => {
         {!isLoading && restaurants.length > 0 && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRestaurants.map(renderRestaurantCard)}
-              {searchRestaurants.map(renderRestaurantCard)}
+              {searchRestaurants && searchRestaurants.length > 0 ? (
+                searchRestaurants.map(renderRestaurantCard)
+              ) : searchError ? (
+                <div className="text-center py-10 mx-auto col-span-full">
+                  <p className="text-lg text-gray-600">{searchError}</p>
+                </div>
+              ) : (
+                filteredRestaurants.map(renderRestaurantCard)
+              )}
             </div>
             <div className="mt-12 flex justify-center items-center space-x-4">
               <button

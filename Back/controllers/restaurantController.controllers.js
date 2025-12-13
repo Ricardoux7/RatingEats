@@ -184,14 +184,20 @@ const addOperator = (asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
+    const isOwner = await BusinessUser.findOne({ restaurant: restaurantId, user: req.user._id, role: 'owner' });
+
+    if (!isOwner) {
+        res.status(403);
+        throw new Error('Only the owner can add operators');
+    }
+
     const existingRelationship = await BusinessUser.findOne({
         restaurant: restaurantId,
         user: userToAdd._id,
     });
 
     if (existingRelationship) {
-        res.status(400);
-        throw new Error('This user is already associated with the restaurant');
+        return res.status(400).json({ message: 'This user is already associated with the restaurant' });
     }
 
     const restaurant = await Restaurant.findOne({
@@ -234,10 +240,33 @@ const deleteOperator = asyncHandler(async (req, res) => {
     res.status(204).send();
 });
 
+const getOperators = asyncHandler(async (req, res) => {
+    const restaurantId = req.params.idRestaurant;
+    const isOwner = await BusinessUser.findOne({ restaurant: restaurantId, user: req.user._id, role: 'owner' });
+
+    if (!isOwner) {
+        res.status(403);
+        throw new Error('Only the owner can view operators');
+    }
+    const operators = await BusinessUser.find({ restaurant: restaurantId, role: 'operator' })
+        .populate({
+            path: 'user',
+            select: 'email name lastName username',
+        });
+    const operatorData = operators.map(op => ({
+        _id: op._id,
+        email: op.user?.email,
+        name: op.user?.name,
+        lastName: op.user?.lastName,
+        username: op.user?.username,
+    }));
+    res.status(200).json(operatorData);
+})
+
 const getRestaurantsToManage = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const restaurantId = req.params.id;
-        if (!userId) {
+    if (!userId) {
         res.status(401);
         throw new Error('User not authenticated');
     }
@@ -247,9 +276,18 @@ const getRestaurantsToManage = asyncHandler(async (req, res) => {
         throw new Error('Restaurant ID is required');
     }
 
+    const restaurant = await Restaurant.findOne({
+        _id: restaurantId,
+        isDeleted: false,
+    });
+    if (!restaurant) {
+        res.status(404);
+        throw new Error('Restaurant not found');
+    }
+
     const businessUser = await BusinessUser.findOne({
         user: userId,
-        restaurant: restaurantId
+        restaurant: restaurantId,
     }).populate('restaurant');
     if (businessUser) {
         res.status(200).json(businessUser.restaurant);
@@ -290,4 +328,4 @@ const updateBannerImage = asyncHandler(async (req, res) => {
     res.status(200).json(restaurant);
 });
 
-export { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, addOperator, deleteOperator, getRestaurantsToManage, updateBannerImage  };
+export { createRestaurant, getRestaurant, updateRestaurant, deleteRestaurant, getAllRestaurants, uploadImage, addOperator, deleteOperator, getRestaurantsToManage, updateBannerImage, getOperators };

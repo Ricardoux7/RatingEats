@@ -9,6 +9,8 @@ const MyRestaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isOwnerError, setIsOwnerError] = useState(null);
+  const [otroerror, setOtroerror] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,9 +21,11 @@ const MyRestaurants = () => {
             Authorization: `Bearer ${user.token}`,
           },
         });
-        const owner = response.data.owner || [];
-        const admin = response.data.admin?.restaurant ? [response.data.admin.restaurant] : [];
-        setRestaurants([...owner, ...admin]);
+          const owner = response.data.owner || [];
+          const operator = Array.isArray(response.data.operator)
+            ? response.data.operator.map(op => op.restaurant).filter(Boolean)
+            : [];
+          setRestaurants([...owner, ...operator]);
       } catch (err) {
         console.error(err.message);
         setError('Coulnt fetch restaurants. Please try again later.');

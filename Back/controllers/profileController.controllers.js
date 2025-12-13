@@ -2,7 +2,7 @@ import { User } from '../models/users.models.js';
 import { Review } from '../models/review.models.js';
 import Restaurant  from '../models/restaurant.models.js';
 import BusinessUser from '../models/businessUser.models.js';
-import asyncHandler from 'express-async-handler'; 
+import asyncHandler from 'express-async-handler';
 
 const getProfile = asyncHandler(async (req, res) => {
     const userId = req.user._id;
@@ -104,25 +104,16 @@ const getFavoriteRestaurants = asyncHandler(async (req, res) => {
 
 const getReviews = asyncHandler(async (req, res) => {
     const userId = req.user._id;
-    const userReviews = await Review.find({ userId: userId }).populate('restaurantId', 'name');
-    if (userReviews && userReviews.length > 0) {
-        res.json(userReviews);
-    } else {
-        res.status(404);
-        throw new Error('User not found');
-    }
+    const userReviews = await Review.find({ userId: userId, deleted: false }).populate('restaurantId', 'name');
+    res.json(userReviews);
 })
 
 const getMyRestaurants = asyncHandler(async(req, res) => {
     const userId = req.user._id;
-    const myRestaurantsOwner = await Restaurant.find({ ownerId: userId });
-    const myRestaurantsAdmin = await BusinessUser.findById(userId).populate('restaurant');
-    if (myRestaurantsOwner || myRestaurantsAdmin) {
-        res.json({ owner: myRestaurantsOwner, admin: myRestaurantsAdmin }   );
-    } else {
-        res.status(404);
-        throw new Error('User not found');
-    }
+    const myRestaurantsOwner = await Restaurant.find({ ownerId: userId, isDeleted: false });
+    const myRestaurantsOperatorRaw = await BusinessUser.find({ user: userId, role: 'operator' }).populate('restaurant');
+    const myRestaurantsOperator = myRestaurantsOperatorRaw.filter(op => op.restaurant && op.restaurant.isDeleted === false);
+    res.json({ owner: myRestaurantsOwner, operator: myRestaurantsOperator });
 })
 
 export { getProfile, editProfile, addFavoriteRestaurants, removeFavoriteRestaurants, getFavoriteRestaurants, getReviews, getMyRestaurants };

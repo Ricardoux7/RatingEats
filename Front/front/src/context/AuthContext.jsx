@@ -45,14 +45,15 @@ export const AuthProvider = ({ children }) => {
         throw error; 
     }
   };
-    const value = {
-      user,
-      userRole,
-      isLoggedIn: !!user,
-      login,
-      logOut,
-      registerUser, 
-    };
+
+  const value = {
+    user,
+    userRole,
+    isLoggedIn: !!user,
+    login,
+    logOut,
+    registerUser, 
+  };
 
     return (
     <AuthContext.Provider value={value}>
