@@ -1,30 +1,3 @@
-/**
- * API Principal de RatingEats
- *
- * Este archivo inicializa y configura el servidor Express para la API de RatingEats.
- * Incluye la configuración de CORS, rutas principales, manejo de errores y conexión a MongoDB.
- *
- * Middlewares:
- * - `cors`: Permite solicitudes desde orígenes permitidos.
- * - `express.json()`: Parsea JSON en las solicitudes.
- * - `errorHandler`: Manejo centralizado de errores.
- *
- * Rutas principales:
- * - `/api/profile`: Gestión de perfil de usuario.
- * - `/api/auth`: Registro y autenticación de usuarios.
- * - `/api/restaurants`: Gestión de restaurantes.
- * - `/api`: Publicaciones (posts).
- * - `/api/reservations`: Reservaciones de restaurantes.
- * - `/api/filter` y `/search`: Filtrado y búsqueda de restaurantes.
- * - `/api/notifications`: Notificaciones de usuario y restaurante.
- * - `/uploads`: Archivos estáticos de imágenes.
- *
- * Conexión:
- * - Conecta a MongoDB y levanta el servidor en el puerto especificado.
- *
- * @module index
- */
-
 import express from "express";
 import connection from "./config/database.js";
 import "dotenv/config";
@@ -36,17 +9,21 @@ import routerPosts from "./routes/postsRoutes.routes.js";
 import reservationRoutes from "./routes/reservationRoutes.routes.js";
 import errorHandler from "./middlewares/profileMiddleware.middlewares.js";
 import routerNotifications from "./routes/notificationRoutes.routes.js";
+import mongoose from "mongoose";
 import cors from "cors";
 import path from "path";
 
 const app = express();
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:3000", 
+  "http://localhost:5173",
+  "https://ratingeats.vercel.app"
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"), false);
@@ -71,8 +48,10 @@ app.use(errorHandler);
 
 app.get("/", (req, res) => res.send("RatingEats API OK"));
 
-connection.once("open", () => {
-  console.log("MongoDB conectado (desde index.js)");
-});
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://";
+
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log("MongoDB conectado desde Vercel"))
+  .catch(err => console.error("Error MongoDB:", err));
 
 export default app;
