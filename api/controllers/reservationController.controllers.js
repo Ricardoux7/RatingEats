@@ -1,0 +1,281 @@
+/**
+ * @file reservationController.controllers.js
+ * @module controllers/reservationController
+ * @description Controladores para gestión de reservaciones de restaurantes.
+ */
+
+import { Reservation } from "../models/reservations.models.js";
+import asyncHandler from "express-async-handler";
+import Restaurant from "../models/restaurant.models.js";
+import BusinessUser from "../models/businessUser.models.js";
+import { User } from "../models/users.models.js";
+
+/**
+ * Crea una nueva reservación para un restaurante.
+ * @function createReservation
+ * @route POST /api/reservations
+ * @param {Request} req - Objeto de solicitud Express (usuario autenticado, body: datos de la reservación)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve la reservación creada
+ */
+const createReservation = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const userRole = req.user.role;
+  const staffRestaurantId = req.user.restaurantId;
+  const {
+    restaurantId,
+    dateReservation,
+    time,
+    numberOfGuests,
+    customerName,
+    phoneNumber,
+  } = req.body;
+  const restaurant = await Restaurant.findOne({
+    _id: restaurantId,
+    isDeleted: false,
+  });
+  let stateReservation = "pending";
+  const isStaff = userRole === "owner" || userRole === "operator";
+  const isOperatorOfDestination =
+    isStaff &&
+    staffRestaurantId &&
+    staffRestaurantId.toString() === restaurantId.toString();
+
+  if (isOperatorOfDestination) {
+    stateReservation = "confirmed";
+  }
+
+  const reservation = new Reservation({
+    userId,
+    restaurantId,
+    dateReservation,
+    time,
+    numberOfGuests,
+    customerName,
+    phoneNumber,
+    state: stateReservation,
+  });
+  const createdReservation = await reservation.save();
+  res.status(201).json(createdReservation);
+});
+
+/**
+ * Obtiene las reservaciones del usuario autenticado.
+ * @function getReservationsToUser
+ * @route GET /api/reservations/user
+ * @param {Request} req - Objeto de solicitud Express (usuario autenticado)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve un array de reservaciones
+ */
+const getReservationsToUser = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const reservations = await Reservation.find({ userId })
+    .sort({ dateReservation: -1 })
+    .populate("restaurantId", "name");
+  if (!reservations || reservations.length === 0) {
+    res.status(404);
+    throw new Error("There are no reservations for this user");
+  }
+  res.status(200).json(reservations);
+});
+
+/**
+ * Obtiene las reservaciones de un restaurante (excepto pendientes por defecto).
+ * @function getReservationsToRestaurant
+ * @route GET /api/reservations/restaurant/:restaurantId
+ * @param {Request} req - Objeto de solicitud Express (params: restaurantId, query: state)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve un array de reservaciones
+ */
+const getReservationsToRestaurant = asyncHandler(async (req, res) => {
+  const restaurantId = req.params.restaurantId;
+  const { state } = req.query;
+  let query = {
+    restaurantId,
+  };
+  if (state) {
+    query.state = state;
+  } else {
+    query.state = { $ne: "pending" };
+  }
+  const reservations = await Reservation.find(query)
+    .sort({ dateReservation: 1, time: 1 })
+    .populate("userId", "customerName phoneNumber");
+
+  res.status(200).json(reservations);
+});
+
+/**
+ * Obtiene las reservaciones pendientes de un restaurante.
+ * @function getReservationsToManage
+ * @route GET /api/reservations/manage/:restaurantId
+ * @param {Request} req - Objeto de solicitud Express (params: restaurantId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve un array de reservaciones pendientes
+ */
+const getReservationsToManage = asyncHandler(async (req, res) => {
+  const restaurantId = req.params.restaurantId;
+  const reservations = await Reservation.find({
+    restaurantId,
+    state: "pending",
+  })
+    .sort({ dateReservation: 1, time: 1 })
+    .populate("userId", "customerName phoneNumber");
+  res.status(200).json(reservations);
+});
+
+/**
+ * Confirma una reservación pendiente.
+ * @function confirmReservation
+ * @route PATCH /api/reservations/:reservationId/confirm
+ * @param {Request} req - Objeto de solicitud Express (params: reservationId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve mensaje y reservación confirmada
+ */
+const confirmReservation = asyncHandler(async (req, res) => {
+  const reservationId = req.params.reservationId;
+  const reservation = await Reservation.findOneAndUpdate(
+    {
+      _id: reservationId,
+      state: "pending",
+    },
+    {
+      state: "confirmed",
+    },
+    { new: true, runValidators: true }
+  );
+
+  if (!reservation) {
+    res.status(404);
+    throw new Error(
+      "Reservation not found or cannot be confirmed (must be pending)."
+    );
+  }
+
+  res
+    .status(200)
+    .json({ message: "Reservation successfully confirmed.", reservation });
+});
+
+/**
+ * Rechaza una reservación pendiente.
+ * @function rejectReservation
+ * @route PATCH /api/reservations/:reservationId/reject
+ * @param {Request} req - Objeto de solicitud Express (params: reservationId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve mensaje y reservación rechazada
+ */
+const rejectReservation = asyncHandler(async (req, res) => {
+  const reservationId = req.params.reservationId;
+  const reservation = await Reservation.findOneAndUpdate(
+    {
+      _id: reservationId,
+      state: "pending",
+    },
+    {
+      state: "rejected",
+    },
+    { new: true, runValidators: true }
+  );
+  if (!reservation) {
+    res.status(404);
+    throw new Error(
+      "Reservation not found or cannot be rejected (must be pending)."
+    );
+  }
+  res.status(200).json({
+    message: "Reservation rejected successfully.",
+    reservation: reservation,
+  });
+});
+
+/**
+ * Cancela una reservación (por usuario o staff autorizado).
+ * @function cancelReservation
+ * @route PATCH /api/reservations/:reservationId/cancel
+ * @param {Request} req - Objeto de solicitud Express (params: reservationId, usuario autenticado)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve mensaje y reservación cancelada
+ */
+const cancelReservation = asyncHandler(async (req, res) => {
+  const reservationId = req.params.reservationId;
+  const userId = req.user._id;
+  const reservation = await Reservation.findById(reservationId).select(
+    "userId restaurantId state"
+  );
+  if (!reservation) {
+    res.status(400);
+    throw new Error("Reservation not found");
+  }
+  if (!userId) {
+    res.status(400);
+    throw new Error("User not found");
+  }
+
+  const isCustomerOwner = String(reservation.userId) === String(userId);
+  const isRestaurantStaff =
+    (req.user.role === "owner" || req.user.role === "operator") &&
+    String(req.user.restaurantId) === String(reservation.restaurantId);
+  if (!isRestaurantStaff && !isCustomerOwner) {
+    res.status(403);
+    throw new Error("You do not have permission to cancel this reservation.");
+  }
+  if (reservation.state === "completed" || reservation.state === "cancelled") {
+    res.status(400);
+    throw new Error(`Reservation is already ${reservation.state}.`);
+  }
+  const updatedReservation = await Reservation.findOneAndUpdate(
+    {
+      _id: reservationId,
+    },
+    { state: "cancelled" },
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json({
+    message: "Reservation cancelled successfully.",
+    reservation: updatedReservation,
+  });
+});
+
+/**
+ * Marca una reservación como completada.
+ * @function markAsCompleted
+ * @route PATCH /api/reservations/:reservationId/complete
+ * @param {Request} req - Objeto de solicitud Express (params: reservationId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve mensaje y reservación completada
+ */
+const markAsCompleted = asyncHandler(async (req, res) => {
+  const reservationId = req.params.reservationId;
+  const reservation = await Reservation.findOneAndUpdate(
+    {
+      _id: reservationId,
+      state: { $in: ["pending", "confirmed"] },
+    },
+    { state: "completed" },
+    { new: true, runValidators: true }
+  );
+
+  if (!reservation) {
+    res.status(404);
+    throw new Error(
+      "Reservation not found or cannot be completed (must be confirmed)."
+    );
+  }
+
+  res
+    .status(200)
+    .json({ message: "Reservation successfully completed.", reservation });
+});
+
+export {
+  createReservation,
+  getReservationsToUser,
+  getReservationsToRestaurant,
+  confirmReservation,
+  rejectReservation,
+  cancelReservation,
+  markAsCompleted,
+  getReservationsToManage,
+};
