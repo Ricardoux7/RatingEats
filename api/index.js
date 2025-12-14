@@ -19,7 +19,8 @@ const allowedOrigins = [
   "http://localhost:3000", 
   "http://localhost:5173",
   "https://ratingeats.vercel.app",
-  "https://rating-eats.vercel.app"
+  "https://rating-eats.vercel.app",
+  "https://rating-eats-af5oh9w8z-ricardoux7s-projects.vercel.app"
 ];
 
 const corsOptions = {
