@@ -67,13 +67,13 @@ const createPost = asyncHandler(async (req, res) => {
 
 const getPostsByRestaurant = asyncHandler(async (req, res) => {
     const restaurantId = req.params.id || req.params.restaurantId;
-    const restaurant = await Restaurant.findOne({ _id: restaurantId, isDeleted: false });
+    const restaurant = await Restaurant.findOne({ _id: restaurantId, isDeleted: false })
     if (!restaurant) {
         res.status(404);
         throw new Error('Restaurant not found');
     }
 
-    const posts = await Post.find({ authorRestaurantId: restaurantId, state: 'accepted' });
+    const posts = await Post.find({ authorRestaurantId: restaurantId, state: 'accepted', deleted: { $ne: true } });
     res.status(200).json(posts);
 });
 

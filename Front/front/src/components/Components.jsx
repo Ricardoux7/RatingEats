@@ -369,7 +369,7 @@ const HeaderProfile = ({ title, setTitle, name }) => {
           }}
           className='text-white bg-red-500 h-[30px] w-full rounded-md flex items-center justify-center'
           >Log out</button>
-          <img src="/icons/logo2.png" alt="logo" className="h-20 w-full object-contain" />
+          <img src="/icons/logo2.png" alt="logo" className="h-20 w-full object-contain" onClick={() => {navigate('/')}} />
         </div>
       </div>
     </header>

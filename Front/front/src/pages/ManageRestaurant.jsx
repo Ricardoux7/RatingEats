@@ -18,6 +18,7 @@ import BringMenu from '../components/BringMenu.jsx';
 import DeleteRestaurant from '../components/ManageRestaurant/DeleteREstaurant.jsx';
 import AddOperator from '../components/ManageRestaurant/AddOperator.jsx';
 import DeleteOperator from '../components/ManageRestaurant/DeleteOperator.jsx';
+
 const MyRestaurant = () => {
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState(null);
@@ -210,7 +211,7 @@ const MyRestaurant = () => {
                 <ManagePosts restaurantId={restaurant._id} userToken={user.token} />
               )}
               {activeSection === 'postsHistory' && restaurant && (
-                <BringPosts restaurantId={restaurant._id} userToken={user.token} />
+                <BringPosts restaurantId={restaurant._id} userToken={user.token} onDelete={true} />
               )}
               {activeSection === 'reservations' && restaurant && (
                 <BringReservations restaurantId={restaurant._id} userToken={user.token} />
@@ -236,16 +237,26 @@ const MyRestaurant = () => {
             </>
           )}
         </div>
-        <aside className="hidden bg-white rounded-2xl p-4 items-center md:flex flex-col gap-4">
-          <div className='ml-4 mt-4 flex flex-col gap-2'>
-            <p className='text-[#171A1F] font-light text-[2rem] mt-4 mb-2'>Operating hours</p>
+        <aside 
+          className="hidden bg-white rounded-2xl p-4 items-center md:flex flex-col gap-4"
+          style={{
+            width: '100%',
+            maxWidth: '350px',
+            minWidth: '180px',
+            transition: 'max-width 0.3s',
+          }}
+        >
+          <div className='ml-4 mt-4 flex flex-col gap-2 w-full'>
+            <p className='text-[#171A1F] font-light text-[2rem] mb-2'>Operating hours</p>
             {restaurant && restaurant.schedule ? (
                 <p className='text-[#171A1F] text-[1.5rem]'>{restaurant.schedule}</p>
             ) : (
               <p>No schedule available</p>
             )}
+          </div> 
+          <div className="w-full max-w-full overflow-x-auto">
+            <Statistics restaurantId={id} userToken={user.token} />
           </div>
-          <Statistics restaurantId={id} userToken={user.token}/>
         </aside>
       </div>
       <div className="flex flex-col md:hidden gap-4 p-4 pb-10">
@@ -315,7 +326,7 @@ const MyRestaurant = () => {
           <Statistics restaurantId={id} userToken={user.token} />
         )}
         {activeSection === 'postsHistory' && restaurant && (
-          <BringPosts restaurantId={restaurant._id} userToken={user.token} />
+          <BringPosts restaurantId={restaurant._id} userToken={user.token} onDelete={true}/>
         )}
         {activeSection === 'reservations' && restaurant && (
           <BringReservations restaurantId={restaurant._id} userToken={user.token} />

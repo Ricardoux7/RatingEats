@@ -8,16 +8,18 @@ import  MyReviews from '../components/Profile/MyReviews.jsx';
 import MyRestaurants from '../components/Profile/MyRestaurants.jsx';
 import { useFavorites } from '../components/Favorites.jsx';
 import Switch from "../components/FavoriteButton.jsx";
+import BringMyReservations from '../components/Profile/BringMyReservations.jsx';
 
 const Profile = () => {
   const { id } = useParams();
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
+  //const [favoriteRestaurants, setFavoriteRestaurants] = useState([]);
   const { favorites, handleFavoriteToggle } = useFavorites();
   const [title, setTitle] = useState('My Profile');
   const [showEdit, setShowEdit] = useState(false);
+  const [showReservations, setShowReservations] = useState(false);
   const navigate = useNavigate(); 
 
   useEffect(() => {
@@ -59,8 +61,12 @@ const Profile = () => {
             <button className={showEdit ? "border border-red-500 rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-red-500" : "border border-[#2DA800] rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-[#2DA800]"} onClick={() => setShowEdit(!showEdit)}>
               {showEdit ? 'Close' : 'Edit Profile'}
             </button>
+            <button className={showReservations ? "border border-red-500 rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-red-500" : "border border-[#2DA800] rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-[#2DA800]"} onClick={() => setShowReservations(!showReservations)}>
+              {showReservations ? 'Close' : 'Bring my reservations'}
+            </button>
           </div>
           {showEdit && <EditProfile id={userData._id} user={userData} onClose={() => setShowEdit(false)} />}
+          {showReservations && <BringMyReservations userId={userData._id} onClose={() => setShowReservations(false)}/>}
           <div className='w-[90%] mx-auto mb-10 gap-4 flex flex-col'>
             <h2 className='text-[2rem] font-bold text-[#1D2025]'>About {userData ? userData.name : ''}</h2>
             <p className='text-[#45484C]'>{userData ? userData.biography : ''}</p>
@@ -121,9 +127,11 @@ const Profile = () => {
               <p>joined on {userData ? userData.createdAt.slice(0, 10) : 'Unknown'}</p>
             </div>
             <button className={showEdit ? "border border-red-500 rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-red-500 cursor-pointer" : "border border-[#2DA800] rounded-xl w-[65%] h-13 items-center justify-center flex mt-10 gap-1 text-[#2DA800] cursor-pointer"} onClick={() => setShowEdit(!showEdit)}><img src={showEdit ? "../icons/close.svg" : "../icons/pencil.svg"} alt="edit" className='w-5'/>{showEdit ? 'Close' : 'Edit Profile'}</button>
+            <button className={showReservations ? "border border-red-500 rounded-xl w-[65%] h-13 items-center justify-center flex mt-4 gap-1 text-red-500 cursor-pointer" : "border border-[#2DA800] rounded-xl w-[65%] h-13 items-center justify-center flex mt-4 gap-1 text-[#2DA800] cursor-pointer"} onClick={() => setShowReservations(!showReservations)}><img src={showReservations ? "../icons/close.svg" : "../icons/pencil.svg"} alt="edit" className='w-5'/>{showReservations ? 'Close' : 'Bring my reservations'}</button>
           </div>
           <div className='mt-20'>
             {showEdit && <EditProfile id={userData._id} user={userData} onClose={() => setShowEdit(false)} />}
+            {showReservations && <BringMyReservations userId={userData._id} onClose={() => setShowReservations(false)}/>}
             <p className='text-[2rem] font-bold'>About {userData ? userData.name : ''}</p>
             <p className='text-[#45484C] text-[1.5rem]'>{userData ? userData.biography : ''}</p>
             <div>

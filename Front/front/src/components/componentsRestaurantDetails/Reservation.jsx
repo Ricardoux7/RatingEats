@@ -9,7 +9,7 @@ const CreateReservation = () => {
   const { user } = useAuth();
   const [restaurant, setRestaurant] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState([]);
   const [reservationDate, setReservationDate] = useState('');
   const [reservationTime, setReservationTime] = useState('');
   const [numberOfPeople, setNumberOfPeople] = useState(1);
@@ -36,7 +36,7 @@ const CreateReservation = () => {
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
-    setError(null);
+    setError([]);
     try {
       const token = localStorage.getItem('userToken');
       const response = await api.post(`/reservations`, {
@@ -65,6 +65,13 @@ const CreateReservation = () => {
       setCustomerName('');
       setCustomerPhone('');
     } catch (err) {
+      if (Array.isArray(err.response?.data?.errors)) {
+        setError(err.response.data.errors);
+      } else if (typeof err.response?.data?.message === 'string') {
+        setError([err.response.data.message]);
+      } else {
+        setError(['Error creating reservation. Please try again.']);
+      }
       setMessage('Error creating reservation. Please try again.');
       setShowPopup(true);
     } finally {
@@ -83,11 +90,20 @@ const CreateReservation = () => {
   return (
     <>
     {showPopup && (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
-          {message && <p className={`${message.includes('Error') ? 'text-red-600' : 'text-green-600'} text-lg font-bold`}>{message}</p>}
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div className={`bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl flex flex-col items-center gap-6 border-2 animate-drop-in ${message && message.includes('Error') ? 'border-red-200' : 'border-green-200'}`}>
+          {message && message.includes('Error') ? (
+            <svg className="w-16 h-16 text-red-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-16 h-16 text-green-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2l4-4M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z" />
+            </svg>
+          )}
+          <p className={`${message && message.includes('Error') ? 'text-red-600' : 'text-green-600'} text-lg font-semibold text-center`}>{message}</p>
           <button
-            className="mt-4 px-4 py-2 bg-[#258A00] text-white rounded hover:bg-[#45A049]"
+            className="px-4 py-2 bg-[#258A00] text-white rounded hover:bg-[#45A049]"
             onClick={() => setShowPopup(false)}
           >
             Close
@@ -108,7 +124,9 @@ const CreateReservation = () => {
             placeholder='DD/MM/YYYY'
             min={new Date().toISOString().split('T')[0]}
           />
-          {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+          {error.filter(e => e.toLowerCase().includes('date')).map((e, i) => (
+            <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>
+          ))}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Time:</p>
@@ -118,7 +136,9 @@ const CreateReservation = () => {
             onChange={(e) => setReservationTime(e.target.value)}
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
           />
-          {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+          {error.filter(e => e.toLowerCase().includes('time')).map((e, i) => (
+            <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>
+          ))}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Number of People:</p>
@@ -129,7 +149,9 @@ const CreateReservation = () => {
             min="1"
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
           />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('people')).map((e, i) => (
+              <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>
+            ))}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Customer Name:</p>
@@ -140,7 +162,9 @@ const CreateReservation = () => {
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             placeholder='John Doe'
           />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('name')).map((e, i) => (
+              <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>
+            ))}
         </label>
         <label className='flex flex-col'>
           <p className='font-bold text-[#171A1F]'>Customer Phone:</p>
@@ -151,7 +175,9 @@ const CreateReservation = () => {
             className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             placeholder='+584141234567'
           />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('phone')).map((e, i) => (
+              <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>
+            ))}
         </label>
         <button
           type="submit"
@@ -177,7 +203,7 @@ const CreateReservation = () => {
               placeholder='DD/MM/YYYY'
               min = {new Date().toISOString().split('T')[0]}
             />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('date')).map((e, i) => <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>)}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Time:</p>
@@ -187,7 +213,7 @@ const CreateReservation = () => {
               onChange={(e) => setReservationTime(e.target.value)}
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('time')).map((e, i) => <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>)}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Number of People:</p>
@@ -198,7 +224,7 @@ const CreateReservation = () => {
               min="1"
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
             />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('people')).map((e, i) => <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>)}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Customer Name:</p>
@@ -209,7 +235,7 @@ const CreateReservation = () => {
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
               placeholder='John Doe'
             />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('name')).map((e, i) => <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>)}
           </label>
           <label className='flex flex-col'>
             <p className='font-bold text-[#171A1F]'>Customer Phone:</p>
@@ -220,7 +246,7 @@ const CreateReservation = () => {
               className='h-12 w-full bg-[#DEE1E6] rounded-md p-4'
               placeholder='+584141234567'
             />
-            {error && <div className='text-red-600 font-medium mt-2'>{error}</div>}
+            {error.filter(e => e.toLowerCase().includes('phone')).map((e, i) => <div key={i} className='text-red-600 font-medium mt-2'>{e}</div>)}
           </label>
           <button
             type="submit"
@@ -235,7 +261,5 @@ const CreateReservation = () => {
     </>
   );
 }
-
-
 
 export default CreateReservation;

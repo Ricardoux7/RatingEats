@@ -69,7 +69,19 @@ const Statistics = ({ restaurantId, userToken }) => {
   }
 
   const options = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          boxWidth: 20,
+          font: {
+            size: 14
+          }
+        }
+      },
       tooltip: {
         callbacks: {
           label: function(context) {
@@ -81,23 +93,23 @@ const Statistics = ({ restaurantId, userToken }) => {
   };
 
   return (
-    <div >
-      <div>
-        <Doughnut data={data} options={options} />
-        <div className='items-center text-2xl mx-auto w-fit mt-4 text-center'>
-          <h3 className='text-[#565d6d]'>Avg: <span className='text-[#258A00] font-semibold'>{statistics.averageRating.toFixed(2)}</span></h3>
-          <div className='flex flex-col items-center'>
-            <div className='flex gap-2'>
-              {Array.from({ length: 5 }).map((_, i) => (
-                i < Math.round(statistics.averageRating) ? (
-                  <img key={i} src="../../icons/star-green.svg" alt="star" className='w-6' />
-                  ) : (
-                    <img key={i} src="../../icons/star-gray-com.svg" alt="star" className='w-7' />
-                  )
-              ))}
-            </div>
-            <p className='text-[#565d6d]'>{`Total Reviews: ${statistics.totalReviews}`}</p>
+    <div className="w-full max-w-full flex flex-col items-center justify-center">
+      <div className="w-full max-w-[250px] md:max-w-[300px] h-80 mx-auto flex flex-col">
+        <Doughnut data={data} options={options} height={180} width={180} />
+      </div>
+      <div className='items-center text-2xl mx-auto mt-4 text-center flex flex-col gap-2 w-full'>
+        <h3 className='text-[#565d6d]'>Avg: <span className='text-[#258A00] font-semibold'>{statistics.averageRating.toFixed(2)}</span></h3>
+        <div className='flex flex-col items-center'>
+          <div className='flex gap-2 flex-wrap justify-center'>
+            {Array.from({ length: 5 }).map((_, i) => (
+              i < Math.round(statistics.averageRating) ? (
+                <img key={i} src="../../icons/star-green.svg" alt="star" className='w-6' />
+                ) : (
+                  <img key={i} src="../../icons/star-gray-com.svg" alt="star" className='w-7' />
+                )
+            ))}
           </div>
+          <p className='text-[#565d6d] break-words'>{`Total Reviews: ${statistics.totalReviews}`}</p>
         </div>
       </div>
     </div>
