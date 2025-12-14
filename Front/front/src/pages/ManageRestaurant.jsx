@@ -37,7 +37,7 @@ import ManageMenu from '../components/ManageRestaurant/ManageMenu.jsx';
 import UploadPost from '../components/ManageRestaurant/UploadPost.jsx';
 import UpdateBanner from '../components/ManageRestaurant/UpdateBanner.jsx';
 import BringMenu from '../components/BringMenu.jsx';
-import DeleteRestaurant from '../components/ManageRestaurant/DeleteREstaurant.jsx';
+import DeleteRestaurant from '../components/ManageRestaurant/DeleteRestaurant.jsx';
 import AddOperator from '../components/ManageRestaurant/AddOperator.jsx';
 import DeleteOperator from '../components/ManageRestaurant/DeleteOperator.jsx';
 
