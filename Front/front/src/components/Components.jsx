@@ -27,8 +27,6 @@ import { useAuth } from '../context/AuthContext.jsx';
 //import Results from './Search.jsx';
 import api from '../api/api.js';
 import Notifications from './Notifications.jsx';
-import { set } from 'mongoose';
-//import { set } from 'mongoose';
 
 const HeaderMobile = ({ tab, setTab, manage }) => {
   const navigate = useNavigate();
