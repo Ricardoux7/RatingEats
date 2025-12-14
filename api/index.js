@@ -40,7 +40,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use("/api/profile", profileRoutes);
 app.use("/api/auth", authRoutes);
