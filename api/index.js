@@ -18,7 +18,8 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000", 
   "http://localhost:5173",
-  "https://ratingeats.vercel.app"
+  "https://ratingeats.vercel.app",
+  "https://rating-eats.vercel.app"
 ];
 
 const corsOptions = {
