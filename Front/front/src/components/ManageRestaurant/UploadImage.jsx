@@ -37,6 +37,7 @@ import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Zoom from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
+import { put } from "@vercel/blob"
 
 const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onClear, onClose, onBannerUpdate }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -58,16 +59,19 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
     }
 
     setUploading(true);
-    const formData = new FormData();
 
-    if (mode === 'add') {
-      selectedFiles.forEach((file, idx) => {
-        formData.append('images', file);
-      });
-      try {
-        await api.post(`restaurants/${restaurantId}/menu/images`, formData, {
+    try {
+      let imageUrls = [];
+      if (mode === 'add' || mode === 'replace' || mode === 'bannerUpload') {
+        for (const file of selectedFiles) {
+          const { url } = await put(`images/${Date.now()}-${file.name}`, file, { access: 'public' });
+          imageUrls.push(url);
+        }
+      }
+
+      if (mode === 'add') {
+        await api.post(`restaurants/${restaurantId}/menu/images`, { images: imageUrls }, {
           headers: {
-            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${user.token}`,
           }
         });
@@ -79,28 +83,12 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setShowPopup(false);
           setPopupMessage(null);
         }, 3000);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Error uploading image. Please try again.');
-        setShowPopup(true);
-        setTimeout(() => {
-          setShowPopup(false);
-        }, 3000);
-      } finally {
-        setUploading(false);
-        if (onUploadSuccess) onUploadSuccess();
-      }
-      return;
-    }
-
-    if (mode === 'replace' && imageId) {
-      formData.append('image', selectedFiles[0]);
-      try {
+      } else if (mode === 'replace' && imageId) {
         await api.patch(
           `restaurants/${restaurantId}/menu/images/${imageId}`,
-          formData,
+          { image: imageUrls[0] },
           {
             headers: {
-              'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${user.token}`,
             }
           }
@@ -113,56 +101,26 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setShowPopup(false);
           setPopupMessage(null);
         }, 3000);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Error uploading image. Please try again.');
-        setShowPopup(true);
-        setTimeout(() => {
-          setShowPopup(false);
-        }, 3000);
-      } finally {
-        setUploading(false);
-        if (onUploadSuccess) onUploadSuccess();
-      }
-      return;
-    }
-
-    if (mode === 'postUpload'){
-      formData.append('image', selectedFiles[0]);
-      formData.append('content', content);
-      try {
-        const submitting = await api.post(`/${restaurantId}/posts`, formData, {
+      } else if (mode === 'postUpload') {
+        const { url } = await put(`posts/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public' });
+        await api.post(`/${restaurantId}/posts`, { image: url, content }, {
           headers: {
-            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${user.token}`,
           }
         });
         setSelectedFiles([]);
         setContent('');
-        if(submitting.data?.message === 'Post created and uploaded successfully'){
-          setPopupMessage('Post image uploaded successfully.');
-        } else {
-          setPopupMessage('Post image sent and is pending acceptance.');
-        }
+        setPopupMessage('Post image uploaded successfully.');
         setShowPopup(true);
         setTimeout(() => {
           if (onClose) onClose();
           setShowPopup(false);
           setPopupMessage(null);
         }, 3000);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Error uploading image. Please try again.');
-      } finally {
-        setUploading(false);
-        if (onUploadSuccess) onUploadSuccess();
-      }
-    }
-
-    if (mode === 'bannerUpload'){
-      formData.append('image', selectedFiles[0]);
-      try {
-        const response =await api.patch(`restaurants/${restaurantId}/images/banner`, formData, {
+      } else if (mode === 'bannerUpload') {
+        const { url } = await put(`banners/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public' });
+        const response = await api.patch(`restaurants/${restaurantId}/images/banner`, { image: url }, {
           headers: {
-            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${user.token}`,
           }
         });
@@ -177,19 +135,18 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setShowPopup(false);
           setPopupMessage(null);
         }, 3000);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Error uploading image. Please try again.');
-        setShowPopup(true);
-        setTimeout(() => {
-          setShowPopup(false);
-        }, 3000);
-      } finally {
-        setUploading(false);
-        if (onUploadSuccess) {
-          onUploadSuccess()
-        };
       }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error uploading image. Please try again.');
+      setShowPopup(true);
+      setTimeout(() => {
+        setShowPopup(false);
+      }, 3000);
+    } finally {
+      setUploading(false);
+      if (onUploadSuccess) onUploadSuccess();
     }
+    return;
   };
 
   const handleCancel = () => {
