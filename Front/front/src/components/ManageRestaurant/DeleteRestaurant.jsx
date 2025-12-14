@@ -26,7 +26,6 @@
  *
  * @module DeleteRestaurant
  */
-import { set } from 'mongoose';
 import api from '../../api/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useState, useEffect } from 'react';
