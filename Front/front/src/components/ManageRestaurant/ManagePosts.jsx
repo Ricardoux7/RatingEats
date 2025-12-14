@@ -1,3 +1,27 @@
+/**
+ * ManagePosts Component
+ *
+ * Permite a los administradores gestionar los posts pendientes de un restaurante (aceptar o rechazar).
+ * Muestra los posts con sus imágenes y detalles, y permite acciones sobre ellos.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante.
+ * @param {string} userToken - Token JWT del usuario autenticado.
+ *
+ * Estado:
+ * - posts: Lista de posts pendientes.
+ * - popupMessage: Mensaje de feedback.
+ * - showPopup: Controla la visibilidad del popup.
+ *
+ * Características:
+ * - Permite aceptar o rechazar posts.
+ * - Muestra mensajes de éxito o error.
+ *
+ * Ejemplo de uso:
+ * <ManagePosts restaurantId={id} userToken={token} />
+ *
+ * @module ManagePosts
+ */
 import api from '../../api/api';
 import React, { useEffect, useState } from 'react';
 import { handleAcceptPost, handleRejectPost } from '../NotiPost.jsx';

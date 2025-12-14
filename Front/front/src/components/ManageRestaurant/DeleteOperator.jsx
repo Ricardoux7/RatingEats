@@ -1,3 +1,29 @@
+/**
+ * DeleteOperator Component
+ *
+ * Permite al propietario de un restaurante eliminar operadores asociados.
+ * Muestra la lista de operadores y permite su eliminación con feedback visual.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante.
+ * @param {string} userId - ID del usuario autenticado.
+ *
+ * Estado:
+ * - operators: Lista de operadores.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - deletingOperatorId: ID del operador en proceso de eliminación.
+ * - successMessage: Mensaje de éxito.
+ *
+ * Características:
+ * - Obtiene operadores desde la API.
+ * - Permite eliminar operadores y muestra feedback visual.
+ *
+ * Ejemplo de uso:
+ * <DeleteOperator restaurantId={restaurantId} userId={userId} />
+ *
+ * @module DeleteOperator
+ */
 import api from '../../api/api';
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext';

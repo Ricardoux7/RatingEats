@@ -1,3 +1,19 @@
+/**
+ * BringRestaurants Component
+ *
+ * Muestra una selección aleatoria de restaurantes destacados.
+ *
+ * Características:
+ * - Obtiene restaurantes desde la API.
+ * - Muestra una selección aleatoria y única de restaurantes.
+ * - Permite navegar a los detalles de cada restaurante.
+ *
+ * Estado:
+ * - bringRestaurant: Array de restaurantes destacados.
+ * - error: Mensaje de error.
+ *
+ * @module BringRestaurants
+ */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../api/api'; 

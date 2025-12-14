@@ -1,3 +1,23 @@
+/**
+ * Switch (FavoriteButton) Component
+ *
+ * Botón de alternancia para marcar o desmarcar un restaurante como favorito.
+ * Cambia el estado visual y ejecuta un callback al cambiar.
+ *
+ * Props:
+ * @param {string|number} id - ID único del restaurante.
+ * @param {boolean} isFav - Indica si el restaurante es favorito.
+ * @param {Function} onChange - Callback al cambiar el estado del favorito.
+ *
+ * Características:
+ * - Cambia el estado visual del botón y ejecuta el callback.
+ * - Muestra animación de corazón y texto según el estado.
+ *
+ * Ejemplo de uso:
+ * <Switch id={id} isFav={isFavorite} onChange={handleToggle} />
+ *
+ * @module FavoriteButton
+ */
 import React from 'react';
 import styled from 'styled-components';
 

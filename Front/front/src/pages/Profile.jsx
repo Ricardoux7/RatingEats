@@ -1,3 +1,26 @@
+/**
+ * Profile Component
+ *
+ * Página de perfil de usuario, muestra información personal, favoritos, reseñas y restaurantes asociados.
+ * Permite editar perfil y ver reservas.
+ *
+ * Estado:
+ * - userData: Datos del usuario.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - title: Sección activa del perfil.
+ * - showEdit, showReservations: Controlan visibilidad de edición y reservas.
+ *
+ * Características:
+ * - Obtiene y muestra datos del usuario.
+ * - Permite editar perfil y ver reservas.
+ * - Muestra favoritos y reseñas.
+ *
+ * Ejemplo de uso:
+ * <Profile />
+ *
+ * @module Profile
+ */
 import React, {useEffect, useState} from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';

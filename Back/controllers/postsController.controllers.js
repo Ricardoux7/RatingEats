@@ -1,190 +1,274 @@
-import Post from '../models/posts.models.js';
-import Restaurant from '../models/restaurant.models.js';
-import asyncHandler from 'express-async-handler';
-import { unlink } from 'fs/promises';
-import path from 'path';
+/**
+ * @file postsController.controllers.js
+ * @module controllers/postsController
+ * @description Controladores para gestión de posts de restaurantes (crear, aceptar, rechazar, eliminar, listar).
+ */
 
+import Post from "../models/posts.models.js";
+import Restaurant from "../models/restaurant.models.js";
+import asyncHandler from "express-async-handler";
+import { unlink } from "fs/promises";
+import path from "path";
+
+/**
+ * Crea un nuevo post para un restaurante.
+ * @function createPost
+ * @route POST /api/restaurants/:id/posts
+ * @param {Request} req - Objeto de solicitud Express (archivo en req.file, body: content)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve el post creado y mensaje
+ */
 const createPost = asyncHandler(async (req, res) => {
-    const uploadedFile = req.file;
-    try{
-        const restaurantId = req.params.id || req.params.restaurantId;
-        const { content } = req.body;
-        const authorUserId = req.user._id;
-        const userRole = req.user.role; 
-        const userRestaurantId = req.user.restaurantId;
-
-        if (!uploadedFile || !uploadedFile.filename) {
-            res.status(400);
-            throw new Error('Image is required');
-        }
-        const restaurant = await Restaurant.findOne({ _id: restaurantId, isDeleted: false });
-        if (!restaurant) {
-            res.status(404);
-            throw new Error('Restaurant not found');
-        }
-
-        const image = {
-            url: '/uploads/posts/' + uploadedFile.filename,
-            alt: content ? content.substring(0, 200) : 'Post image',
-            size: uploadedFile.size
-        }
-        const isOperatorOfDestination = (userRole === 'owner' || userRole === 'operator') && (String(userRestaurantId) === String(restaurantId));
-        let postState = isOperatorOfDestination ? 'accepted' : 'pending';
-
-        const post = new Post({
-            authorUserId: authorUserId, 
-            authorRestaurantId: restaurantId,
-            image: image,
-            content: content || '',
-            state: postState
-        });
-
-        await post.save();
-        await Restaurant.findOneAndUpdate({ _id: restaurantId }, { $push: { posts: post._id } });
-
-        let message;
-        if (isOperatorOfDestination) {
-            message = 'Post created and uploaded successfully';
-        } else {
-            message = 'The post was sent and is pending acceptance.';
-        }
-
-        res.status(201).json({ message, post });
-    }
-    catch (error) {
-        if (uploadedFile) {
-            try {
-                const filePath = path.join(process.cwd(), 'uploads', 'posts', uploadedFile.filename);
-                await unlink(filePath);
-                console.log(`The image was deleted: ${uploadedFile.filename}`);
-            } catch (unlinkError) {
-                console.error("Error cleaning up image:", unlinkError);
-            }
-        }
-        throw error;
-    }
-})
-
-const getPostsByRestaurant = asyncHandler(async (req, res) => {
+  const uploadedFile = req.file;
+  try {
     const restaurantId = req.params.id || req.params.restaurantId;
-    const restaurant = await Restaurant.findOne({ _id: restaurantId, isDeleted: false })
-    if (!restaurant) {
-        res.status(404);
-        throw new Error('Restaurant not found');
-    }
+    const { content } = req.body;
+    const authorUserId = req.user._id;
+    const userRole = req.user.role;
+    const userRestaurantId = req.user.restaurantId;
 
-    const posts = await Post.find({ authorRestaurantId: restaurantId, state: 'accepted', deleted: { $ne: true } });
-    res.status(200).json(posts);
-});
-
-const acceptPost = asyncHandler(async (req, res) => {
-    const postId = req.params.postId;
-    const post = await Post.findById(postId);
-
-    if (!post) {
-        res.status(404);
-        throw new Error('Post not found');
+    if (!uploadedFile || !uploadedFile.filename) {
+      res.status(400);
+      throw new Error("Image is required");
     }
-    if (post.deleted) {
-        res.status(404);
-        throw new Error('Post was deleted before.');
-    }
-    if (post.state === 'accepted') {
-        return res.status(200).json({ message: 'Post is already accepted.' });
-    }
-    
-    if (post.state === 'rejected') {
-        res.status(400);
-        throw new Error('Cannot accept a rejected post.');
-    }
-    if (req.user.state === 'rejected') {
-        res.status(403);
-        throw new Error('User is rejected and cannot accept posts.');
-    }
-    post.state = 'accepted';
-    await post.save();
-
-    res.status(200).json({ 
-        message: 'Post accepted and visible to the public.', 
-        post 
+    const restaurant = await Restaurant.findOne({
+      _id: restaurantId,
+      isDeleted: false,
     });
-});
+    if (!restaurant) {
+      res.status(404);
+      throw new Error("Restaurant not found");
+    }
 
-const rejectPost = asyncHandler(async (req, res) => {
-    const postId = req.params.postId;
-    const post = await Post.findById(postId);
-    if (!post) {
-        res.status(404);
-        throw new Error('Post not found');
-    }
-    if (post.deleted) {
-        res.status(404);
-        throw new Error('Post was deleted before.');
-    }
-    if (post.state === 'rejected') {
-        return res.status(200).json({ message: 'Post is already rejected.' });
-    }
-    if (post.state === 'accepted') {
-        res.status(400);
-        throw new Error('Cannot reject an accepted post.');
-    }
-    post.state = 'rejected';
+    const image = {
+      url: "/uploads/posts/" + uploadedFile.filename,
+      alt: content ? content.substring(0, 200) : "Post image",
+      size: uploadedFile.size,
+    };
+    const isOperatorOfDestination =
+      (userRole === "owner" || userRole === "operator") &&
+      String(userRestaurantId) === String(restaurantId);
+    let postState = isOperatorOfDestination ? "accepted" : "pending";
+
+    const post = new Post({
+      authorUserId: authorUserId,
+      authorRestaurantId: restaurantId,
+      image: image,
+      content: content || "",
+      state: postState,
+    });
+
     await post.save();
-    res.status(200).json({
-        message: 'Post has been rejected succesfully'
-    })
-})
+    await Restaurant.findOneAndUpdate(
+      { _id: restaurantId },
+      { $push: { posts: post._id } }
+    );
 
-const deletePost = asyncHandler(async (req, res) => {
-    const postId = req.params.postId;
-    const currentUserId = req.user._id;
-    const post = await Post.findById(postId);
-    if (!post || post.deleted) {
-        res.status(404);
-        throw new Error('Post not found');
-    }
-    const isPostAuthor = String(post.authorUserId) === String(currentUserId);
-    const isOperator = req.user.role === 'owner' || req.user.role === 'operator';
-
-    if (!isOperator) {
-        if (!isPostAuthor || post.state !== 'pending') {
-            res.status(403);
-            throw new Error('User not authorized: Post is no longer pending or you are not the author.');
-        }
-    }
-    if (post.image && post.image.url) {
-        try {
-            const fileName = post.image.url.split('/').pop(); 
-            const filePath = path.join(process.cwd(), 'uploads', 'posts', fileName); 
-            await unlink(filePath);
-        } catch (error) {
-            if (error.code !== 'ENOENT') {
-                console.error("Error al borrar el archivo físico del post:", error);
-            }
-        }
+    let message;
+    if (isOperatorOfDestination) {
+      message = "Post created and uploaded successfully";
+    } else {
+      message = "The post was sent and is pending acceptance.";
     }
 
-    post.deleted = true;
-    await post.save();
-
-    if (post.authorRestaurantId) {
-        await Restaurant.findByIdAndUpdate(
-            post.authorRestaurantId,
-            { $pull: { posts: postId } } 
+    res.status(201).json({ message, post });
+  } catch (error) {
+    if (uploadedFile) {
+      try {
+        const filePath = path.join(
+          process.cwd(),
+          "uploads",
+          "posts",
+          uploadedFile.filename
         );
+        await unlink(filePath);
+        console.log(`The image was deleted: ${uploadedFile.filename}`);
+      } catch (unlinkError) {
+        console.error("Error cleaning up image:", unlinkError);
+      }
     }
-
-    res.status(204).send(); 
+    throw error;
+  }
 });
 
-const getPendingPosts = asyncHandler(async (req, res) => {
-    const restaurantId = req.params.restaurantId;
-    const posts = await Post.find({authorRestaurantId: restaurantId, state: 'pending'}).populate('authorUserId', 'username');
-    if (!posts) {
-        res.status(404);
-        throw new Error('No pending posts found for this restaurant.');
-    }
-    res.status(200).json(posts);
-})
+/**
+ * Obtiene todos los posts aceptados de un restaurante.
+ * @function getPostsByRestaurant
+ * @route GET /api/restaurants/:id/posts
+ * @param {Request} req - Objeto de solicitud Express (params: id)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve un array de posts aceptados
+ */
+const getPostsByRestaurant = asyncHandler(async (req, res) => {
+  const restaurantId = req.params.id || req.params.restaurantId;
+  const restaurant = await Restaurant.findOne({
+    _id: restaurantId,
+    isDeleted: false,
+  });
+  if (!restaurant) {
+    res.status(404);
+    throw new Error("Restaurant not found");
+  }
 
-export { createPost, getPostsByRestaurant, acceptPost, rejectPost, deletePost, getPendingPosts };
+  const posts = await Post.find({
+    authorRestaurantId: restaurantId,
+    state: "accepted",
+    deleted: { $ne: true },
+  });
+  res.status(200).json(posts);
+});
+
+/**
+ * Acepta un post pendiente.
+ * @function acceptPost
+ * @route PATCH /api/posts/:postId/accept
+ * @param {Request} req - Objeto de solicitud Express (params: postId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve el post aceptado y mensaje
+ */
+const acceptPost = asyncHandler(async (req, res) => {
+  const postId = req.params.postId;
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+  if (post.deleted) {
+    res.status(404);
+    throw new Error("Post was deleted before.");
+  }
+  if (post.state === "accepted") {
+    return res.status(200).json({ message: "Post is already accepted." });
+  }
+
+  if (post.state === "rejected") {
+    res.status(400);
+    throw new Error("Cannot accept a rejected post.");
+  }
+  if (req.user.state === "rejected") {
+    res.status(403);
+    throw new Error("User is rejected and cannot accept posts.");
+  }
+  post.state = "accepted";
+  await post.save();
+
+  res.status(200).json({
+    message: "Post accepted and visible to the public.",
+    post,
+  });
+});
+
+/**
+ * Rechaza un post pendiente.
+ * @function rejectPost
+ * @route PATCH /api/posts/:postId/reject
+ * @param {Request} req - Objeto de solicitud Express (params: postId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve mensaje de rechazo
+ */
+const rejectPost = asyncHandler(async (req, res) => {
+  const postId = req.params.postId;
+  const post = await Post.findById(postId);
+  if (!post) {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+  if (post.deleted) {
+    res.status(404);
+    throw new Error("Post was deleted before.");
+  }
+  if (post.state === "rejected") {
+    return res.status(200).json({ message: "Post is already rejected." });
+  }
+  if (post.state === "accepted") {
+    res.status(400);
+    throw new Error("Cannot reject an accepted post.");
+  }
+  post.state = "rejected";
+  await post.save();
+  res.status(200).json({
+    message: "Post has been rejected succesfully",
+  });
+});
+
+/**
+ * Elimina (soft delete) un post.
+ * @function deletePost
+ * @route DELETE /api/posts/:postId/:restaurantId
+ * @param {Request} req - Objeto de solicitud Express (params: postId, restaurantId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve status 204 si se elimina correctamente
+ */
+const deletePost = asyncHandler(async (req, res) => {
+  const postId = req.params.postId;
+  const currentUserId = req.user._id;
+  const post = await Post.findById(postId);
+  if (!post || post.deleted) {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+  const isPostAuthor = String(post.authorUserId) === String(currentUserId);
+  const isOperator = req.user.role === "owner" || req.user.role === "operator";
+
+  if (!isOperator) {
+    if (!isPostAuthor || post.state !== "pending") {
+      res.status(403);
+      throw new Error(
+        "User not authorized: Post is no longer pending or you are not the author."
+      );
+    }
+  }
+  if (post.image && post.image.url) {
+    try {
+      const fileName = post.image.url.split("/").pop();
+      const filePath = path.join(process.cwd(), "uploads", "posts", fileName);
+      await unlink(filePath);
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        console.error("Error al borrar el archivo físico del post:", error);
+      }
+    }
+  }
+
+  post.deleted = true;
+  await post.save();
+
+  if (post.authorRestaurantId) {
+    await Restaurant.findByIdAndUpdate(post.authorRestaurantId, {
+      $pull: { posts: postId },
+    });
+  }
+
+  res.status(204).send();
+});
+
+/**
+ * Obtiene todos los posts pendientes de un restaurante.
+ * @function getPendingPosts
+ * @route GET /api/posts/:restaurantId/pending
+ * @param {Request} req - Objeto de solicitud Express (params: restaurantId)
+ * @param {Response} res - Objeto de respuesta Express
+ * @returns {void} Devuelve un array de posts pendientes
+ */
+const getPendingPosts = asyncHandler(async (req, res) => {
+  const restaurantId = req.params.restaurantId;
+  const posts = await Post.find({
+    authorRestaurantId: restaurantId,
+    state: "pending",
+  }).populate("authorUserId", "username");
+  if (!posts) {
+    res.status(404);
+    throw new Error("No pending posts found for this restaurant.");
+  }
+  res.status(200).json(posts);
+});
+
+export {
+  createPost,
+  getPostsByRestaurant,
+  acceptPost,
+  rejectPost,
+  deletePost,
+  getPendingPosts,
+};

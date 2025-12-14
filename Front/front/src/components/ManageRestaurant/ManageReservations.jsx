@@ -1,3 +1,29 @@
+/**
+ * ManageReservations Component
+ *
+ * Permite a los administradores gestionar las reservaciones pendientes de un restaurante (aceptar o rechazar).
+ * Muestra la lista de reservaciones y permite acciones sobre ellas.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante.
+ *
+ * Estado:
+ * - reservations: Lista paginada de reservaciones.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - firstLoad: Indica si es la primera carga.
+ * - popupMessage: Mensaje de feedback.
+ * - showPopup: Controla la visibilidad del popup.
+ *
+ * Características:
+ * - Permite aceptar o rechazar reservaciones.
+ * - Muestra mensajes de éxito o error.
+ *
+ * Ejemplo de uso:
+ * <ManageReservations restaurantId={id} />
+ *
+ * @module ManageReservations
+ */
 import api from '../../api/api';
 import { useState, useEffect, useParams } from 'react';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -5,7 +31,7 @@ import { handleAcceptReservation, handleRejectReservation } from '../NotiReserva
 
 const ManageReservations = ({ restaurantId }) => {
   const { user } = useAuth();
-  const [reservations, setReservations] = useState([]);
+  const [reservations, setReservations] = useState({ docs: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [firstLoad, setFirstLoad] = useState(true);
@@ -45,7 +71,7 @@ const ManageReservations = ({ restaurantId }) => {
       setShowPopup(true);
       fetchReservations();
       handleAcceptReservation({
-        userId: reservations.find(r => r._id === reservationId).userId,
+        userId: reservations.docs.find(r => r._id === reservationId)?.userId,
         restaurantId: restaurantId,
         reservationId: reservationId,
       });
@@ -69,7 +95,7 @@ const ManageReservations = ({ restaurantId }) => {
       setShowPopup(true);
       fetchReservations();
       handleRejectReservation({
-        userId: reservations.find(r => r._id === reservationId).userId,
+        userId: reservations.docs.find(r => r._id === reservationId)?.userId,
         restaurantId: restaurantId,
         reservationId: reservationId,
       });
@@ -101,7 +127,7 @@ const ManageReservations = ({ restaurantId }) => {
           )}
         <h2 className="text-2xl font-bold mb-4">Pending reservations</h2>
         <div className='border border-[#258A00] rounded-2xl p-4 mt-8 bg-white '>
-          {reservations.length === 0 ? (
+          {(!reservations.docs || reservations.docs.length === 0) ? (
             <p className="text-center text-gray-600">No reservations found.</p>
           ) : (
             <table className='min-w-full table-fixed text-left'>
@@ -115,7 +141,7 @@ const ManageReservations = ({ restaurantId }) => {
                 </tr>
               </thead>
               <tbody>
-                {reservations.map((reservation) => (
+                {reservations.docs.map((reservation) => (
                   <tr key={reservation._id} className="border-b border-gray-200">
                     <td className="text-gray-600 w-1/5">{reservation.customerName}</td>
                     <td className="text-gray-600 w-1/5">{reservation.dateReservation.slice(0, 10)}</td>

@@ -1,3 +1,25 @@
+/**
+ * MyRestaurant Component
+ *
+ * Página de gestión de un restaurante específico (detalles, menú, imágenes, banner, etc.).
+ * Permite editar información, actualizar imágenes y navegar entre secciones.
+ *
+ * Estado:
+ * - restaurant: Objeto restaurante actual.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - selectedImage, showImage, activeSection, showBanner: Estados de UI.
+ *
+ * Características:
+ * - Obtiene y muestra detalles del restaurante.
+ * - Permite actualizar información y banner.
+ * - Navega entre secciones de gestión.
+ *
+ * Ejemplo de uso:
+ * <MyRestaurant />
+ *
+ * @module MyRestaurant
+ */
 import api from '../api/api';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';

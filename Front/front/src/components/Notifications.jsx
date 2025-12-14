@@ -1,3 +1,23 @@
+/**
+ * Notifications Component
+ *
+ * Muestra la lista de notificaciones del usuario ordenadas por fecha.
+ * Obtiene las notificaciones desde la API y muestra feedback de carga y error.
+ *
+ * Estado:
+ * - notifications: Lista de notificaciones.
+ * - loading: Estado de carga.
+ * - error: Mensaje de error.
+ *
+ * Características:
+ * - Obtiene y ordena notificaciones desde la API.
+ * - Muestra mensajes de error y feedback de carga.
+ *
+ * Ejemplo de uso:
+ * <Notifications />
+ *
+ * @module Notifications
+ */
 
 import api from '../api/api.js';
 import React, { useEffect, useState } from 'react';

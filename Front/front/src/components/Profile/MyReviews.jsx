@@ -1,3 +1,27 @@
+/**
+ * MyReviews Component
+ *
+ * Muestra todas las reseñas realizadas por el usuario autenticado.
+ * Permite eliminar reseñas y muestra feedback visual.
+ *
+ * Props:
+ * @param {Object} user - Objeto de usuario autenticado.
+ *
+ * Estado:
+ * - reviews: Lista de reseñas del usuario.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ *
+ * Características:
+ * - Obtiene y muestra las reseñas del usuario desde la API.
+ * - Permite eliminar reseñas y actualiza la lista localmente.
+ * - Muestra mensajes de error y feedback de carga.
+ *
+ * Ejemplo de uso:
+ * <MyReviews user={user} />
+ *
+ * @module MyReviews
+ */
 import api from '../../api/api';
 import React, { useEffect, useState } from 'react';
 import DeleteReview from '../DeleteReview.jsx';
@@ -7,6 +31,12 @@ const MyReviews = ({ user }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /**
+   * Efecto que obtiene las reseñas del usuario desde la API.
+   *
+   * @function
+   * @returns {void}
+   */
   useEffect(() => {
     const fetchReviews = async () => {
       try {

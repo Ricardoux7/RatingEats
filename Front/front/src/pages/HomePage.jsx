@@ -1,3 +1,25 @@
+/**
+ * HomePage Component
+ *
+ * Página principal de la aplicación RatingEats tras iniciar sesión.
+ * Muestra los headers, barras de búsqueda, filtros y la lista principal de restaurantes.
+ *
+ * Estado:
+ * - restaurants: Lista de restaurantes filtrados por búsqueda.
+ * - searchError: Mensaje de error de búsqueda.
+ * - showMobileFilter: Controla la visibilidad del filtro móvil.
+ * - filters: Filtros aplicados (categorías, rating).
+ *
+ * Características:
+ * - Redirige a login si el usuario no está autenticado.
+ * - Permite buscar y filtrar restaurantes.
+ * - Renderiza la página principal con filtros y resultados.
+ *
+ * Ejemplo de uso:
+ * <HomePage />
+ *
+ * @module HomePage
+ */
 
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';

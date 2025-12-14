@@ -1,3 +1,28 @@
+/**
+ * AddOperator Component
+ *
+ * Permite al propietario de un restaurante agregar un nuevo operador mediante el correo electrónico.
+ * Gestiona la validación, feedback de éxito y error, y redirección tras la operación.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante al que se agregará el operador.
+ *
+ * Estado:
+ * - email: Correo electrónico del operador a agregar.
+ * - isAdding: Estado de carga durante la operación.
+ * - error: Mensaje de error.
+ * - successMessage: Mensaje de éxito.
+ *
+ * Características:
+ * - Envía solicitud a la API para agregar operador.
+ * - Muestra mensajes de error específicos según la respuesta de la API.
+ * - Redirige al usuario tras agregar exitosamente.
+ *
+ * Ejemplo de uso:
+ * <AddOperator restaurantId={restaurantId} />
+ *
+ * @module AddOperator
+ */
 import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useState } from 'react'; 

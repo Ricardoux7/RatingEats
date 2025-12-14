@@ -1,3 +1,24 @@
+/**
+ * CreateReservation Component
+ *
+ * Permite a los usuarios crear una reservación en un restaurante.
+ * Muestra formularios adaptados a móvil y escritorio, maneja validaciones y feedback.
+ *
+ * Características:
+ * - Obtiene detalles del restaurante.
+ * - Permite seleccionar fecha, hora, número de personas, nombre y teléfono.
+ * - Muestra mensajes de éxito y error en popups.
+ *
+ * Estado:
+ * - restaurant: Detalles del restaurante.
+ * - isLoading: Estado de carga.
+ * - error: Array de mensajes de error.
+ * - reservationDate, reservationTime, numberOfPeople, customerName, customerPhone: Datos del formulario.
+ * - message: Mensaje de éxito o error.
+ * - showPopup: Controla la visibilidad del popup.
+ *
+ * @module CreateReservation
+ */
 import api from '../../api/api';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';

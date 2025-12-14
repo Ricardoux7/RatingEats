@@ -1,3 +1,25 @@
+  // ...existing code...
+  // ...existing code...
+  /**
+   * useFavorites Hook
+   *
+   * Hook personalizado para gestionar la lista de restaurantes favoritos del usuario.
+   * Permite obtener, agregar y eliminar favoritos, y gestiona errores.
+   *
+   * Estado:
+   * - favorites: Lista de restaurantes favoritos.
+   * - error: Mensaje de error.
+   *
+   * Características:
+   * - Obtiene favoritos desde la API.
+   * - Permite alternar favoritos (agregar/eliminar).
+   * - Muestra mensajes de error.
+   *
+   * Ejemplo de uso:
+   * const { favorites, handleFavoriteToggle, error } = useFavorites();
+   *
+   * @module useFavorites
+   */
   import api from '../api/api.js';
   import { useState, useEffect, use } from 'react';
   import { useAuth } from '../context/AuthContext.jsx';

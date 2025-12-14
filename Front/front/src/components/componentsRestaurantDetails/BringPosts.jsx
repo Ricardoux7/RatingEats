@@ -1,3 +1,29 @@
+/**
+ * BringPosts Component
+ *
+ * Muestra los posts de un restaurante y permite eliminarlos si el usuario tiene permisos.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante cuyos posts se mostrarán.
+ * @param {string} userToken - Token JWT del usuario autenticado.
+ * @param {Function} onDelete - Callback para manejar la eliminación de un post.
+ *
+ * Características:
+ * - Obtiene y muestra los posts del restaurante.
+ * - Permite eliminar posts con confirmación.
+ * - Muestra mensajes de éxito y error en popups.
+ *
+ * Estado:
+ * - posts: Array de posts del restaurante.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - showPopup: Controla la visibilidad del popup.
+ * - popupMessage: Mensaje mostrado en el popup.
+ * - succesMessage: Mensaje de éxito tras eliminar un post.
+ * - selectedPostId: ID del post seleccionado para eliminar.
+ *
+ * @module BringPosts
+ */
 import api from '../../api/api';
 import { useState, useEffect } from 'react';
 import '../../components.css';

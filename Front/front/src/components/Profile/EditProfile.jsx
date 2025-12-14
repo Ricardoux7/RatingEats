@@ -1,3 +1,29 @@
+/**
+ * EditProfile Component
+ *
+ * Permite al usuario editar su perfil (nombre, apellido, usuario, biografía).
+ * Obtiene los datos actuales del perfil y permite actualizarlos mediante un formulario.
+ *
+ * Props:
+ * @param {string} id - ID del usuario.
+ * @param {Object} user - Objeto de usuario autenticado.
+ *
+ * Estado:
+ * - name, lastName, username, bio: Campos editables del perfil.
+ * - originalUser: Datos originales del usuario.
+ * - showPopup: Controla la visibilidad del popup.
+ * - message: Mensaje de feedback.
+ *
+ * Características:
+ * - Obtiene y muestra los datos actuales del perfil.
+ * - Permite editar y guardar los datos del perfil.
+ * - Muestra mensajes de éxito o error en popups.
+ *
+ * Ejemplo de uso:
+ * <EditProfile id={user._id} user={user} />
+ *
+ * @module EditProfile
+ */
 import api from '../../api/api';
 import { useState, useEffect} from 'react';
 import '../../components.css';
@@ -11,6 +37,12 @@ const EditProfile = ({id, user}) => {
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState(null);
 
+  /**
+   * Efecto que obtiene los datos actuales del perfil del usuario desde la API.
+   *
+   * @function
+   * @returns {void}
+   */
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -30,6 +62,13 @@ const EditProfile = ({id, user}) => {
     fetchUser();
   }, [id]);
 
+  /**
+   * Envía los datos editados del perfil a la API y muestra feedback.
+   *
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   */
   const ShowForm = async () => {
     try {
       const response = await api.patch('/profile', {

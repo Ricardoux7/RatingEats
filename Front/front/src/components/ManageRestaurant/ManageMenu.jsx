@@ -1,3 +1,29 @@
+/**
+ * ManageMenu Component
+ *
+ * Permite gestionar las imágenes del menú de un restaurante (agregar, reemplazar, eliminar).
+ * Muestra las imágenes actuales y permite su administración visualmente.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante.
+ *
+ * Estado:
+ * - menuItems: Lista de ítems del menú.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - replaceImageId: ID de la imagen a reemplazar.
+ * - popupMessage: Mensaje de feedback.
+ * - showPopup: Controla la visibilidad del popup.
+ *
+ * Características:
+ * - Permite agregar, reemplazar y eliminar imágenes del menú.
+ * - Muestra mensajes de éxito o error.
+ *
+ * Ejemplo de uso:
+ * <ManageMenu restaurantId={restaurantId} />
+ *
+ * @module ManageMenu
+ */
 import api from "../../api/api";
 import { useState, useEffect } from "react";
 import '../../components.css';

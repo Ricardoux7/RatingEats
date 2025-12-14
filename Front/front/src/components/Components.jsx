@@ -1,3 +1,24 @@
+/**
+ * Components Module
+ *
+ * Contiene componentes reutilizables para la navegación, búsqueda y menús de usuario en la aplicación.
+ * Incluye versiones móviles y de escritorio de headers, menús y barras de búsqueda.
+ *
+ * Componentes exportados:
+ * - HeaderMobile
+ * - HeaderDesktop
+ * - SearchBarMobile
+ * - SearchBarDesktop
+ * - UserMenu
+ * - NotificationMenu
+ * - HeaderProfile
+ * - HeaderProfileDesktop
+ * - AsideManager
+ *
+ * Cada componente tiene props y lógica específica para su función en la UI.
+ *
+ * @module Components
+ */
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 //import MyRestaurant from '../pages/ManageRestaurant';

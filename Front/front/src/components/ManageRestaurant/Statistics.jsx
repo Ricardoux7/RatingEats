@@ -1,3 +1,28 @@
+/**
+ * Statistics Component
+ *
+ * Muestra estadísticas de calificaciones y reseñas de un restaurante usando un gráfico de dona.
+ * Obtiene datos de la API y calcula promedios y distribución de ratings.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante.
+ * @param {string} userToken - Token JWT del usuario autenticado.
+ *
+ * Estado:
+ * - statistics: Objeto con total de reseñas, rating promedio y distribución de ratings.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ *
+ * Características:
+ * - Obtiene y muestra estadísticas de reseñas.
+ * - Renderiza gráfico de dona con Chart.js.
+ * - Muestra rating promedio y total de reseñas.
+ *
+ * Ejemplo de uso:
+ * <Statistics restaurantId={id} userToken={token} />
+ *
+ * @module Statistics
+ */
 import api from '../../api/api';
 import { useState, useEffect } from 'react';
 import { Pie, Doughnut } from 'react-chartjs-2';

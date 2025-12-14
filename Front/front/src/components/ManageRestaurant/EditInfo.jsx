@@ -1,3 +1,29 @@
+/**
+ * EditInfo Component
+ *
+ * Permite editar la información básica de un restaurante (nombre, descripción, dirección, categorías, horario, capacidad, teléfono).
+ * Gestiona la validación, feedback visual y actualización de datos.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante a editar.
+ * @param {Function} onUpdate - Callback para actualizar la información tras editar.
+ * @param {Object} initialData - Datos iniciales del restaurante.
+ *
+ * Estado:
+ * - form: Objeto con los campos editables.
+ * - loading: Estado de carga.
+ * - success: Mensaje de éxito.
+ * - error: Mensaje de error.
+ *
+ * Características:
+ * - Permite editar y guardar información del restaurante.
+ * - Muestra mensajes de éxito o error.
+ *
+ * Ejemplo de uso:
+ * <EditInfo restaurantId={id} onUpdate={handleUpdate} initialData={data} />
+ *
+ * @module EditInfo
+ */
 import { useState, useEffect } from 'react';
 import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext.jsx';

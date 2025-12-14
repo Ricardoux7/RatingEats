@@ -1,3 +1,27 @@
+/**
+ * Filter Component
+ *
+ * Permite filtrar restaurantes por categorías y rating.
+ * Gestiona la selección de filtros y aplica los cambios mediante callbacks.
+ *
+ * Props:
+ * @param {Object} filters - Filtros actuales (categorías, rating).
+ * @param {Function} setFilters - Setter para actualizar los filtros.
+ * @param {Function} onFilterClick - Callback al aplicar los filtros.
+ *
+ * Estado:
+ * - selectedFilters: Categorías seleccionadas.
+ * - selectedRating: Rating seleccionado.
+ *
+ * Características:
+ * - Permite seleccionar y aplicar filtros.
+ * - Llama a callbacks al aplicar cambios.
+ *
+ * Ejemplo de uso:
+ * <Filter filters={filters} setFilters={setFilters} onFilterClick={cb} />
+ *
+ * @module Filter
+ */
 import React, { useState, useEffect } from 'react';
 
 const Filter = ({ filters, setFilters, onFilterClick }) => {

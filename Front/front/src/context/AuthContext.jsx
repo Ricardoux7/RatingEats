@@ -1,3 +1,30 @@
+/**
+ * AuthContext y AuthProvider
+ *
+ * Provee el contexto de autenticación para la aplicación, incluyendo el usuario actual, login, logout y registro.
+ * Permite acceder al estado de autenticación y funciones relacionadas desde cualquier componente hijo.
+ *
+ * Estado:
+ * - user: Objeto de usuario autenticado o null.
+ * - userRole: Rol del usuario autenticado.
+ *
+ * Funciones expuestas:
+ * - login: Inicia sesión y guarda el usuario en localStorage.
+ * - logOut: Cierra sesión y limpia el estado/localStorage.
+ * - registerUser: Registra un nuevo usuario.
+ *
+ * Características:
+ * - Persiste el usuario en localStorage.
+ * - Redirige tras logout.
+ * - Provee el contexto a través de AuthContext.Provider.
+ *
+ * Ejemplo de uso:
+ * <AuthProvider>
+ *   <App />
+ * </AuthProvider>
+ *
+ * @module AuthContext
+ */
 import { createContext, useContext, useState, Children } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api'; 
@@ -62,4 +89,15 @@ export const AuthProvider = ({ children }) => {
   );
 }; 
 
+/**
+ * useAuth Hook
+ *
+ * Hook personalizado para acceder al contexto de autenticación.
+ * Permite obtener el usuario, rol y funciones de autenticación desde cualquier componente.
+ *
+ * @returns {Object} Contexto de autenticación (user, userRole, isLoggedIn, login, logOut, registerUser)
+ *
+ * Ejemplo de uso:
+ * const { user, login, logOut } = useAuth();
+ */
 export const useAuth = () => useContext(AuthContext);

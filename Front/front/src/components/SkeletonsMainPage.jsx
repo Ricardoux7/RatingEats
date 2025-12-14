@@ -1,6 +1,28 @@
+/**
+ * SkeletonsMainPage Component
+ *
+ * Muestra un esqueleto de carga para la página principal de restaurantes.
+ * Utiliza react-loading-skeleton para simular tarjetas de restaurante mientras se cargan los datos.
+ *
+ * Características:
+ * - Renderiza múltiples tarjetas de esqueleto.
+ * - Diseño responsivo para diferentes tamaños de pantalla.
+ *
+ * Ejemplo de uso:
+ * <SkeletonsMainPage />
+ *
+ * @module SkeletonsMainPage
+ */
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
+/**
+ * SkeletonsMainPage
+ *
+ * Renderiza tarjetas de esqueleto para la carga de la página principal.
+ *
+ * @returns {JSX.Element}
+ */
 const SkeletonsMainPage = () => {
   const skeletonCards = Array.from({ length: 12 }).map((_, index) => (
     <div
@@ -23,6 +45,13 @@ const SkeletonsMainPage = () => {
   );
 };
 
+/**
+ * SkeletonMap
+ *
+ * Renderiza un esqueleto de carga para el mapa de ubicación.
+ *
+ * @returns {JSX.Element}
+ */
 const SkeletonMap = () => {
   const skeletonMaps = Array.from({ length: 1 }).map((_, index) => (
     <div key={index} className='bg-white rounded-lg shadow-md overflow-hidden transform transition duration-700 hover:shadow-xl'>

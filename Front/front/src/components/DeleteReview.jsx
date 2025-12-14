@@ -1,3 +1,29 @@
+/**
+ * DeleteReview Component
+ *
+ * Permite eliminar una reseña de un restaurante.
+ * Muestra un botón y un popup de confirmación antes de eliminar.
+ *
+ * Props:
+ * @param {string} reviewId - ID de la reseña a eliminar.
+ * @param {Function} onDelete - Callback tras eliminar la reseña.
+ * @param {Function} onError - Callback en caso de error.
+ *
+ * Estado:
+ * - isDeleting: Estado de carga.
+ * - error: Mensaje de error.
+ * - showConfirm: Controla la visibilidad del popup de confirmación.
+ *
+ * Características:
+ * - Elimina la reseña mediante la API.
+ * - Muestra confirmación antes de eliminar.
+ * - Muestra mensajes de error y feedback de carga.
+ *
+ * Ejemplo de uso:
+ * <DeleteReview reviewId={id} onDelete={cb} />
+ *
+ * @module DeleteReview
+ */
 import api from '../api/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useState } from 'react';
@@ -8,6 +34,13 @@ const DeleteReview = ({ reviewId, onDelete, onError }) => {
   const [error, setError] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  /**
+   * Elimina la reseña mediante la API y gestiona el feedback visual.
+   *
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   */
   const handleDelete = async () => {
     setIsDeleting(true);
     setError(null);

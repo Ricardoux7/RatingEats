@@ -1,3 +1,31 @@
+/**
+ * DeleteRestaurant Component
+ *
+ * Permite al propietario eliminar un restaurante de la plataforma.
+ * Gestiona la confirmación, feedback visual y redirección tras la eliminación.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante a eliminar.
+ *
+ * Estado:
+ * - isDeleting: Estado de carga.
+ * - restaurant: Información del restaurante.
+ * - error: Mensaje de error.
+ * - showError: Controla la visibilidad del error.
+ * - successfullyDeleted: Estado de éxito.
+ * - successMessage: Mensaje de éxito.
+ * - popUp: Controla la visibilidad del popup.
+ *
+ * Características:
+ * - Solicita confirmación antes de eliminar.
+ * - Muestra mensajes de éxito o error.
+ * - Redirige tras eliminar exitosamente.
+ *
+ * Ejemplo de uso:
+ * <DeleteRestaurant restaurantId={restaurantId} />
+ *
+ * @module DeleteRestaurant
+ */
 import { set } from 'mongoose';
 import api from '../../api/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';

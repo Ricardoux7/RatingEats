@@ -1,3 +1,25 @@
+/**
+ * RestaurantDetails Component
+ *
+ * Página de detalles de un restaurante, muestra información, menú, imágenes, favoritos y permite reservar.
+ *
+ * Estado:
+ * - restaurant: Objeto restaurante actual.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - reservationSuccess: Estado de éxito de reserva.
+ * - tab: Sección activa (general, menú, etc.).
+ *
+ * Características:
+ * - Obtiene y muestra detalles del restaurante.
+ * - Permite marcar como favorito y reservar.
+ * - Muestra menú, imágenes y tabs.
+ *
+ * Ejemplo de uso:
+ * <RestaurantDetails />
+ *
+ * @module RestaurantDetails
+ */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { HeaderMobile, HeaderDesktop } from '../components/Components.jsx';

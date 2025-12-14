@@ -1,3 +1,43 @@
+/**
+ * Función interna renderRestaurantCard
+ *
+ * Renderiza una tarjeta de restaurante con detalles, imagen y botón de favoritos.
+ *
+ * @param {Object} restaurant - Objeto restaurante a renderizar.
+ * @returns {JSX.Element} Tarjeta de restaurante.
+ */
+/**
+ * MainPage Component
+ *
+ * Página principal de la aplicación RatingEats.
+ * Muestra una lista de restaurantes con paginación, filtrado por categorías y rating, y permite marcar favoritos.
+ * Incluye manejo de carga, errores, y renderizado responsivo.
+ *
+ * Props:
+ * @param {Array} searchRestaurants - Lista de restaurantes filtrados por búsqueda (opcional).
+ * @param {Function} setSearchRestaurants - Setter para actualizar los restaurantes de búsqueda.
+ * @param {string} searchError - Mensaje de error de búsqueda (opcional).
+ * @param {Object} filters - Filtros aplicados (categorías, rating).
+ * @param {Function} setFilters - Setter para actualizar los filtros.
+ *
+ * Características:
+ * - Obtiene restaurantes paginados desde la API.
+ * - Permite filtrar por categorías y rating.
+ * - Muestra favoritos y permite alternar favoritos.
+ * - Incluye paginación, feedback de carga y errores.
+ * - Renderiza tarjetas de restaurante con detalles y botón de favoritos.
+ *
+ * Ejemplo de uso:
+ * <MainPage
+ *   searchRestaurants={searchResults}
+ *   setSearchRestaurants={setSearchResults}
+ *   searchError={searchError}
+ *   filters={filters}
+ *   setFilters={setFilters}
+ * />
+ *
+ * @module MainPage
+ */
 import React, { useState, useEffect } from "react";
 import api from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";

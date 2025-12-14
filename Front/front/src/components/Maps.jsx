@@ -1,3 +1,25 @@
+/**
+ * Maps Component
+ *
+ * Muestra un mapa interactivo con la ubicación del restaurante usando Leaflet.
+ * Muestra un esqueleto de carga mientras se obtiene el mapa.
+ *
+ * Props:
+ * @param {Array|string} geoLocation - Coordenadas de ubicación (lat, lon).
+ * @param {string} restaurantName - Nombre del restaurante para el popup.
+ *
+ * Estado:
+ * - isLoading: Estado de carga del mapa.
+ *
+ * Características:
+ * - Muestra mapa con marcador y popup.
+ * - Muestra esqueleto de carga mientras se carga el mapa.
+ *
+ * Ejemplo de uso:
+ * <Maps geoLocation={location} restaurantName={name} />
+ *
+ * @module Maps
+ */
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { useState } from 'react';

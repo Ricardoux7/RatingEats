@@ -1,3 +1,30 @@
+/**
+ * HandleCreate Component
+ *
+ * Permite a los usuarios crear un nuevo restaurante mediante un formulario por pasos (wizard).
+ * Gestiona la validación de campos, feedback visual, y navegación entre pasos.
+ *
+ * Props:
+ * @param {Object} user - Objeto de usuario autenticado.
+ *
+ * Estado:
+ * - name, description, adress, phoneNumber, categories, geoLocation, schedule, capacity, email: Campos del formulario.
+ * - error: Mensaje de error.
+ * - message: Mensaje de éxito.
+ * - showPopup: Controla la visibilidad del popup.
+ * - restaurantId: ID del restaurante creado.
+ * - activeIndex: Paso actual del wizard.
+ *
+ * Características:
+ * - Formulario multi-paso para crear restaurante.
+ * - Validación de campos y feedback visual.
+ * - Navegación entre pasos y resumen final.
+ *
+ * Ejemplo de uso:
+ * <HandleCreate user={user} />
+ *
+ * @module HandleCreate
+ */
 import api from '../../api/api';
 import { useState, useRef} from 'react';
 import { useAuth } from '../../context/AuthContext';

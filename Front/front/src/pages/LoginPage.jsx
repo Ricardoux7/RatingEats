@@ -1,3 +1,23 @@
+/**
+ * LoginPage Component
+ *
+ * Página de inicio de sesión para usuarios de RatingEats.
+ * Permite ingresar credenciales, muestra feedback de carga y errores, y redirige según el rol.
+ *
+ * Estado:
+ * - email, password: Credenciales del usuario.
+ * - error: Mensaje de error.
+ * - isLoading: Estado de carga.
+ *
+ * Características:
+ * - Permite iniciar sesión y redirige según el rol.
+ * - Muestra mensajes de error y feedback de carga.
+ *
+ * Ejemplo de uso:
+ * <LoginPage />
+ *
+ * @module LoginPage
+ */
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';

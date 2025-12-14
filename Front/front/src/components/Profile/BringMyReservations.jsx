@@ -1,3 +1,27 @@
+/**
+ * BringMyReservations Component
+ *
+ * Muestra las reservaciones confirmadas del usuario autenticado.
+ * Obtiene las reservaciones desde la API y filtra solo las confirmadas.
+ *
+ * Props:
+ * @param {string} userId - Token JWT del usuario autenticado.
+ *
+ * Estado:
+ * - reservations: Array de reservaciones confirmadas.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ *
+ * Características:
+ * - Obtiene reservaciones del usuario desde la API.
+ * - Filtra y muestra solo las reservaciones confirmadas.
+ * - Muestra mensajes de error y feedback de carga.
+ *
+ * Ejemplo de uso:
+ * <BringMyReservations userId={user.token} />
+ *
+ * @module BringMyReservations
+ */
 import api from '../../api/api';
 import { useEffect, useState } from 'react';
 
@@ -6,25 +30,31 @@ const BringMyReservations = ({ userId }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  /**
+   * Efecto que obtiene las reservaciones del usuario desde la API y filtra solo las confirmadas.
+   *
+   * @function
+   * @returns {void}
+   */
   useEffect(() => {
-    try {
-      const fetchReservations = async () => {
+    const fetchReservations = async () => {
+      try {
         const response = await api.get('/reservations/user', {
           headers: {
             Authorization: `Bearer ${userId}`,
           }
-        })
+        });
         const confirmed = response.data.filter(reservation => reservation.state === 'confirmed');
         setReservations(confirmed);
         setIsLoading(false);
+      } catch (err) {
+        if (err.response && err.response.status === 500) {
+          setError('Internal server error. Please try again later.');
+        }
       }
-      fetchReservations();
-    } catch (err) {
-      if (err.response && err.response.status === 500) {
-        setError('Internal server error. Please try again later.');
-      }
-    }
-  })
+    };
+    fetchReservations();
+  }, [userId]);
 
 
   if (isLoading) {

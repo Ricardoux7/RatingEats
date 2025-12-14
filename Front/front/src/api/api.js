@@ -1,8 +1,25 @@
+/**
+ * API Client
+ *
+ * Este módulo configura una instancia de Axios para interactuar con la API de RatingEats.
+ * Incluye la configuración de la URL base, cabeceras y un interceptor para adjuntar el token JWT
+ * almacenado en localStorage a cada solicitud saliente.
+ *
+ * Características:
+ * - Base URL: http://localhost:3000/api
+ * - Content-Type: application/json
+ * - Interceptor de solicitud: agrega el token de autenticación si existe.
+ *
+ * Uso:
+ *   import api from './api';
+ *   api.get('/restaurants');
+ *
+ * @module api
+ */
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api';
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

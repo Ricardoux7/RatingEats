@@ -1,3 +1,37 @@
+/**
+ * UploadImage Component
+ *
+ * Permite subir, reemplazar o actualizar imágenes para menús, posts o banners de un restaurante.
+ * Gestiona la validación, feedback visual y lógica de carga según el modo seleccionado.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante.
+ * @param {string} [imageId] - ID de la imagen a reemplazar (opcional).
+ * @param {string} [mode='add'] - Modo de operación: 'add', 'replace', 'postUpload', 'bannerUpload'.
+ * @param {Function} [onUploadSuccess] - Callback tras carga exitosa.
+ * @param {Function} [onClear] - Callback para limpiar selección.
+ * @param {Function} [onClose] - Callback para cerrar el modal.
+ * @param {Function} [onBannerUpdate] - Callback tras actualizar banner.
+ *
+ * Estado:
+ * - selectedFiles: Archivos seleccionados para subir.
+ * - showForm: Controla visibilidad del formulario.
+ * - content: Contenido del post (modo postUpload).
+ * - uploading: Estado de carga.
+ * - error: Mensaje de error.
+ * - popupMessage: Mensaje de feedback.
+ * - showPopup: Controla la visibilidad del popup.
+ *
+ * Características:
+ * - Permite subir, reemplazar o actualizar imágenes según el modo.
+ * - Muestra mensajes de éxito o error.
+ * - Soporta vista previa de imágenes seleccionadas.
+ *
+ * Ejemplo de uso:
+ * <UploadImage restaurantId={id} mode="add" onUploadSuccess={cb} />
+ *
+ * @module UploadImage
+ */
 import React, { useState } from 'react';
 import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext.jsx';

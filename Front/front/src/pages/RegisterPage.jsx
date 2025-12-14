@@ -1,3 +1,24 @@
+/**
+ * RegisterPage Component
+ *
+ * Página de registro de nuevos usuarios para RatingEats.
+ * Permite ingresar datos personales, muestra feedback de carga y errores.
+ *
+ * Estado:
+ * - name, lastName, username, email, password: Campos del formulario.
+ * - error: Mensaje de error general.
+ * - fieldErrors: Errores específicos de campos.
+ * - isLoading: Estado de carga.
+ *
+ * Características:
+ * - Permite registrar un nuevo usuario.
+ * - Muestra mensajes de error y feedback de carga.
+ *
+ * Ejemplo de uso:
+ * <RegisterPage />
+ *
+ * @module RegisterPage
+ */
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';

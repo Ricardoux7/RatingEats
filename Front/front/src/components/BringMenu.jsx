@@ -1,3 +1,27 @@
+/**
+ * BringMenu Component
+ *
+ * Muestra el menú de imágenes de un restaurante en un slider responsivo.
+ * Obtiene los ítems del menú desde la API y los muestra con zoom y navegación.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante cuyos menús se mostrarán.
+ *
+ * Estado:
+ * - menuItems: Lista de ítems del menú.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ *
+ * Características:
+ * - Obtiene los ítems del menú desde la API.
+ * - Muestra las imágenes en un slider con zoom.
+ * - Muestra mensajes de error y feedback de carga.
+ *
+ * Ejemplo de uso:
+ * <BringMenu restaurantId={id} />
+ *
+ * @module BringMenu
+ */
 import api from '../api/api'; 
 import { useEffect, useState } from 'react';
 import Slider from 'react-slick';
@@ -12,6 +36,12 @@ const BringMenu = ({ restaurantId }) => {
   const [error, setError] = useState(null);
   const imageURL = import.meta.env.VITE_BACKEND_URL;
 
+  /**
+   * Efecto que obtiene los ítems del menú del restaurante desde la API.
+   *
+   * @function
+   * @returns {void}
+   */
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {

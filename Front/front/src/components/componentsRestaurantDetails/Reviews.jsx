@@ -1,3 +1,25 @@
+/**
+ * Reviews Component
+ *
+ * Permite a los usuarios ver, crear y eliminar reseñas de un restaurante.
+ * Muestra las reseñas existentes, permite dejar una nueva reseña y gestiona mensajes de error y éxito.
+ *
+ * Características:
+ * - Obtiene y muestra las reseñas del restaurante.
+ * - Permite a usuarios autenticados dejar una reseña.
+ * - Permite eliminar la propia reseña.
+ * - Muestra mensajes de error y feedback en popups.
+ *
+ * Estado:
+ * - reviews: Array de reseñas del restaurante.
+ * - isLoading: Estado de carga.
+ * - error: Mensaje de error.
+ * - review: Objeto con rating y comentario para nueva reseña.
+ * - visibleCount: Número de reseñas visibles.
+ * - showPopup: Controla la visibilidad del popup de error.
+ *
+ * @module Reviews
+ */
 import api from '../../api/api';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';

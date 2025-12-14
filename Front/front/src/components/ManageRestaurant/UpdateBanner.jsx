@@ -1,3 +1,23 @@
+/**
+ * UpdateBanner Component
+ *
+ * Permite actualizar la imagen de banner de un restaurante.
+ * Utiliza el componente UploadImage en modo 'bannerUpload' para gestionar la carga.
+ *
+ * Props:
+ * @param {string} restaurantId - ID del restaurante.
+ * @param {Function} onClose - Callback para cerrar el modal.
+ * @param {Function} onBannerUpdate - Callback tras actualizar el banner.
+ *
+ * Características:
+ * - Renderiza un modal centrado para subir la imagen de banner.
+ * - Utiliza UploadImage para la lógica de carga y feedback.
+ *
+ * Ejemplo de uso:
+ * <UpdateBanner restaurantId={id} onClose={closeModal} onBannerUpdate={handleUpdate} />
+ *
+ * @module UpdateBanner
+ */
 import { useEffect } from "react";
 import UploadImage from "./UploadImage.jsx";
 
