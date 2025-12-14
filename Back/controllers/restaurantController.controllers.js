@@ -225,10 +225,9 @@ const uploadImage = asyncHandler(async (req, res) => {
     }
 
     const newImage = {
-      url: `/uploads/${filename}`,
+      url: req.body.image,
       alt: req.body.alt || restaurant.name + " image",
-      size: req.file.size,
-      isHeader: req.body.isHeader === "true",
+      isHeader: req.body.isHeader === "true" || req.body.isHeader === true,
     };
 
     restaurant.images.push(newImage);

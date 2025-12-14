@@ -240,7 +240,6 @@ router
   .post(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(uploadMenu.array("images")),
     uploadMenuImage
   );
 router
@@ -249,7 +248,6 @@ router
   .patch(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(uploadMenu.single("image")),
     changeThisImage
   );
 router

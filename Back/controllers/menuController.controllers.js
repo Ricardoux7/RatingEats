@@ -19,16 +19,12 @@ import path from "path";
  */
 const uploadMenuImage = asyncHandler(async (req, res) => {
   const restaurantId = req.params.id;
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ message: "No images uploaded" });
+  const { images } = req.body;
+
+  if (!images || !Array.isArray(images) || images.length === 0) {
+    return res.status(400).json({ message: "No images provided" });
   }
-  const { alt, isHeader } = req.body;
-  const images = req.files.map((file) => ({
-    url: `/uploads/menu/${file.filename}`,
-    alt: alt || "",
-    size: file.size,
-    isHeader: isHeader === "true" || isHeader === true,
-  }));
+
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant || restaurant.isDeleted) {
     res.status(404);
@@ -37,11 +33,12 @@ const uploadMenuImage = asyncHandler(async (req, res) => {
   if (!restaurant.menu) {
     restaurant.menu = [];
   }
-  restaurant.menu.push(...images);
+  const imagesToAdd = images.map((url) => ({ url }));
+  restaurant.menu.push(...imagesToAdd);
   await restaurant.save();
   res.status(201).json({
     message: "Menu images uploaded successfully",
-    images,
+    images: imagesToAdd,
   });
 });
 
@@ -65,22 +62,6 @@ const deleteMenuImage = asyncHandler(async (req, res) => {
   if (!image) {
     res.status(404);
     throw new Error("Image not found");
-  }
-  const fileName = image.url.split("/").pop();
-  try {
-    const filePath = path.join(process.cwd(), "uploads", fileName);
-    await unlink(filePath);
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      console.warn(
-        "File not found, might have been already deleted:",
-        fileName
-      );
-    } else {
-      console.error("Error deleting file:", error);
-      res.status(500);
-      throw new Error("Error deleting image file");
-    }
   }
   const result = await Restaurant.updateOne(
     { _id: restaurantId },
@@ -135,33 +116,16 @@ const changeThisImage = asyncHandler(async (req, res) => {
     throw new Error("Image not found");
   }
   const oldImage = restaurant.menu[imageIndex];
-  const oldFileName = oldImage.url.split("/").pop();
-
-  try {
-    const filePath = path.join(process.cwd(), "uploads", "menu", oldFileName);
-    await unlink(filePath);
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      console.warn(
-        "File not found, might have been already deleted:",
-        oldFileName
-      );
-    }
-  }
-
-  if (!req.file) {
+  const { url, alt, isHeader } = req.body;
+  if (!url) {
     res.status(400);
-    throw new Error("No image uploaded to replace the existing one.");
+    throw new Error("No image URL provided to replace the existing one.");
   }
-
-  const { alt, isHeader } = req.body;
   const newImage = {
-    url: `/uploads/menu/${req.file.filename}`,
+    url,
     alt: alt || oldImage.alt,
-    size: req.file.size,
     isHeader: isHeader === "true" || isHeader === true,
   };
-
   restaurant.menu[imageIndex] = {
     ...restaurant.menu[imageIndex]._doc,
     ...newImage,

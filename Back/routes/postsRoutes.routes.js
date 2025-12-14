@@ -36,7 +36,7 @@ const routerPosts = express.Router();
 
 routerPosts
   .route("/:id/posts")
-  .post(protect, uploadPost.single("image"), createPost)
+  .post(protect, createPost)
   .get(getPostsByRestaurant);
 routerPosts.route("/posts/:postId/:restaurantId").delete(protect, deletePost);
 routerPosts

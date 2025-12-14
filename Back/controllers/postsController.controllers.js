@@ -19,17 +19,16 @@ import path from "path";
  * @returns {void} Devuelve el post creado y mensaje
  */
 const createPost = asyncHandler(async (req, res) => {
-  const uploadedFile = req.file;
   try {
     const restaurantId = req.params.id || req.params.restaurantId;
-    const { content } = req.body;
+    const { content, image } = req.body;
     const authorUserId = req.user._id;
     const userRole = req.user.role;
     const userRestaurantId = req.user.restaurantId;
 
-    if (!uploadedFile || !uploadedFile.filename) {
+    if (!image) {
       res.status(400);
-      throw new Error("Image is required");
+      throw new Error("Image URL is required");
     }
     const restaurant = await Restaurant.findOne({
       _id: restaurantId,
@@ -40,10 +39,9 @@ const createPost = asyncHandler(async (req, res) => {
       throw new Error("Restaurant not found");
     }
 
-    const image = {
-      url: "/uploads/posts/" + uploadedFile.filename,
+    const imageObj = {
+      url: image,
       alt: content ? content.substring(0, 200) : "Post image",
-      size: uploadedFile.size,
     };
     const isOperatorOfDestination =
       (userRole === "owner" || userRole === "operator") &&
@@ -53,7 +51,7 @@ const createPost = asyncHandler(async (req, res) => {
     const post = new Post({
       authorUserId: authorUserId,
       authorRestaurantId: restaurantId,
-      image: image,
+      image: imageObj,
       content: content || "",
       state: postState,
     });
@@ -73,20 +71,6 @@ const createPost = asyncHandler(async (req, res) => {
 
     res.status(201).json({ message, post });
   } catch (error) {
-    if (uploadedFile) {
-      try {
-        const filePath = path.join(
-          process.cwd(),
-          "uploads",
-          "posts",
-          uploadedFile.filename
-        );
-        await unlink(filePath);
-        console.log(`The image was deleted: ${uploadedFile.filename}`);
-      } catch (unlinkError) {
-        console.error("Error cleaning up image:", unlinkError);
-      }
-    }
     throw error;
   }
 });
@@ -219,18 +203,6 @@ const deletePost = asyncHandler(async (req, res) => {
       );
     }
   }
-  if (post.image && post.image.url) {
-    try {
-      const fileName = post.image.url.split("/").pop();
-      const filePath = path.join(process.cwd(), "uploads", "posts", fileName);
-      await unlink(filePath);
-    } catch (error) {
-      if (error.code !== "ENOENT") {
-        console.error("Error al borrar el archivo físico del post:", error);
-      }
-    }
-  }
-
   post.deleted = true;
   await post.save();
 
