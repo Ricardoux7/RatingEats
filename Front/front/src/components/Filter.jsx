@@ -90,7 +90,7 @@ const Filter = ({ filters, setFilters, onFilterClick }) => {
                 onClick={() => setSelectedRating(star)}
               >
                 <img
-                  src={star <= selectedRating ? '../icons/star-green.svg' : '../icons/star-light-green.svg'}
+                  src={star <= selectedRating ? '/icons/star-green.svg' : '/icons/star-light-green.svg'}
                   alt={`${star} stars`}
                   className="w-5 h-5"
                 />
@@ -151,7 +151,7 @@ const Filter = ({ filters, setFilters, onFilterClick }) => {
                   onClick={() => setSelectedRating(star)}
                 >
                   <img
-                    src={star <= selectedRating ? '../icons/star-green.svg' : '../icons/star-light-green.svg'}
+                    src={star <= selectedRating ? '/icons/star-green.svg' : '/icons/star-light-green.svg'}
                     alt={`${star} stars`}
                     className="w-5 h-5"
                   />

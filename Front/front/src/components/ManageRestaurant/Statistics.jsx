@@ -128,9 +128,9 @@ const Statistics = ({ restaurantId, userToken }) => {
           <div className='flex gap-2 flex-wrap justify-center'>
             {Array.from({ length: 5 }).map((_, i) => (
               i < Math.round(statistics.averageRating) ? (
-                <img key={i} src="../../icons/star-green.svg" alt="star" className='w-6' />
+                <img key={i} src="/icons/star-green.svg" alt="star" className='w-6' />
                 ) : (
-                  <img key={i} src="../../icons/star-gray-com.svg" alt="star" className='w-7' />
+                  <img key={i} src="/icons/star-gray-com.svg" alt="star" className='w-7' />
                 )
             ))}
           </div>

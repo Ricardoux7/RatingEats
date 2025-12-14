@@ -114,7 +114,7 @@ const MyRestaurant = () => {
               className='absolute top-2 right-2 rounded-full p-2 bg-white hover:bg-gray-200'
               onClick={() => setShowImage(false)}
             >
-              <img src="../icons/cancel.svg" alt="close" className='w-6'/>
+              <img src="/icons/cancel.svg" alt="close" className='w-6'/>
             </button>
           </div>
         </div>
@@ -194,9 +194,9 @@ const MyRestaurant = () => {
                   <div className='flex items-center flex-row w-[30%]  break-words'>
                     {Array.from({ length: 5 }).map((_, i) => (
                       i < Math.round(restaurant.averageRating) ? (
-                        <img key={i} src="../../icons/star.svg" alt="star" className='w-6 mt-5' />
+                        <img key={i} src="/icons/star.svg" alt="star" className='w-6 mt-5' />
                         ) : (
-                        <img key={i} src="../../icons/star-outline.svg" alt="star" className='w-8 mt-5' />
+                        <img key={i} src="/icons/star-outline.svg" alt="star" className='w-8 mt-5' />
                         )
                     ))}
                     <p className='text-[1.4rem] ml-2 text-[#171A1F] mt-5'>{restaurant.averageRating}</p>

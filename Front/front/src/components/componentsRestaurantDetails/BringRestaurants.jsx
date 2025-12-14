@@ -71,7 +71,7 @@ const BringRestaurants = () => {
                 <p className="text-gray-600 mt-1">{restaurant.adress || "No specified address"}</p>
                 <div className="flex items-center mt-2">
                   {[...Array(5)].map((_, i) => (
-                    <img key={i} src={i < Math.round(restaurant.averageRating) ? '../icons/star.svg' : '../icons/star-outline.svg'} alt="star" className="w-6" />
+                    <img key={i} src={i < Math.round(restaurant.averageRating) ? '/icons/star.svg' : '/icons/star-outline.svg'} alt="star" className="w-6" />
                   ))}
                   <p className="text-[1rem] ml-2 text-[#1D2025]">{restaurant.averageRating}</p>
                 </div>

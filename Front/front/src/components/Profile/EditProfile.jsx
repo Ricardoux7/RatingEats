@@ -148,7 +148,7 @@ const EditProfile = ({id, user}) => {
         {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] animate-fade-in w-full h-full z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg animate-drop-in w-[90%] inset-0">
-            <img src={showPopup === 'Profile updated successfully!' ? '../icons/check.svg' : '../icons/error.svg'} alt="" className='w-15 justify-center mx-auto mb-4'/>
+            <img src={showPopup === 'Profile updated successfully!' ? '/icons/check.svg' : '/icons/error.svg'} alt="" className='w-15 justify-center mx-auto mb-4'/>
             <h2 className="text-lg font-semibold mb-4 text-center">{showPopup}</h2>
             <button
               onClick={() => setShowPopup(false)}
@@ -220,7 +220,7 @@ const EditProfile = ({id, user}) => {
         {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.5)] animate-fade-in w-full h-full z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg animate-drop-in w-[90%] inset-0">
-            <img src={showPopup === 'Profile updated successfully!' ? '../icons/check.svg' : '../icons/error.svg'} alt="" className='w-15 justify-center mx-auto mb-4'/>
+            <img src={showPopup === 'Profile updated successfully!' ? '/icons/check.svg' : '/icons/error.svg'} alt="" className='w-15 justify-center mx-auto mb-4'/>
             <h2 className="text-lg font-semibold mb-4 text-center">{showPopup}</h2>
             <button
               onClick={() => setShowPopup(false)}

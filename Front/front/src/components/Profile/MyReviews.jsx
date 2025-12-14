@@ -79,9 +79,9 @@ const MyReviews = ({ user }) => {
                   <p className="mb-2 text-[2rem] font-normal text-[#171A1F]">{review.restaurantId?.name}</p>
                   {Array.from({ length: 5 }).map((_, i) => (
                     i < Math.round(review.rating) ? (
-                      <img key={i} src="../../icons/star-green.svg" alt="star" className='h-6 mb-2'/>
+                      <img key={i} src="/icons/star-green.svg" alt="star" className='h-6 mb-2'/>
                     ) : (
-                      <img key={i} src="../../icons/star-gray-com.svg" alt="star" className='h-6 mb-2' />
+                      <img key={i} src="/icons/star-gray-com.svg" alt="star" className='h-6 mb-2' />
                     )
                   ))}
                 </div>

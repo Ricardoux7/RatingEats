@@ -102,7 +102,7 @@ const Reviews = () => {
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-opacity-90 z-50 ">
           <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center gap-4 text-center">
-            <img src="../icons/error.svg" alt="error" className='w-20'/>
+            <img src="/icons/error.svg" alt="error" className='w-20'/>
             <p className="text-red-600 text-lg font-bold mb-4">
               {error}
             </p>
@@ -131,7 +131,7 @@ const Reviews = () => {
                     className="focus:outline-none"
                   >
                     <img
-                      src={star <= review.rating ? "../icons/star-green.svg" : "../icons/star-light-green.svg"}
+                      src={star <= review.rating ? "/icons/star-green.svg" : "../icons/star-light-green.svg"}
                       alt={`${star} star`}
                       className="w-8 transition-transform hover:scale-110"
                     />
@@ -166,9 +166,9 @@ const Reviews = () => {
               <div className='flex items-center'>
                 {Array.from({ length: 5 }).map((_, i) => (
                   i < Math.round(review.rating) ? (
-                    <img key={i} src="../icons/star-green.svg" alt="star" className='w-6' />
+                    <img key={i} src="/icons/star-green.svg" alt="star" className='w-6' />
                   ) : (
-                    <img key={i} src="../icons/star-light-green.svg" alt="star" className='w-6' />
+                    <img key={i} src="/icons/star-light-green.svg" alt="star" className='w-6' />
                   )
                 ))}
               </div>

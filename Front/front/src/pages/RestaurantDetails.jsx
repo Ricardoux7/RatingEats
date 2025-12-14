@@ -108,16 +108,16 @@ const RestaurantDetails = () => {
                   <div className='flex items-end flex-row '>
                     {Array.from({ length: 5 }).map((_, i) => (
                       i < Math.round(restaurant.averageRating) ? (
-                        <img key={i} src="../icons/star.svg" alt="star" className='w-8 mb-1' />
+                        <img key={i} src="/icons/star.svg" alt="star" className='w-8 mb-1' />
                       ) : (
-                        <img key={i} src="../icons/star-outline.svg" alt="star" className='w-10' />
+                        <img key={i} src="/icons/star-outline.svg" alt="star" className='w-10' />
                       )
                     ))}
                     <p className='text-[1.5rem] ml-2  text-white'>{restaurant.averageRating}</p>
                     <p className='text-[1.5rem] ml-4 text-white'>{' • ' + restaurant.categories[0]}</p>
                   </div>
                   <div className='flex items-center flex-row mt-2'>
-                    <img src="../icons/location2.svg" alt="adress-icon" className="w-5" />
+                    <img src="/icons/location2.svg" alt="adress-icon" className="w-5" />
                     <span className="ml-2 text-white text-[2rem]">{restaurant.adress || "No specified adress"}</span>
                   </div>
                   <div className="mt-3 flex flex-col items-start space-y-2 h-full">
@@ -174,16 +174,16 @@ const RestaurantDetails = () => {
                 <div className='flex items-center flex-row'>
                   {Array.from({ length: 5 }).map((_, i) => (
                     i < Math.round(restaurant.averageRating) ? (
-                      <img key={i} src="../icons/star.svg" alt="star" className='w-6' />
+                      <img key={i} src="/icons/star.svg" alt="star" className='w-6' />
                     ) : (
-                      <img key={i} src="../icons/star-outline.svg" alt="star" className='w-8' />
+                      <img key={i} src="/icons/star-outline.svg" alt="star" className='w-8' />
                     )
                   ))}
                   <p className='text-[1rem] ml-2 text-[#5F6369]'>{restaurant.averageRating}</p>
                   <p className='text-[1rem] ml-4 text-[#5F6369]'>{'(' + restaurant.numReviews + ' reviews)'}</p>
                 </div>
                 <div className='flex items-center flex-row'>
-                  <img src="../icons/location.svg" alt="adress-icon" className="w-5" />
+                  <img src="/icons/location.svg" alt="adress-icon" className="w-5" />
                   <span className="ml-2 text-gray-600">{restaurant.adress || "No specified adress"}</span>
                 </div>
                 <div className='mt-3 flex flex-col items-start space-y-2 h-full'>
