@@ -15,18 +15,21 @@ import path from "path";
 
 const app = express();
 
+
 const allowedOrigins = [
-  "http://localhost:3000", 
+  "http://localhost:3000",
   "http://localhost:5173",
   "https://ratingeats.vercel.app",
-  "https://rating-eats.vercel.app",
-  "https://rating-eats-af5oh9w8z-ricardoux7s-projects.vercel.app",
   "https://rating-eats.vercel.app"
 ];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      /^https:\/\/rating-eats.*\.vercel\.app$/.test(origin)
+    ) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"), false);
