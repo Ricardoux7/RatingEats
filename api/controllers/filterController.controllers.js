@@ -69,7 +69,7 @@ const searchInBar = asyncHandler(async (req, res, next) => {
         restaurant.description.toLowerCase().includes(searchTerm) ||
         (Array.isArray(restaurant.categories) &&
           restaurant.categories.some((category) =>
-            category.includes(category.toLowerCase())
+            category.toLowerCase().includes(searchTerm)
           ))
     );
     restaurants = restaurants.sort((a, b) => {

@@ -98,6 +98,14 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setPopupMessage(null);
         }, 3000);
       } else if (mode === 'replace' && imageId) {
+        if (!imageUrls[0]) {
+          setError('No image URL generated. Please try again.');
+          setUploading(false);
+          return;
+        }
+        console.log('DEBUG PATCH imageId:', imageId);
+        console.log('DEBUG PATCH imageUrls[0]:', imageUrls[0]);
+        console.log('DEBUG PATCH body:', { image: imageUrls[0] });
         await api.patch(
           `restaurants/${restaurantId}/menu/images/${imageId}`,
           { image: imageUrls[0] },
@@ -177,7 +185,6 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
   };
 
   const handleCancel = () => {
-    // Si está subiendo, abortar la subida
     if (uploading && abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -243,9 +250,9 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
             {error && <p className="text-red-500">{error}</p>}
             <button
               type="submit"
-              disabled={uploading}
+              disabled={uploading || (mode === 'replace' && selectedFiles.length === 0)}
               className="bg-[#258A00] text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-[#1e6b00] transition"
-              style={uploading ? { opacity: 0.5, pointerEvents: 'none' } : {}}
+              style={uploading || (mode === 'replace' && selectedFiles.length === 0) ? { opacity: 0.5, pointerEvents: 'none' } : {}}
             >
               {mode === 'replace' ? 'Replace' : 'Upload'}
             </button>
