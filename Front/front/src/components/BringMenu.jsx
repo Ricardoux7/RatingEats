@@ -77,7 +77,7 @@ const BringMenu = ({ restaurantId }) => {
     <div className="w-full max-w-3xl mx-auto">
       <Slider {...settings} className='mb-10'>
         {menuItems.map((item, index) => {
-          const imagePath = item.url ? `${imageURL}${item.url}` : '';
+          const imagePath = item.image ? item.image.url : null;
           return (
             <div key={item._id || index} className="px-2 h-60 flex flex-col items-center hover:scale-105 transition-transform duration-500">
               {imagePath && (

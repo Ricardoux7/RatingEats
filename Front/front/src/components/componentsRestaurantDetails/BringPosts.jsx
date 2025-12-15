@@ -114,7 +114,7 @@ const BringPosts = ({ restaurantId, userToken, onDelete }) => {
           posts
             .filter(post => post.image && post.image.url)
             .map((post) => {
-              const imageUrl = `${BACKEND_URL}${post.image.url}`;
+              const imageUrl = post.image.url ? post.image.url : null;
               return (
                 <div
                   key={post._id}

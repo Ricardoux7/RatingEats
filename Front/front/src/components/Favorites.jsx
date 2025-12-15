@@ -40,7 +40,6 @@
             });
             setFavorites(response.data);
           } catch (err) {
-            //console.error("Error fetching favorites:", err);
           }
         }
       };

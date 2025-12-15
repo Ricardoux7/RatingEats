@@ -104,7 +104,8 @@ const Profile = () => {
                 ) : (
                   <div className='grid grid-cols-2 md:grid-cols-3 gap-4 mt-4'>
                     {favorites.map((restaurant) => {
-                      const imageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : "../icons/image-not-found.png";
+                      const imageUrl = restaurant.images && restaurant.images.length > 0 ? restaurant.images[0].url
+                        : '../icons/image-not-found.png';
                       return (
                         <div key={restaurant._id} className="p-4 mb-4 rounded-lg cursor-pointer transition" onClick={() => navigate(`/restaurants/${restaurant._id}`)}> 
                           <div>
@@ -160,7 +161,7 @@ const Profile = () => {
             <div>
               <p className='text-[2rem] mt-10 mb-5 font-medium'>Favorite Restaurants</p>
               <div className='flex flex-wrap md:items-center md:justify-center xl:justify-start'>{favorites.map((restaurant) => {
-                const imageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : "../icons/image-not-found.png";
+                const imageUrl = restaurant.images && restaurant.images.length > 0 ? restaurant.images[0].url : '/icons/image-not-found.png';
                 return (
                   <div key={restaurant._id} className="p-4 mb-4 rounded-lg cursor-pointer transition border-b border-gray-200 " onClick={() => navigate(`/restaurants/${restaurant._id}`)}> 
                     <div className='w-[400px] h-[450px] border-r border-gray-200 flex flex-col gap-2'>

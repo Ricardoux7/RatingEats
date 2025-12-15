@@ -79,8 +79,8 @@ const MyRestaurants = () => {
         <>
           <div className="gap-4 hidden md:grid grid-cols-3 mt-8">
             {restaurants.map((restaurant) => {
-              const imageUrl = restaurant.images && restaurant.images.length > 0 
-                ? `${BACKEND_URL}${restaurant.images[0].url}` 
+              const imageUrl = restaurant.images && restaurant.images.length > 0
+                ? restaurant.images[0].url
                 : "../icons/image-not-found.png";
               return (
                 <div
@@ -99,8 +99,8 @@ const MyRestaurants = () => {
         <div className="gap-4 md:hidden grid grid-cols-1 mt-8 justify-center items-center mx-auto">
           
             {restaurants.map((restaurant) => {
-              const imageUrl = restaurant.images && restaurant.images.length > 0 
-                ? `${BACKEND_URL}${restaurant.images[0].url}` 
+              const imageUrl = restaurant.images && restaurant.images.length > 0
+                ? restaurant.images[0].url
                 : "../icons/image-not-found.png";
               return (
                 <div

@@ -75,7 +75,9 @@ const RestaurantDetails = () => {
     </div>;
   }
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const imageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : '../icons/image-not-found.png';
+  const imageUrl = restaurant.images && restaurant.images.length > 0
+    ? restaurant.images[0].url
+    : '/icons/image-not-found.png';
   const imagesMenuUrl = restaurant.menu && restaurant.menu.length > 0;
 
   if(favorites.some(fav => fav._id === restaurant._id)){

@@ -127,7 +127,7 @@ const ManageMenu = ({ restaurantId }) => {
               )}
               <Zoom>
                 <img
-                  src={`${BACKEND_URL}${item.url}`}
+                  src={item.url}
                   alt={item.name}
                   className="w-full h-48 md:h-56 lg:h-64 xl:h-72 object-cover rounded-md"
                 />

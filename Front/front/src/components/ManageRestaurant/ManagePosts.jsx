@@ -102,7 +102,7 @@ const ManagePosts = ({ restaurantId, userToken }) => {
       ) : (
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start'>
         {posts.map((post) => {
-          const imageUrl = post.image && post.image.url ? `${BACKEND_URL}${post.image.url}` : null;
+          const imageUrl = post.image && post.image.url ? post.image.url : null;
           return (
             <div key={post._id} className='w-full rounded-lg shadow-lg text-[1.2rem] text-[#171a1f] break-words h-auto flex flex-col gap-4 p-4'>
               {imageUrl && <img src={imageUrl} alt="" className='w-full h-[200px]'/>}

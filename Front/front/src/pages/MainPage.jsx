@@ -114,7 +114,9 @@ const MainPage = ({searchRestaurants, setSearchRestaurants, searchError, filters
   const handleViewDetails = () => {
     navigate(`/restaurants/${restaurant._id}`);
   }
-  const imageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : "../icons/image-not-found.png";
+  const imageUrl = restaurant.images && restaurant.images.length > 0
+    ?  restaurant.images[0].url
+    : '/icons/image-not-found.png';
     return (
       <div
         key={restaurant._id}

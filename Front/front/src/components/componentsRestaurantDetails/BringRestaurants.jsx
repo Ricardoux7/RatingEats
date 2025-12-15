@@ -62,7 +62,9 @@ const BringRestaurants = () => {
     
       <div className='grid grid-cols-2 md:grid-cols-3 gap-4 p-4 w-full md:w-[60%]'>
         {bringRestaurant && bringRestaurant.map((restaurant) => {
-          const restaurantImageUrl = restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant.images[0].url}` : '../icons/image-not-found.png';
+          const restaurantImageUrl = restaurant.images && restaurant.images.length > 0
+            ? restaurant.images[0].url
+            : '/icons/image-not-found.png';
           return (
             <div key={restaurant._id} className="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:shadow-xl hover:scale-[1.02]" onClick={() => handleViewDetails(restaurant)}>  
               <img className="w-full h-48 object-cover" src={restaurantImageUrl} alt={restaurant.images && restaurant.images[0]?.alt ? restaurant.images[0].alt : restaurant.name} />

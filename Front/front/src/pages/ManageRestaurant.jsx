@@ -326,7 +326,7 @@ const MyRestaurant = () => {
               <div className='flex gap-4 p-4 object-cover overflow-x-scroll scrollbar-thin w-full menu-scrollbar'>
                 {imagesMenuUrl ? (
                   restaurant.menu.map((menuItem, i) => {
-                    const menuImageUrl = `${BACKEND_URL}${menuItem.url}`;
+                    const menuImageUrl = menuItem.url;
                     return (
                       <div key={i} className='w-fit shrink-0'>
                         <img src={menuImageUrl} alt="Menu Image" className="w-[200px] h-[200px] object-cover rounded-lg cursor-pointer" onClick={() => { setSelectedImage(menuImageUrl); setShowImage(true); }} />
