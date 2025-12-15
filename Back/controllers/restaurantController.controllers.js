@@ -202,7 +202,7 @@ const getAllRestaurants = asyncHandler(async (req, res) => {
  */
 const uploadImage = asyncHandler(async (req, res) => {
   const restaurantId = req.params.id;
-  const { image, alt, isHeader } = req.body;
+  const { image, alt, isHeader, replaceMainImage } = req.body;
 
   if (!image) {
     res.status(400);
@@ -225,12 +225,17 @@ const uploadImage = asyncHandler(async (req, res) => {
     isHeader: isHeader === "true" || isHeader === true,
   };
 
-  if (!restaurant.images) restaurant.images = [];
-  restaurant.images.push(newImage);
+  if (replaceMainImage) {
+    // Sobrescribe la imagen principal
+    restaurant.images = [newImage];
+  } else {
+    if (!restaurant.images) restaurant.images = [];
+    restaurant.images.push(newImage);
+  }
   await restaurant.save();
 
   res.status(200).json({
-    message: "Image uploaded successfully",
+    message: replaceMainImage ? "Main image replaced successfully" : "Image uploaded successfully",
     image: newImage,
   });
 });
@@ -433,7 +438,6 @@ const updateBannerImage = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Restaurant not found");
   }
-  // Remove previous banner images
   if (restaurant.images && restaurant.images.length > 0) {
     restaurant.images = restaurant.images.filter((img) => !img.isHeader);
   } else {

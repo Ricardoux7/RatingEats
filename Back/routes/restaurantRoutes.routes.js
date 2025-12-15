@@ -216,6 +216,16 @@ router
     protect,
     hasRestaurantRole(["owner", "operator"]),
     uploadImage
+  )
+  .patch(
+    protect,
+    hasRestaurantRole(["owner", "operator"]),
+    async (req, res, next) => {
+      // Permite reemplazar la imagen principal
+      req.body.replaceMainImage = true;
+      next();
+    },
+    uploadImage
   );
 router
   .route("/:idRestaurant/operators")
