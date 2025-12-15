@@ -70,7 +70,6 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
       }
 
       if (mode === 'add') {
-        // El backend espera { images: [url1, url2, ...] }
         const payload = { images: imageUrls };
         await api.post(`restaurants/${restaurantId}/menu/images`, payload, {
           headers: {
@@ -87,7 +86,6 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setPopupMessage(null);
         }, 3000);
       } else if (mode === 'replace' && imageId) {
-        // El backend espera { image: url }
         await api.patch(
           `restaurants/${restaurantId}/menu/images/${imageId}`,
           { image: imageUrls[0] },
@@ -144,11 +142,9 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         }, 3000);
       }
     } catch (err) {
-      // Mostrar el error real del backend y loguear para depuración
       let backendMsg = err?.response?.data?.message || err?.message || 'Error uploading image. Please try again.';
       setError(backendMsg);
       setShowPopup(true);
-      // Log completo para depuración
       if (err?.response) {
         console.error('Upload error:', err.response);
       } else {
