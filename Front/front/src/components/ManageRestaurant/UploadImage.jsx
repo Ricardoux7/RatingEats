@@ -63,6 +63,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
     try {
       let imageUrls = [];
       if (mode === 'add' || mode === 'replace' || mode === 'bannerUpload') {
+        console.log(import.meta.env.VITE_BLOB_READ_WRITE_TOKEN)
         for (const file of selectedFiles) {
           const { url } = await put(
             `images/${Date.now()}-${file.name}`,
