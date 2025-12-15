@@ -165,7 +165,7 @@ const MyRestaurant = () => {
           <button className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]' onClick={() => setActiveSection('editInfo')}>
             Edit information
           </button>
-          <button className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]' onClick={() => setActiveSection('postsUpload')}>
+          <button className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]' onClick={() => setActiveSection('uploadPost')}>
             Upload posts
           </button>
           <button onClick={() => setActiveSection('addOperator')} className='h-auto w-[90%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[80%]'>Add Operator</button>
@@ -250,7 +250,7 @@ const MyRestaurant = () => {
               {activeSection === 'menu' && restaurant && (
                 <ManageMenu restaurantId={restaurant._id} />
               )}
-              {activeSection === 'postsUpload' && restaurant && (
+              {activeSection === 'uploadPost' && restaurant && (
                 <UploadPost restaurantId={restaurant._id} />
               )}
               {activeSection === 'deleteRestaurant' && restaurant && (
@@ -365,7 +365,7 @@ const MyRestaurant = () => {
         {activeSection === 'menu' && restaurant && (
           <ManageMenu restaurantId={restaurant._id} />
         )}
-        {activeSection === 'postsUpload' && restaurant && (
+        {activeSection === 'uploadPost' && restaurant && (
           <UploadPost restaurantId={restaurant._id} />
         )}
         {activeSection === 'addOperator' && restaurant && (

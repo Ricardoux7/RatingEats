@@ -32,7 +32,7 @@
  *
  * @module UploadImage
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import api from '../../api/api';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Zoom from 'react-medium-image-zoom'
@@ -49,6 +49,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
   const [popupMessage, setPopupMessage] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const { user } = useAuth();
+  const abortControllerRef = useRef(null);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -60,34 +61,32 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
     }
 
     setUploading(true);
+    // Crear un AbortController para cancelar peticiones
+    abortControllerRef.current = new AbortController();
 
     try {
       let imageUrls = [];
       if (mode === 'add' || mode === 'replace' || mode === 'bannerUpload') {
         for (const file of selectedFiles) {
+          // Si se canceló, abortar
+          if (abortControllerRef.current.signal.aborted) throw new Error('Upload cancelled');
           const { url } = await put(
             `images/${Date.now()}-${file.name}`,
             file,
-            { access: 'public', token:  token }
+            { access: 'public', token:  token, signal: abortControllerRef.current.signal }
           );
           imageUrls.push(url);
         }
       }
-
-      // Debug: mostrar qué URLs se van a enviar
-      console.log('imageUrls:', imageUrls);
-
       if (mode === 'add') {
-        // Si el backend espera array de objetos { url }, descomenta la siguiente línea:
-        // const payload = { images: imageUrls.map(url => ({ url })) };
-        // Si espera array de strings, usa la siguiente:
         const payload = { images: imageUrls };
         console.log('Payload enviado al backend:', payload);
         await api.post(`restaurants/${restaurantId}/menu/images`, payload, {
           headers: {
             Authorization: `Bearer ${user.token}`,
             'Content-Type': 'application/json',
-          }
+          },
+          signal: abortControllerRef.current.signal
         });
         setSelectedFiles([]);
         setPopupMessage('Image uploaded successfully.');
@@ -105,7 +104,8 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
             headers: {
               Authorization: `Bearer ${user.token}`,
               'Content-Type': 'application/json',
-            }
+            },
+            signal: abortControllerRef.current.signal
           }
         );
         setSelectedFiles([]);
@@ -117,12 +117,13 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setPopupMessage(null);
         }, 3000);
       } else if (mode === 'postUpload') {
-        const { url } = await put(`posts/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public', token: token });
+        const { url } = await put(`posts/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public', token: token, signal: abortControllerRef.current.signal });
         await api.post(`/${restaurantId}/posts`, { image: url, content }, {
           headers: {
             Authorization: `Bearer ${user.token}`,
             'Content-Type': 'application/json',
-          }
+          },
+          signal: abortControllerRef.current.signal
         });
         setSelectedFiles([]);
         setContent('');
@@ -134,12 +135,13 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setPopupMessage(null);
         }, 3000);
       } else if (mode === 'bannerUpload') {
-        const { url } = await put(`banners/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public', token: token });
+        const { url } = await put(`banners/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public', token: token, signal: abortControllerRef.current.signal });
         const response = await api.patch(`restaurants/${restaurantId}/images/banner`, { image: url }, {
           headers: {
             Authorization: `Bearer ${user.token}`,
             'Content-Type': 'application/json',
-          }
+          },
+          signal: abortControllerRef.current.signal
         });
         setSelectedFiles([]);
         setPopupMessage('Banner image uploaded successfully.');
@@ -167,12 +169,17 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
       }, 3000);
     } finally {
       setUploading(false);
+      abortControllerRef.current = null;
       if (onUploadSuccess) onUploadSuccess();
     }
     return;
   };
 
   const handleCancel = () => {
+    // Si está subiendo, abortar la subida
+    if (uploading && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
     setSelectedFiles([]);
     setError(null);
     setPopupMessage(null);
@@ -196,6 +203,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
               onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
               onClick={(e) => e.target.value = null}
               className="border border-gray-300 rounded-lg p-2 w-full"
+              disabled={uploading}
             />
             {mode === 'postUpload' && (
               <input
@@ -204,6 +212,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="border border-gray-300 rounded-lg p-2 w-full"
+                disabled={uploading}
               />
             )}
             {selectedFiles.length > 0 && (
@@ -223,6 +232,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
                   type="button"
                   onClick={handleCancel}
                   className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded-lg shadow transition duration-150 ease-in-out mt-2"
+                  disabled={uploading}
                 >
                   Clear
                 </button>
@@ -234,6 +244,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
               type="submit"
               disabled={uploading}
               className="bg-[#258A00] text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-[#1e6b00] transition"
+              style={uploading ? { opacity: 0.5, pointerEvents: 'none' } : {}}
             >
               {mode === 'replace' ? 'Replace' : 'Upload'}
             </button>
@@ -241,6 +252,8 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
               type="button"
               onClick={handleCancel}
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded-lg shadow transition duration-150 ease-in-out mt-2"
+              disabled={!uploading}
+              style={!uploading ? { opacity: 0.5, pointerEvents: 'none' } : {}}
             >
               Cancel
             </button>

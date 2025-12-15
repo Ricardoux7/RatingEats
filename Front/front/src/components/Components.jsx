@@ -318,14 +318,14 @@ const UserMenu = ({ onClose }) => {
       onClick={e => e.stopPropagation()}
     >
       <button
-        className="w-full text-left px-5 py-3 rounded-lg font-semibold text-[#1D2025] transition-all duration-150 bg-gradient-to-r from-[#f8fff8] to-[#e6fbe6] hover:from-[#e6fbe6] hover:to-[#c6f7c6] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2DA800]/40"
+        className="w-full text-left px-5 py-3 rounded-lg font-semibold text-[#1D2025] transition-all duration-150 bg-linear-to-r from-[#f8fff8] to-[#e6fbe6] hover:from-[#e6fbe6] hover:to-[#c6f7c6] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#2DA800]/40"
         onClick={() => {buttonName === 'Login' ? handleLogIn() : navigate('/profile'); onClose();}}
       >
         {buttonName}
       </button>
       {buttonName === 'Login' && (
         <button
-          className="w-full text-left px-5 py-3 rounded-lg font-semibold text-[#2DA800] border border-[#2DA800] bg-gradient-to-r from-[#e6fbe6] to-[#f8fff8] hover:from-[#c6f7c6] hover:to-[#e6fbe6] shadow-sm hover:shadow-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#2DA800]/40"
+          className="w-full text-left px-5 py-3 rounded-lg font-semibold text-[#2DA800] border border-[#2DA800] bg-linear-to-r from-[#e6fbe6] to-[#f8fff8] hover:from-[#c6f7c6] hover:to-[#e6fbe6] shadow-sm hover:shadow-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#2DA800]/40"
           onClick={() => { navigate('/register'); onClose(); }}
         >
           Register
@@ -333,7 +333,7 @@ const UserMenu = ({ onClose }) => {
       )}
       {buttonName === 'Profile' && (
         <button
-          className="w-full text-left px-5 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#ff5f5f] to-[#ff2d2d] hover:from-[#ff2d2d] hover:to-[#b80000] shadow-sm hover:shadow-md transition-all duration-150 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"
+          className="w-full text-left px-5 py-3 rounded-lg font-semibold text-white bg-linear-to-r from-[#ff5f5f] to-[#ff2d2d] hover:from-[#ff2d2d] hover:to-[#b80000] shadow-sm hover:shadow-md transition-all duration-150 mt-1 focus:outline-none focus:ring-2 focus:ring-red-400"
           onClick={handleLogout}
         >
           Logout
@@ -406,6 +406,7 @@ const AsideManager = ({ setTitle }) => {
     { label: 'Posts History', onClick: () => setTitle('postsHistory') },
     { label: 'Menu Management', onClick: () => setTitle('menu') },
     { label: 'Edit information', onClick: () => setTitle('editInfo') },
+    { label: 'Upload Post', onClick: () => setTitle('uploadPost') },
     { label: 'Add Operator', onClick: () => setTitle('addOperator') },
     { label: 'Delete Operator', onClick: () => setTitle('deleteOperator') },
     { label: 'Delete Restaurant', onClick: () => setTitle('deleteRestaurant'), danger: true },
