@@ -75,6 +75,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
 
       if (mode === 'add') {
         const payload = { images: imageUrls };
+        console.log('TOKEN:', import.meta.env.VITE_BLOB_READ_WRITE_TOKEN);
         await api.post(`restaurants/${restaurantId}/menu/images`, payload, {
           headers: {
             Authorization: `Bearer ${user.token}`,
