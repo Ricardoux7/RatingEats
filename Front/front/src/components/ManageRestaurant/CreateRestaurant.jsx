@@ -260,7 +260,7 @@ const HandleCreate = ({ user }) => {
             <div className={`${slideStyles} py-10 mt-15 text-center`}>
               <Logo />
               <label className={labelStyles}>
-                Categories:
+                Categories (must be comma separated):
                 <input type="text" value={categories} onChange={(e) => setCategories(e.target.value)} className={inputStyles} required disabled={!!restaurantId}/>
               </label>
               <label className={labelStyles}>

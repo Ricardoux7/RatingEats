@@ -70,9 +70,12 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
       }
 
       if (mode === 'add') {
-        await api.post(`restaurants/${restaurantId}/menu/images`, { images: imageUrls }, {
+        // El backend espera { images: [url1, url2, ...] }
+        const payload = { images: imageUrls };
+        await api.post(`restaurants/${restaurantId}/menu/images`, payload, {
           headers: {
             Authorization: `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
           }
         });
         setSelectedFiles([]);
@@ -84,12 +87,14 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setPopupMessage(null);
         }, 3000);
       } else if (mode === 'replace' && imageId) {
+        // El backend espera { image: url }
         await api.patch(
           `restaurants/${restaurantId}/menu/images/${imageId}`,
           { image: imageUrls[0] },
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
+              'Content-Type': 'application/json',
             }
           }
         );
@@ -106,6 +111,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         await api.post(`/${restaurantId}/posts`, { image: url, content }, {
           headers: {
             Authorization: `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
           }
         });
         setSelectedFiles([]);
@@ -122,6 +128,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         const response = await api.patch(`restaurants/${restaurantId}/images/banner`, { image: url }, {
           headers: {
             Authorization: `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
           }
         });
         setSelectedFiles([]);
@@ -137,8 +144,16 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         }, 3000);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error uploading image. Please try again.');
+      // Mostrar el error real del backend y loguear para depuración
+      let backendMsg = err?.response?.data?.message || err?.message || 'Error uploading image. Please try again.';
+      setError(backendMsg);
       setShowPopup(true);
+      // Log completo para depuración
+      if (err?.response) {
+        console.error('Upload error:', err.response);
+      } else {
+        console.error('Upload error:', err);
+      }
       setTimeout(() => {
         setShowPopup(false);
       }, 3000);
@@ -151,6 +166,8 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
 
   const handleCancel = () => {
     setSelectedFiles([]);
+    setError(null);
+    setPopupMessage(null);
     if (onClear) onClear();
     if (onClose) onClose();
   };
