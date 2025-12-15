@@ -19,9 +19,12 @@ import path from "path";
  */
 const uploadMenuImage = asyncHandler(async (req, res) => {
   const restaurantId = req.params.id;
-  const { images } = req.body; // Espera un array de objetos { url, alt, isHeader }
+  let { images } = req.body;
   if (!images || !Array.isArray(images) || images.length === 0) {
     return res.status(400).json({ message: "No images uploaded" });
+  }
+  if (typeof images[0] === 'string') {
+    images = images.map(url => ({ url }));
   }
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant || restaurant.isDeleted) {
@@ -31,7 +34,6 @@ const uploadMenuImage = asyncHandler(async (req, res) => {
   if (!restaurant.menu) {
     restaurant.menu = [];
   }
-  // Solo acepta imágenes con url válida
   const validImages = images.filter(img => img.url && typeof img.url === 'string' && img.url.startsWith('http'));
   if (validImages.length === 0) {
     return res.status(400).json({ message: "No valid image URLs provided" });
