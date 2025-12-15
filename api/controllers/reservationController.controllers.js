@@ -121,7 +121,7 @@ const getReservationsToManage = asyncHandler(async (req, res) => {
   })
     .sort({ dateReservation: 1, time: 1 })
     .populate("userId", "customerName phoneNumber");
-  res.status(200).json(reservations);
+  res.status(200).json({ docs: reservations });
 });
 
 /**

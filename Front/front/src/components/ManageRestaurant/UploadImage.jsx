@@ -74,8 +74,15 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         }
       }
 
+      // Debug: mostrar qué URLs se van a enviar
+      console.log('imageUrls:', imageUrls);
+
       if (mode === 'add') {
+        // Si el backend espera array de objetos { url }, descomenta la siguiente línea:
+        // const payload = { images: imageUrls.map(url => ({ url })) };
+        // Si espera array de strings, usa la siguiente:
         const payload = { images: imageUrls };
+        console.log('Payload enviado al backend:', payload);
         await api.post(`restaurants/${restaurantId}/menu/images`, payload, {
           headers: {
             Authorization: `Bearer ${user.token}`,
