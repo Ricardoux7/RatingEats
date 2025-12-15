@@ -33,7 +33,7 @@ const Filter = ({ filters, setFilters, onFilterClick }) => {
     setSelectedRating(filters.rating);
   }, [filters]);
 
-  const categories = ['Italiana', 'Chinese', 'Mexican', 'Indian', 'Thai', 'Vegetarian', 'Vegan', 'Venezolana', 'Fast Food', 'Seafood'];
+  const categories = ['Italiana', 'China', 'Mexicana', 'Pizzeria', 'Japonesa', 'Thai', 'Vegetariana', 'Vegana', 'Venezolana', 'Comida rapida', 'Hamburguesas', 'Postres', 'Cafeteria', 'Coreana', 'Asiatica', 'Americana', 'Europea'];
 
   const handleApply = () => {
     setFilters({

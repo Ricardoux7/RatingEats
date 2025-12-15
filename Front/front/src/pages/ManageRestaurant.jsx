@@ -99,6 +99,10 @@ const MyRestaurant = () => {
     } catch (err) {
       }
   }
+  if (!isLoading && !restaurant) {
+    navigate('/no-permission', { replace: true });
+    return null;
+  }
   return (
     <>
       <HeaderDesktop />

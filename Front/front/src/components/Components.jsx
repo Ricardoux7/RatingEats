@@ -395,7 +395,19 @@ const HeaderProfile = ({ title, setTitle, name }) => {
   );
 }
 
-const AsideManager = ({  setTitle }) => {
+const AsideManager = ({ setTitle }) => {
+  const buttons = [
+    { label: 'Restaurant Details', onClick: () => setTitle('details') },
+    { label: 'Reservations history', onClick: () => setTitle('reservations') },
+    { label: 'Pending Reservations', onClick: () => setTitle('pending') },
+    { label: 'Posts Management', onClick: () => setTitle('posts') },
+    { label: 'Posts History', onClick: () => setTitle('postsHistory') },
+    { label: 'Menu Management', onClick: () => setTitle('menu') },
+    { label: 'Edit information', onClick: () => setTitle('editInfo') },
+    { label: 'Add Operator', onClick: () => setTitle('addOperator') },
+    { label: 'Delete Operator', onClick: () => setTitle('deleteOperator') },
+    { label: 'Delete Restaurant', onClick: () => setTitle('deleteRestaurant'), danger: true },
+  ];
   return (
     <aside className="flex p-4 border-gray-300 bg-white items-center md:hidden relative ">
       <input type="checkbox" id="menu-toggle" className="peer hidden" />
@@ -406,58 +418,20 @@ const AsideManager = ({  setTitle }) => {
         htmlFor="menu-toggle"
         className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-40 hidden peer-checked:block"
       />
-      <div className="w-[50vw] fixed top-0 left-0 h-full bg-white shadow-lg z-50 flex flex-col gap-4 p-6 -translate-x-full peer-checked:translate-x-0 transition-transform duration-300 peer-checked:visible invisible overflow-y-scroll">
+      <div className="w-[70vw] max-w-xs fixed top-0 left-0 h-full bg-white shadow-lg z-50 flex flex-col gap-3 p-4 -translate-x-full peer-checked:translate-x-0 transition-transform duration-300 peer-checked:visible invisible overflow-y-auto">
         <label htmlFor="menu-toggle" className="self-end cursor-pointer">
           <span className="text-2xl"></span>
         </label>
-        <button
-            className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'
-            onClick={() => setTitle('details')}
-          >
-            Restaurant Details
-          </button>
+        {buttons.map((btn, idx) => (
           <button
-            className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'
-            onClick={() => setTitle('reservations')}
+            key={btn.label}
+            className={`w-full px-4 py-3 rounded-lg font-semibold text-[1.1rem] flex items-center justify-center transition-all duration-150 shadow-sm border focus:outline-none focus:ring-2 focus:ring-green-400/40 bg-gradient-to-r from-[#f8fff8] to-[#e6fbe6] hover:from-[#e6fbe6] hover:to-[#c6f7c6] border-[#DEE1E6] text-[#1D2025] whitespace-nowrap overflow-hidden text-ellipsis ${btn.danger ? 'bg-gradient-to-r from-[#ff5f5f] to-[#ff2d2d] text-white border-none hover:from-[#ff2d2d] hover:to-[#b80000] focus:ring-red-400' : ''} max-w-full min-h-[48px]`}
+            onClick={btn.onClick}
+            title={btn.label}
           >
-            Reservations history
+            <span className="block w-full truncate">{btn.label}</span>
           </button>
-          <button
-            className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'
-            onClick={() => setTitle('pending')}
-          >
-            Pending Reservations
-          </button>
-          <button
-            className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'
-            onClick={() => setTitle('posts')}
-          >
-            Posts Management
-          </button>
-          <button
-            className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'
-            onClick={() => setTitle('postsHistory')}
-          >
-            Posts History
-          </button>
-          <button
-            className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'
-            onClick={() => setTitle('menu')}
-          >
-            Menu Management
-          </button>
-          <button className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center' onClick={() => setTitle('editInfo')}>
-            Edit information
-          </button>
-          <button onClick={() => setTitle('addOperator')} className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'>
-            Add Operator
-          </button>
-          <button onClick={() => setTitle('deleteOperator')} className='h-auto w-[80%] border-2 border-[#DEE1E6] bg-white text-black font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center'>
-            Delete Operator
-          </button>
-          <button className='h-auto w-[80%] bg-red-500 text-white font-semibold rounded-md p-2 text-[1.2rem] flex items-center justify-center' onClick={() => setTitle('deleteRestaurant')}>
-            delete Restaurant
-          </button>
+        ))}
       </div>
     </aside>
   );

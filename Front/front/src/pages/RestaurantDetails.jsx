@@ -88,7 +88,7 @@ const RestaurantDetails = () => {
 
   return (
     <>
-      <HeaderMobile tab={tab} setTab={setTab} />
+      <HeaderMobile tab={tab} setTab={setTab} manage={false} />
       <HeaderDesktop tab={tab} setTab={setTab} />
       {tab === 'general' && (
         <div>
