@@ -40,6 +40,7 @@ import 'react-medium-image-zoom/dist/styles.css'
 import { put } from "@vercel/blob"
 
 const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onClear, onClose, onBannerUpdate }) => {
+  const token = import.meta.env.VITE_BLOB_READ_WRITE_TOKEN;
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showForm, setShowForm] = useState(true);
   const [content, setContent] = useState('');
@@ -61,14 +62,13 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
     setUploading(true);
 
     try {
-      console.log(import.meta.env.VITE_BLOB_READ_WRITE_TOKEN)
       let imageUrls = [];
       if (mode === 'add' || mode === 'replace' || mode === 'bannerUpload') {
         for (const file of selectedFiles) {
           const { url } = await put(
             `images/${Date.now()}-${file.name}`,
             file,
-            { access: 'public', token: import.meta.env.VITE_BLOB_READ_WRITE_TOKEN }
+            { access: 'public', token:  token }
           );
           imageUrls.push(url);
         }
@@ -110,7 +110,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setPopupMessage(null);
         }, 3000);
       } else if (mode === 'postUpload') {
-        const { url } = await put(`posts/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public' });
+        const { url } = await put(`posts/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public', token: token });
         await api.post(`/${restaurantId}/posts`, { image: url, content }, {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -127,7 +127,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setPopupMessage(null);
         }, 3000);
       } else if (mode === 'bannerUpload') {
-        const { url } = await put(`banners/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public' });
+        const { url } = await put(`banners/${Date.now()}-${selectedFiles[0].name}`, selectedFiles[0], { access: 'public', token: token });
         const response = await api.patch(`restaurants/${restaurantId}/images/banner`, { image: url }, {
           headers: {
             Authorization: `Bearer ${user.token}`,
