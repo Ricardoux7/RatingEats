@@ -20,10 +20,25 @@
  *
  * @module Maps
  */
+
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { useState } from 'react';
 import { SkeletonMap } from './SkeletonsMainPage.jsx';
+import L from 'leaflet';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const customIcon = L.icon({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 const Maps = ({ geoLocation, restaurantName }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -63,7 +78,7 @@ const Maps = ({ geoLocation, restaurantName }) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={[lat, lon]}>
+          <Marker position={[lat, lon]} icon={customIcon}>
             <Popup>{restaurantName}</Popup>
           </Marker>
         </MapContainer>

@@ -79,13 +79,13 @@ const BringMenu = ({ restaurantId }) => {
         {menuItems.map((item, index) => {
           const imagePath = item.url || (item.image && item.image.url) || null;
           return (
-            <div key={item._id || index} className="px-2 h-60 flex flex-col items-center hover:scale-105 transition-transform duration-500">
+            <div key={item._id || index} className="px-2 w-[850px] h-[250px] flex flex-col items-center hover:scale-105 transition-transform duration-500">
               {imagePath && (
                 <Zoom>
                   <img
                     src={imagePath}
                     alt={item.name}
-                    className="w-60 h-60 object-cover rounded-lg mb-2 cursor-pointer"
+                    className="w-[850px] h-[250px] object-contain bg-white rounded-lg mb-2 cursor-pointer"
                   />
                 </Zoom>
               )}
