@@ -202,11 +202,12 @@ const getAllRestaurants = asyncHandler(async (req, res) => {
  */
 const uploadImage = asyncHandler(async (req, res) => {
   const restaurantId = req.params.id;
-  const { image, alt, isHeader, replaceMainImage } = req.body;
+  const imageUrl = req.body.url || req.body.image;
+  const { alt, isHeader, replaceMainImage } = req.body;
 
-  if (!image) {
+  if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.startsWith('http')) {
     res.status(400);
-    throw new Error("No image URL provided");
+    throw new Error("No valid public image URL provided");
   }
 
   const restaurant = await Restaurant.findOne({
@@ -218,24 +219,29 @@ const uploadImage = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Restaurant not found");
   }
-
+  if (replaceMainImage) {
+    const newImage = {
+      url: imageUrl,
+      alt: alt || restaurant.name + " image",
+      isHeader: isHeader === "true" || isHeader === true,
+    };
+    restaurant.images = [newImage];
+    await restaurant.save();
+    return res.status(200).json({
+      message: "Main image replaced successfully",
+      image: newImage,
+    });
+  }
   const newImage = {
-    url: image,
+    url: imageUrl,
     alt: alt || restaurant.name + " image",
     isHeader: isHeader === "true" || isHeader === true,
   };
-
-  if (replaceMainImage) {
-    // Sobrescribe la imagen principal
-    restaurant.images = [newImage];
-  } else {
-    if (!restaurant.images) restaurant.images = [];
-    restaurant.images.push(newImage);
-  }
+  if (!Array.isArray(restaurant.images)) restaurant.images = [];
+  restaurant.images.push(newImage);
   await restaurant.save();
-
   res.status(200).json({
-    message: replaceMainImage ? "Main image replaced successfully" : "Image uploaded successfully",
+    message: "Image uploaded successfully",
     image: newImage,
   });
 });
