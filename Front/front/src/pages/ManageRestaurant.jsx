@@ -53,7 +53,9 @@ const MyRestaurant = () => {
   const [showBanner, setShowBanner] = useState(false);  
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const imageUrl = restaurant && restaurant.images && restaurant.images.length > 0 ? `${BACKEND_URL}${restaurant?.images[0].url}` : '/icons/image-not-found.png';
+  const imageUrl = restaurant && restaurant.images && restaurant.images.length > 0
+  ? restaurant.images[0].url
+  : '/icons/image-not-found.png';
   const imagesMenuUrl = restaurant?.menu && restaurant.menu.length > 0;
   useEffect(() => {
     const fetchRestaurant = async () => {
