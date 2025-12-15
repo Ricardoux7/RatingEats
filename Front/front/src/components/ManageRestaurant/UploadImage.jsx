@@ -80,7 +80,8 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
       }
       if (mode === 'add') {
         const payload = { images: imageUrls };
-        console.log('Payload enviado al backend:', payload);
+        console.log('DEBUG: imageUrls:', imageUrls);
+        console.log('DEBUG: payload enviado al backend:', payload);
         await api.post(`restaurants/${restaurantId}/menu/images`, payload, {
           headers: {
             Authorization: `Bearer ${user.token}`,
