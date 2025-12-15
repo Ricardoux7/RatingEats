@@ -46,7 +46,7 @@ const LoginPage = () => {
         try {
             await login(email, password);
         } catch (error) {
-            const message = error.response?.data?.message || 'Error during login. Please try again.';
+            const message = 'Error during login. Please try again.';
             setError(message);
         } finally {
             setIsLoading(false);
