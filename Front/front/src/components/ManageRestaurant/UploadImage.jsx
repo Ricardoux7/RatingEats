@@ -108,7 +108,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         console.log('DEBUG PATCH body:', { image: imageUrls[0] });
         await api.patch(
           `restaurants/${restaurantId}/menu/images/${imageId}`,
-          { image: imageUrls[0] },
+          { url: imageUrls[0] },
           {
             headers: {
               Authorization: `Bearer ${user.token}`,

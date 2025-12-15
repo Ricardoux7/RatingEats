@@ -210,7 +210,12 @@ const SearchBarMobile = ({ setRestaurants, searchError, setSearchError, onFilter
   }, [searchTerm]);
   const handleSearch = async () => {
     try {
-      const response = await api.get('/filter/search', { params: { searchBar: searchTerm } });
+      let response;
+      if (!searchTerm.trim()) {
+        response = await api.get('/filter');
+      } else {
+        response = await api.get('/filter/search', { params: { searchBar: searchTerm } });
+      }
       setRestaurants(response.data);
     } catch (err) {
       console.error('No matching restaurants found:');
@@ -254,7 +259,12 @@ const SearchBarDesktop = ( {setRestaurants, searchError, setSearchError }) => {
   }, [searchTerm]);
     const handleSearch = async () => {
       try {
-        const response = await api.get('/filter/search', { params: { searchBar: searchTerm } });
+        let response;
+        if (!searchTerm.trim()) {
+          response = await api.get('/filter');
+        } else {
+          response = await api.get('/filter/search', { params: { searchBar: searchTerm } });
+        }
         setRestaurants(response.data);
       } catch (err) {
         console.error('Error fetching restaurants:');

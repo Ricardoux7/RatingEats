@@ -160,7 +160,7 @@ const handleSubmit = async (e) => {
                   {isLoading ? 'Loading...' : 'Sign Up'}
                 </button>
               </div>
-            <p>Don't have an account? <a href="/login" className='text-[#21C45D]'>Log in</a></p>
+            <p>Already have an account? <a href="/login" className='text-[#21C45D]'>Log in</a></p>
           </form>
       </main>
     </div>
