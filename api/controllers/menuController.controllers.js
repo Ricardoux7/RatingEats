@@ -10,25 +10,19 @@ import { unlink } from "fs/promises";
 import path from "path";
 
 /**
- * Sube imágenes al menú de un restaurante.
+ * Sube imágenes al menú de un restaurante (solo URLs, no archivos locales).
  * @function uploadMenuImage
  * @route POST /api/restaurants/:id/menu
- * @param {Request} req - Objeto de solicitud Express (archivos en req.files)
+ * @param {Request} req - Objeto de solicitud Express (body: images[])
  * @param {Response} res - Objeto de respuesta Express
  * @returns {void} Devuelve mensaje y las imágenes subidas
  */
 const uploadMenuImage = asyncHandler(async (req, res) => {
   const restaurantId = req.params.id;
-  if (!req.files || req.files.length === 0) {
+  const { images } = req.body; // Espera un array de objetos { url, alt, isHeader }
+  if (!images || !Array.isArray(images) || images.length === 0) {
     return res.status(400).json({ message: "No images uploaded" });
   }
-  const { alt, isHeader } = req.body;
-  const images = req.files.map((file) => ({
-    url: `/uploads/menu/${file.filename}`,
-    alt: alt || "",
-    size: file.size,
-    isHeader: isHeader === "true" || isHeader === true,
-  }));
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant || restaurant.isDeleted) {
     res.status(404);
@@ -37,11 +31,16 @@ const uploadMenuImage = asyncHandler(async (req, res) => {
   if (!restaurant.menu) {
     restaurant.menu = [];
   }
-  restaurant.menu.push(...images);
+  // Solo acepta imágenes con url válida
+  const validImages = images.filter(img => img.url && typeof img.url === 'string' && img.url.startsWith('http'));
+  if (validImages.length === 0) {
+    return res.status(400).json({ message: "No valid image URLs provided" });
+  }
+  restaurant.menu.push(...validImages);
   await restaurant.save();
   res.status(201).json({
     message: "Menu images uploaded successfully",
-    images,
+    images: validImages,
   });
 });
 
@@ -112,16 +111,17 @@ const getMenuImages = asyncHandler(async (req, res) => {
 });
 
 /**
- * Reemplaza una imagen existente del menú de un restaurante.
+ * Reemplaza una imagen existente del menú de un restaurante (solo URL, no archivos locales).
  * @function changeThisImage
  * @route PUT /api/restaurants/:id/menu/:imageId
- * @param {Request} req - Objeto de solicitud Express (params: id, imageId, archivo en req.file)
+ * @param {Request} req - Objeto de solicitud Express (params: id, imageId, body: image)
  * @param {Response} res - Objeto de respuesta Express
  * @returns {void} Devuelve mensaje y la nueva imagen
  */
 const changeThisImage = asyncHandler(async (req, res) => {
   const restaurantId = req.params.id;
   const imageId = req.params.imageId;
+  const { url, alt, isHeader } = req.body;
   const restaurant = await Restaurant.findById(restaurantId);
   if (!restaurant || restaurant.isDeleted) {
     res.status(404);
@@ -134,42 +134,22 @@ const changeThisImage = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Image not found");
   }
-  const oldImage = restaurant.menu[imageIndex];
-  const oldFileName = oldImage.url.split("/").pop();
-
-  try {
-    const filePath = path.join(process.cwd(), "uploads", "menu", oldFileName);
-    await unlink(filePath);
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      console.warn(
-        "File not found, might have been already deleted:",
-        oldFileName
-      );
-    }
-  }
-
-  if (!req.file) {
+  if (!url || typeof url !== 'string' || !url.startsWith('http')) {
     res.status(400);
-    throw new Error("No image uploaded to replace the existing one.");
+    throw new Error("No valid image URL provided to replace the existing one.");
   }
-
-  const { alt, isHeader } = req.body;
+  // Actualiza la imagen en el menú
   const newImage = {
-    url: `/uploads/menu/${req.file.filename}`,
-    alt: alt || oldImage.alt,
-    size: req.file.size,
-    isHeader: isHeader === "true" || isHeader === true,
+    url,
+    alt: alt || restaurant.menu[imageIndex].alt,
+    isHeader: isHeader === true || isHeader === 'true',
   };
-
   restaurant.menu[imageIndex] = {
     ...restaurant.menu[imageIndex]._doc,
     ...newImage,
   };
   await restaurant.save();
-  res
-    .status(200)
-    .json({ message: "Menu image replaced successfully", newImage });
+  res.status(200).json({ message: "Menu image replaced successfully", newImage });
 });
 
 export { uploadMenuImage, deleteMenuImage, getMenuImages, changeThisImage };

@@ -210,7 +210,6 @@ router
   .patch(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(upload.single("image")),
     updateBannerImage
   );
 router
@@ -218,7 +217,6 @@ router
   .post(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(upload.single("image")),
     uploadImage
   );
 router
@@ -240,7 +238,6 @@ router
   .post(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(uploadMenu.array("images")),
     uploadMenuImage
   );
 router
@@ -249,7 +246,6 @@ router
   .patch(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(uploadMenu.single("image")),
     changeThisImage
   );
 router
