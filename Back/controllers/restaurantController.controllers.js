@@ -8,8 +8,6 @@ import Restaurant from "../models/restaurant.models.js";
 import BusinessUser from "../models/businessUser.models.js";
 import { User } from "../models/users.models.js";
 import asyncHandler from "express-async-handler";
-import fs from "fs";
-import path from "path";
 
 /**
  * Crea un nuevo restaurante.
@@ -195,54 +193,46 @@ const getAllRestaurants = asyncHandler(async (req, res) => {
 });
 
 /**
- * Sube una imagen al restaurante.
+ * Sube una imagen al restaurante (solo URL, no archivos locales).
  * @function uploadImage
  * @route POST /api/restaurants/:id/images
- * @param {Request} req - Objeto de solicitud Express (params: id, archivo en req.file)
+ * @param {Request} req - Objeto de solicitud Express (params: id, body: image URL)
  * @param {Response} res - Objeto de respuesta Express
  * @returns {void} Devuelve mensaje y la imagen subida
  */
 const uploadImage = asyncHandler(async (req, res) => {
-  const filePath = req.file ? path.join(process.cwd(), req.file.path) : null;
+  const restaurantId = req.params.id;
+  const { image, alt, isHeader } = req.body;
 
-  try {
-    if (!req.file) {
-      res.status(400);
-      throw new Error("No image file provided");
-    }
-
-    const restaurantId = req.params.id;
-    const { filename, size } = req.file;
-
-    const restaurant = await Restaurant.findOne({
-      _id: restaurantId,
-      isDeleted: false,
-    });
-
-    if (!restaurant) {
-      res.status(404);
-      throw new Error("Restaurant not found");
-    }
-
-    const newImage = {
-      url: req.body.image,
-      alt: req.body.alt || restaurant.name + " image",
-      isHeader: req.body.isHeader === "true" || req.body.isHeader === true,
-    };
-
-    restaurant.images.push(newImage);
-    await restaurant.save();
-
-    res.status(200).json({
-      message: "Image uploaded successfully",
-      image: newImage,
-    });
-  } catch (error) {
-    if (filePath && fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-    throw error;
+  if (!image) {
+    res.status(400);
+    throw new Error("No image URL provided");
   }
+
+  const restaurant = await Restaurant.findOne({
+    _id: restaurantId,
+    isDeleted: false,
+  });
+
+  if (!restaurant) {
+    res.status(404);
+    throw new Error("Restaurant not found");
+  }
+
+  const newImage = {
+    url: image,
+    alt: alt || restaurant.name + " image",
+    isHeader: isHeader === "true" || isHeader === true,
+  };
+
+  if (!restaurant.images) restaurant.images = [];
+  restaurant.images.push(newImage);
+  await restaurant.save();
+
+  res.status(200).json({
+    message: "Image uploaded successfully",
+    image: newImage,
+  });
 });
 
 /**
@@ -419,19 +409,22 @@ const getRestaurantsToManage = asyncHandler(async (req, res) => {
 });
 
 /**
- * Sube o actualiza la imagen de banner del restaurante.
+ * Sube o actualiza la imagen de banner del restaurante (solo URL, no archivos locales).
  * @function updateBannerImage
- * @route POST /api/restaurants/:id/banner
- * @param {Request} req - Objeto de solicitud Express (params: id, archivo en req.file)
+ * @route PATCH /api/restaurants/:id/images/banner
+ * @param {Request} req - Objeto de solicitud Express (params: id, body: image URL)
  * @param {Response} res - Objeto de respuesta Express
  * @returns {void} Devuelve el restaurante actualizado con el nuevo banner
  */
 const updateBannerImage = asyncHandler(async (req, res) => {
   const restaurantId = req.params.id;
-  if (!req.file) {
+  const { image, alt } = req.body;
+
+  if (!image) {
     res.status(400);
-    throw new Error("No image uploaded for banner update.");
+    throw new Error("No image URL provided for banner update.");
   }
+
   const restaurant = await Restaurant.findOne({
     _id: restaurantId,
     isDeleted: false,
@@ -440,21 +433,25 @@ const updateBannerImage = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Restaurant not found");
   }
+  // Remove previous banner images
   if (restaurant.images && restaurant.images.length > 0) {
     restaurant.images = restaurant.images.filter((img) => !img.isHeader);
+  } else {
+    restaurant.images = [];
   }
 
-  const { filename } = req.file;
-
   const newBannerImage = {
-    url: `/uploads/${filename}`,
-    alt: req.body.alt || restaurant.name + " banner image",
-    size: req.file.size,
+    url: image,
+    alt: alt || restaurant.name + " banner image",
     isHeader: true,
   };
   restaurant.images.push(newBannerImage);
   await restaurant.save();
-  res.status(200).json(restaurant);
+  res.status(200).json({
+    message: "Banner image updated successfully",
+    bannerUrl: newBannerImage.url,
+    restaurant,
+  });
 });
 
 export {

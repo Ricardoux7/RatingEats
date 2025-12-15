@@ -7,8 +7,6 @@
 import Post from "../models/posts.models.js";
 import Restaurant from "../models/restaurant.models.js";
 import asyncHandler from "express-async-handler";
-import { unlink } from "fs/promises";
-import path from "path";
 
 /**
  * Crea un nuevo post para un restaurante.

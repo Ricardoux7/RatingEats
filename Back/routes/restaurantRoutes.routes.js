@@ -173,8 +173,6 @@ import {
   updateRestaurantValidationRules,
 } from "../middlewares/restaurantValidation.middlewares.js";
 import { protect, isOwner } from "../middlewares/authMiddleware.middlewares.js";
-import upload from "../middlewares/MiddlewaresImages/multerConfig.middlewares.js";
-import { multerErrorHandler } from "../middlewares/MiddlewaresImages/multerErrorMiddleware.middlewares.js";
 import { hasRestaurantRole } from "../middlewares/roleMiddleware.middlewares.js";
 import {
   createReview,
@@ -210,7 +208,6 @@ router
   .patch(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(upload.single("image")),
     updateBannerImage
   );
 router
@@ -218,7 +215,6 @@ router
   .post(
     protect,
     hasRestaurantRole(["owner", "operator"]),
-    multerErrorHandler(upload.single("image")),
     uploadImage
   );
 router
