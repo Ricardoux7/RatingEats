@@ -51,7 +51,7 @@ const HeaderMobile = ({ tab, setTab, manage }) => {
     };
   }, [showMenu, showNoti]);
   return (
-    <header className={`${tab ? 'h-20' : 'h-20'} top-0 left-0 right-0 flex flex-col p-4 border-gray-300 bg-white items-center md:hidden`}>
+    <header className={`${tab ? 'h-40' : 'h-20'} top-0 left-0 right-0 flex flex-col p-4 border-gray-300 bg-white items-center md:hidden`}>
       <div className="w-full flex flex-row items-center justify-between">
         <div className="flex items-center min-w-[50px]">
           {manage && <AsideManager setTitle={setTab} />}
@@ -96,23 +96,25 @@ const HeaderMobile = ({ tab, setTab, manage }) => {
         </div>
       </div>
       {tab && setTab && !manage && (
-        <div className="flex justify-center gap-4 mt-2 w-full">
-          <button
-            className={tab === 'general'
-              ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
-              : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
-            onClick={() => setTab('general')}
-          >
-            General
-          </button>
-          <button
-            className={tab === 'posts'
-              ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
-              : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
-            onClick={() => setTab('posts')}
-          >
-            Posts
-          </button>
+        <div className="w-full flex flex-col items-center mt-2">
+          <div className="flex flex-wrap justify-center gap-4 w-full">
+            <button
+              className={tab === 'general'
+                ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
+                : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
+              onClick={() => setTab('general')}
+            >
+              General
+            </button>
+            <button
+              className={tab === 'posts'
+                ? "px-4 py-2 rounded-full font-semibold bg-[#2DA800] text-white"
+                : "px-4 py-2 rounded-full font-semibold bg-[#DEE1E6] text-[#171A1F]"}
+              onClick={() => setTab('posts')}
+            >
+              Posts
+            </button>
+          </div>
         </div>
       )}
     </header>
@@ -425,7 +427,7 @@ const AsideManager = ({ setTitle }) => {
         {buttons.map((btn, idx) => (
           <button
             key={btn.label}
-            className={`w-full px-4 py-3 rounded-lg font-semibold text-[1.1rem] flex items-center justify-center transition-all duration-150 shadow-sm border focus:outline-none focus:ring-2 focus:ring-green-400/40 bg-gradient-to-r from-[#f8fff8] to-[#e6fbe6] hover:from-[#e6fbe6] hover:to-[#c6f7c6] border-[#DEE1E6] text-[#1D2025] whitespace-nowrap overflow-hidden text-ellipsis ${btn.danger ? 'bg-gradient-to-r from-[#ff5f5f] to-[#ff2d2d] text-white border-none hover:from-[#ff2d2d] hover:to-[#b80000] focus:ring-red-400' : ''} max-w-full min-h-[48px]`}
+            className={`w-full px-4 py-3 rounded-lg font-semibold text-[1.1rem] flex items-center justify-center transition-all duration-150 shadow-sm border focus:outline-none focus:ring-2 focus:ring-green-400/40 bg-linear-to-r from-[#f8fff8] to-[#e6fbe6] hover:from-[#e6fbe6] hover:to-[#c6f7c6] border-[#DEE1E6] text-[#1D2025] whitespace-nowrap overflow-hidden text-ellipsis ${btn.danger ? 'bg-linear-to-r from-[#ff5f5f] to-[#ff2d2d] text-white border-none hover:from-[#ff2d2d] hover:to-[#b80000] focus:ring-red-400' : ''} max-w-full min-h-12`}
             onClick={btn.onClick}
             title={btn.label}
           >

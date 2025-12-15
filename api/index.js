@@ -60,4 +60,9 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log("MongoDB conectado desde Vercel"))
   .catch(err => console.error("Error MongoDB:", err));
 
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});
+
 export default app;
