@@ -140,7 +140,6 @@ const changeThisImage = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("No valid image URL provided to replace the existing one.");
   }
-  // Actualiza la imagen en el menú
   const newImage = {
     url,
     alt: alt || restaurant.menu[imageIndex].alt,

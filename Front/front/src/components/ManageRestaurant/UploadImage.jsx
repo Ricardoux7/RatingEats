@@ -103,9 +103,6 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
           setUploading(false);
           return;
         }
-        console.log('DEBUG PATCH imageId:', imageId);
-        console.log('DEBUG PATCH imageUrls[0]:', imageUrls[0]);
-        console.log('DEBUG PATCH body:', { image: imageUrls[0] });
         await api.patch(
           `restaurants/${restaurantId}/menu/images/${imageId}`,
           { url: imageUrls[0] },

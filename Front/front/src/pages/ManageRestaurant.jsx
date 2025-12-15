@@ -341,6 +341,10 @@ const MyRestaurant = () => {
                   <p>No menu images available</p>
                 )}
               </div>
+              <div className='mt-5'>
+                <h2 className='text-[2rem] font-bold text-[#171A1F] pb-4 '>Statistics</h2>
+                <Statistics restaurantId={id} userToken={user.token} />
+              </div>
             </div>
           </>
         )}

@@ -169,7 +169,7 @@ const HandleCreate = ({ user }) => {
 
   const ShowPopup = () => {
     return (
-      <div className={`fixed top-0 mt-50 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${error ? 'bg-red-100' : 'bg-green-100'} p-6 rounded-lg shadow-lg z-50 flex flex-col items-center`}>
+      <div className={`fixed top-0 mt-50 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${error ? 'bg-red-100' : 'bg-green-100'} p-6 rounded-lg shadow-lg z-50 flex flex-col items-center text-center`}>
         {message && <p className={`${error ? 'text-red-600' : 'text-green-600'} text-lg font-bold`}>{message}</p>}
         <button onClick={() => setShowPopup(false)}>Close</button>
         {!error && restaurantId && (

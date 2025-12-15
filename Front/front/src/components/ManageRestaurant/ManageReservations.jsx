@@ -126,34 +126,37 @@ const ManageReservations = ({ restaurantId }) => {
             <p className="text-center text-gray-400 text-sm">Updating...</p>
           )}
         <h2 className="text-2xl font-bold mb-4">Pending reservations</h2>
-        <div className='border border-[#258A00] rounded-2xl p-4 mt-8 bg-white '>
+        <div className='border border-[#258A00] rounded-2xl p-4 mt-8 bg-white'>
           {(!reservations.docs || reservations.docs.length === 0) ? (
             <p className="text-center text-gray-600">No reservations found.</p>
           ) : (
-            <table className='min-w-full table-fixed text-left'>
-              <thead className=''>
-                <tr>
-                  <th className="w-1/5">Customer Name</th>
-                  <th className="w-1/5">Date</th>
-                  <th className="w-1/5">Time</th>
-                  <th className="w-1/5">Guests</th>
-                  <th className="w-1/5">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reservations.docs.map((reservation) => (
-                  <tr key={reservation._id} className="border-b border-gray-200">
-                    <td className="text-gray-600 w-1/5">{reservation.customerName}</td>
-                    <td className="text-gray-600 w-1/5">{reservation.dateReservation.slice(0, 10)}</td>
-                    <td className="text-gray-600 w-1/5">{reservation.time}</td>
-                    <td className="text-gray-600 w-1/5">{reservation.numberOfGuests}</td>
-                    <td className='flex gap-2'><button className='bg-[#258A00] text-white p-2 rounded' onClick={() => acceptReservation(reservation._id)}>Accept</button>
-                      <button className='bg-red-500 text-white p-2 rounded' onClick={() => rejectReservation(reservation._id)}>Reject</button>
-                    </td>
+            <div className="overflow-x-auto w-full">
+              <table className='min-w-full table-fixed text-left'>
+                <thead className=''>
+                  <tr>
+                    <th className="w-1/5 text-center">Customer Name</th>
+                    <th className="w-1/5 text-center">Date</th>
+                    <th className="w-1/5 text-center">Time</th>
+                    <th className="w-1/5 text-center">Guests</th>
+                    <th className="w-1/5 text-center">Actions</th>
                   </tr>
-              ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {reservations.docs.map((reservation) => (
+                    <tr key={reservation._id} className="border-b border-gray-200">
+                      <td className="text-gray-600 w-1/5 text-center align-middle">{reservation.customerName}</td>
+                      <td className="text-gray-600 w-1/5 text-center align-middle">{reservation.dateReservation.slice(0, 10)}</td>
+                      <td className="text-gray-600 w-1/5 text-center align-middle">{reservation.time}</td>
+                      <td className="text-gray-600 w-1/5 text-center align-middle">{reservation.numberOfGuests}</td>
+                      <td className='flex justify-center items-center gap-4'>
+                        <button className='bg-[#258A00] text-white p-2 rounded' style={{minWidth: '60px'}} onClick={() => acceptReservation(reservation._id)}>Accept</button>
+                        <button className='bg-red-500 text-white p-2 rounded' style={{minWidth: '60px'}} onClick={() => rejectReservation(reservation._id)}>Reject</button>
+                      </td>
+                    </tr>
+                ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
         {showPopup && <ReservationPopup message={popupMessage} />}
