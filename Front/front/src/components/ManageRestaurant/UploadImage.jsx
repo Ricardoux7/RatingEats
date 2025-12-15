@@ -112,6 +112,7 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
         setSelectedFiles([]);
         setPopupMessage('Image replaced successfully.');
         setShowPopup(true);
+        if (onUploadSuccess) onUploadSuccess();
         setTimeout(() => {
           if (onClose) onClose();
           setShowPopup(false);
@@ -171,7 +172,6 @@ const UploadImage = ({ restaurantId, imageId, mode = 'add', onUploadSuccess, onC
     } finally {
       setUploading(false);
       abortControllerRef.current = null;
-      if (onUploadSuccess) onUploadSuccess();
     }
     return;
   };
