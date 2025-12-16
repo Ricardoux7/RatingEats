@@ -114,6 +114,7 @@ const updateRestaurant = asyncHandler(async (req, res) => {
     "schedule",
     "capacity",
     "phoneNumber",
+    "email",
   ];
   const updates = {};
   for (const field of fields) {
@@ -132,6 +133,14 @@ const updateRestaurant = asyncHandler(async (req, res) => {
       updates[field] = newValue;
     }
   }
+  if (updates.email && updates.email !== restaurant.email) {
+    const emailExists = await Restaurant.findOne({ email: updates.email, _id: { $ne: restaurantId } });
+    if (emailExists) {
+      res.status(400);
+      throw new Error("Email is already in use by another restaurant.");
+    }
+  }
+
   if (Object.keys(updates).length === 0) {
     res.status(400);
     throw new Error("No changes detected to update.");

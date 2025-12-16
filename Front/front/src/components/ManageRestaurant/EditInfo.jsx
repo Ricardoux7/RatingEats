@@ -38,6 +38,7 @@ const EditInfo = ({ restaurantId, onUpdate, initialData }) => {
     schedule: '',
     capacity: '',
     phoneNumber: '',
+    email: '',
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
@@ -53,6 +54,7 @@ const EditInfo = ({ restaurantId, onUpdate, initialData }) => {
         schedule: initialData.schedule || '',
         capacity: initialData.capacity || '',
         phoneNumber: initialData.phoneNumber || '',
+        email: initialData.email || '',
       });
     }
   }, [initialData]);
@@ -72,6 +74,7 @@ const EditInfo = ({ restaurantId, onUpdate, initialData }) => {
       const payload = {
         ...form,
         categories: form.categories.split(',').map(c => c.trim()),
+        email: form.email,
       };
       const response = await api.patch(
         `/restaurants/${restaurantId}`,
@@ -85,13 +88,13 @@ const EditInfo = ({ restaurantId, onUpdate, initialData }) => {
       setSuccess(response.data.message || 'Information updated successfully!');
       if (onUpdate) onUpdate(response.data);
     } catch (err) {
-  const data = err.response?.data;
-  if (data?.errors && Array.isArray(data.errors)) {
-    setError(data.errors.map(e => e.message).join('\n'));
-  } else {
-    setError(data?.message || 'Error updating information. Please try again.');
-  }
-} finally {
+      const data = err.response?.data;
+      if (data?.errors && Array.isArray(data.errors)) {
+        setError(data.errors.map(e => e.message).join('\n'));
+      } else {
+        setError(data?.message || 'Error updating information. Please try again.');
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -109,6 +112,17 @@ const EditInfo = ({ restaurantId, onUpdate, initialData }) => {
             type="text"
             name="name"
             value={form.name}
+            onChange={handleChange}
+            className="w-full border border-[#2DA800] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2DA800]"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-1 font-semibold text-[#2DA800]">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
             onChange={handleChange}
             className="w-full border border-[#2DA800] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2DA800]"
             required

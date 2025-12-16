@@ -201,7 +201,6 @@ const HeaderDesktop = ( { tab, setTab } ) => {
     </header>
 }
 
-
 const SearchBarMobile = ({ setRestaurants, searchError, setSearchError, onFilterClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -372,7 +371,7 @@ const NotificationMenu = ({ onClose }) => {
 const HeaderProfile = ({ title, setTitle, name }) => {
   const navigate = useNavigate();
   return (
-    <header className="h-20 justify-between top-0 left-0 right-0 flex p-4 border-gray-300 bg-white items-center md:hidden relative">
+    <aside className="h-20 justify-between top-0 left-0 right-0 flex p-4 border-gray-300 bg-white items-center md:hidden relative">
       <input type="checkbox" id="menu-toggle" className="peer hidden" />
       <label htmlFor="menu-toggle" className="cursor-pointer z-50">
         <img src="/icons/hamburger.svg" alt="menu-hamburger" className="w-10" />
@@ -403,7 +402,7 @@ const HeaderProfile = ({ title, setTitle, name }) => {
           <img src="/icons/logo2.png" alt="logo" className="h-20 w-full object-contain" onClick={() => {navigate('/')}} />
         </div>
       </div>
-    </header>
+    </aside>
   );
 }
 

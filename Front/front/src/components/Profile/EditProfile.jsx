@@ -33,6 +33,7 @@ const EditProfile = ({id, user}) => {
   const [lastName, setLastName] = useState('')
   const [username, setUsername] = useState('')
   const [bio, setBio] = useState('')
+  const [email, setEmail] = useState('')
   const [originalUser, setOriginalUser] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState(null);
@@ -56,6 +57,7 @@ const EditProfile = ({id, user}) => {
         setLastName(response.data.lastName || '');
         setUsername(response.data.username || '');
         setBio(response.data.biography || '');
+        setEmail(response.data.email || '');
       } catch (err) {
       }
     };
@@ -76,6 +78,7 @@ const EditProfile = ({id, user}) => {
         lastName,
         username,
         biography: bio,
+        email,
       }, { headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -101,6 +104,19 @@ const EditProfile = ({id, user}) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+              required
             />
           </div>
           <div className="mb-4">
@@ -173,6 +189,19 @@ const EditProfile = ({id, user}) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md"
+              required
             />
           </div>
           <div className="mb-4">

@@ -44,7 +44,7 @@ const editProfile = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("User not found");
   }
-  const fields = ["name", "lastName", "username", "biography"];
+  const fields = ["name", "lastName", "username", "biography", "email"];
   const updates = {};
   for (const field of fields) {
     if (
@@ -55,6 +55,14 @@ const editProfile = asyncHandler(async (req, res) => {
       updates[field] = req.body[field];
     }
   }
+  if (updates.email && updates.email !== user.email) {
+    const emailExists = await User.findOne({ email: updates.email, _id: { $ne: userId } });
+    if (emailExists) {
+      res.status(400);
+      throw new Error("Email is already in use by another user.");
+    }
+  }
+
   if (Object.keys(updates).length === 0) {
     res.status(400);
     throw new Error("No changes detected to update.");

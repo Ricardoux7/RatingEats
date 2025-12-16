@@ -112,43 +112,13 @@ const updateRestaurant = asyncHandler(async (req, res) => {
     "schedule",
     "capacity",
     "phoneNumber",
-    "geoLocation",
+    "email",
   ];
   const updates = {};
   for (const field of fields) {
     const newValue = req.body[field];
     const oldValue = restaurant[field];
     if (newValue === undefined || newValue === "") continue;
-    if (field === "geoLocation") {
-      let parsedGeoLocation = newValue;
-      if (
-        Array.isArray(newValue) &&
-        typeof newValue[0] === "string"
-      ) {
-        parsedGeoLocation = newValue.map(str => {
-          if (typeof str === "string") {
-            return str
-              .replace(/\[|\]|\n|\r/g, "")
-              .split(",")
-              .map(s => Number(s.trim()));
-          }
-          return str;
-        });
-      }
-      if (
-        Array.isArray(parsedGeoLocation) &&
-        parsedGeoLocation.every(
-          arr => Array.isArray(arr) && arr.length === 2 && arr.every(n => typeof n === "number" && !isNaN(n))
-        ) &&
-        JSON.stringify(parsedGeoLocation) !== JSON.stringify(oldValue)
-      ) {
-        updates[field] = parsedGeoLocation;
-      } else if (Array.isArray(parsedGeoLocation)) {
-        res.status(400);
-        throw new Error("GeoLocation must be an array of two coordinates (latitude, longitude) por sucursal.");
-      }
-      continue;
-    }
     if (Array.isArray(oldValue) && Array.isArray(newValue)) {
       if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
         updates[field] = newValue;
@@ -161,26 +131,17 @@ const updateRestaurant = asyncHandler(async (req, res) => {
       updates[field] = newValue;
     }
   }
+  if (updates.email && updates.email !== restaurant.email) {
+    const emailExists = await Restaurant.findOne({ email: updates.email, _id: { $ne: restaurantId } });
+    if (emailExists) {
+      res.status(400);
+      throw new Error("Email is already in use by another restaurant.");
+    }
+  }
+
   if (Object.keys(updates).length === 0) {
     res.status(400);
     throw new Error("No changes detected to update.");
-  }
-
-  if (updates.geoLocation) {
-    if (
-      Array.isArray(updates.geoLocation) &&
-      typeof updates.geoLocation[0] === "string"
-    ) {
-      updates.geoLocation = updates.geoLocation.map((str) => {
-        if (typeof str === "string") {
-          return str
-            .replace(/[\[\]]/g, "")
-            .split(",")
-            .map((s) => Number(s.trim()));
-        }
-        return str;
-      });
-    }
   }
 
   const updatedRestaurant = await Restaurant.findByIdAndUpdate(

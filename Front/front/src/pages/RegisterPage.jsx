@@ -50,16 +50,15 @@ const handleSubmit = async (e) => {
     const errors = error.response?.data?.errors || [error.message];
     errors.forEach((errorMessage) => {
       const lowerCaseMessage = errorMessage.toLowerCase();
-      if (lowerCaseMessage.includes('last name')) {
+      if (lowerCaseMessage.includes('username')) {
+        newFieldErrors.username = errorMessage;
+      } else if (lowerCaseMessage.includes('last name')) {
         newFieldErrors.lastName = errorMessage;
       } else if (lowerCaseMessage.includes('name')) {
         newFieldErrors.name = errorMessage;
       }
       if (lowerCaseMessage.includes('email')) {
         newFieldErrors.email = errorMessage;
-      }
-      if (lowerCaseMessage.includes('username')) {
-        newFieldErrors.username = errorMessage;
       }
       if (lowerCaseMessage.includes('password')) {
         newFieldErrors.password = errorMessage;
@@ -154,7 +153,7 @@ const handleSubmit = async (e) => {
                   type="submit"
                   className={`group relative h-12 w-full flex justify-center items-center py-2 px-4 border border-transparent text-2xl font-medium rounded-md text-white ${
                   isLoading ? 'bg-[#21C45D] cursor-not-allowed' : 'bg-[#21C45D] hover:bg-[#61ec94] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-                   }`}
+                  }`}
                   disabled={isLoading}
                   >
                   {isLoading ? 'Loading...' : 'Sign Up'}
